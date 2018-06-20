@@ -38,3 +38,10 @@ elif testType == 5:
     data = MyDef.my_abs(str1)
     print(data)
     
+elif testType == 6:
+    MyDef.my_keyword01('Dai', 36, 'USA', 'a','b', job='SE')
+    MyDef.my_keyword02('Dai', 36, 'England', city='Qingdao', job='QA')
+    
+elif testType == 7:
+    data = MyDef.my_fact(7)
+    print(data)
