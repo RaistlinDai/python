@@ -1,6 +1,8 @@
 '''
 Created on Jun 20, 2018
 
+This is a functional class for studying
+
 @author: ftd
 '''
 import math
