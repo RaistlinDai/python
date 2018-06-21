@@ -5,10 +5,9 @@ Created on Jun 20, 2018
 '''
 from src.main.pydev.com.ftd.generalutilities.dto.UiObject import UiObject
 
-class Field(UiObject):
+class Label(UiObject):
     
-    def __init__(self, row, column, tablename, name, parent=None):
+    def __init__(self, row, column, name, parent=None):
         UiObject.__init__(self, row, column, parent)
-        self.__tablename = tablename
         self.__name = name
         
