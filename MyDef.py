@@ -37,19 +37,22 @@ def my_fact(n):
     return n * my_fact(n - 1)
 
 # The input order 01
+# name, age are mandatory parameter
+# nation is default parameter
+# city is dynamic parameter (list)
 def my_keyword01(name, age, nation='China', *city, **comments):
     print(name, age, nation, city, comments)
 # The input order 02
 def my_keyword02(name, age, nation='China', *, city, **comments):
     print(name, age, nation, city, comments)
 
-
+# The third number is the sum of the first and the second
 def my_Fibonacci(*, fir, maxC):
     n, a = 0, 0
     while n < maxC:
-        print(fir)
+        yield fir
         a, fir = fir, fir + a
         n = n + 1
     print('done')
-        
+
     

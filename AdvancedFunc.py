@@ -81,5 +81,12 @@ elif tp == 4:
 elif tp == 5:
     fir = int(input('Fibonacci start from: '))
     maxC = int(input('Fibonacci loop for: '))
-    MyDef.my_Fibonacci(fir = fir, maxC = maxC)
+    result = MyDef.my_Fibonacci(fir = fir, maxC = maxC)
+    while True:
+        try:
+            x = next(result)
+            print(x)
+        except StopIteration as e:
+            print('Generator return value:', e.value)
+            break
 
