@@ -5,7 +5,7 @@ course from: https://www.liaoxuefeng.com/wiki/0014316089557264a6b348958f449949df
 
 @author: ftd
 '''
-import MyDef
+from selftest import MyDef
 
 print('hello,world')
 

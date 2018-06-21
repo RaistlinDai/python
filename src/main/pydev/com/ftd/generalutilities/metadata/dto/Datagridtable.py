@@ -5,7 +5,6 @@ Created on Jun 21, 2018
 '''
 from src.main.pydev.com.ftd.generalutilities.metadata.dto.Datagridfield import Datagridfield
 
-
 class Datagridtable(object):
     '''
     classdocs

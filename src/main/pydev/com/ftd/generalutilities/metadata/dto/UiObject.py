@@ -7,6 +7,9 @@ Created on Jun 20, 2018
 class UiObject(object):
     
     def __init__(self, row, column, parentObj=None):
+        '''
+        Constructor
+        '''
         if isinstance(row, int):
             self.__row = row
         else:

@@ -6,7 +6,7 @@ Created on Jun 20, 2018
 from builtins import range
 from _collections_abc import Iterable
 import os 
-import MyDef
+from selftest import MyDef
 
 def my_slice():
     sl = list(range(50, 100))
