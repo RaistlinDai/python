@@ -41,7 +41,7 @@ elif testType == 5:
     print(data)
     
 elif testType == 6:
-    MyDef.my_keyword01('Dai', 36, 'USA', 'a','b', job='SE')
+    MyDef.my_keyword01('Dai', 36, 'USA', 'a', job='SE')
     MyDef.my_keyword02('Dai', 36, 'England', city='Qingdao', job='QA')
     
 elif testType == 7:
