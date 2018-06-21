@@ -43,6 +43,7 @@ def my_keyword01(name, age, nation='China', *city, **comments):
 def my_keyword02(name, age, nation='China', *, city, **comments):
     print(name, age, nation, city, comments)
 
+
 def my_Fibonacci(*, fir, maxC):
     n, a = 0, 0
     while n < maxC:
