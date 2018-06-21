@@ -22,3 +22,31 @@ class Datagrid(UiObject):
             self.__datagridtable = datagridtable
         else:
             self.__datagridtable = None
+
+    def get_tablename(self):
+        return self.__tablename
+
+
+    def get_datagridtable(self):
+        return self.__datagridtable
+
+
+    def set_tablename(self, value):
+        self.__tablename = value
+
+
+    def set_datagridtable(self, value):
+        if isinstance(value, Datagridtable):
+            self.__datagridtable = value
+        else:
+            self.__datagridtable = None
+
+
+    def del_tablename(self):
+        del self.__tablename
+
+
+    def del_datagridtable(self):
+        del self.__datagridtable
+
+    

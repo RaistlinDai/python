@@ -19,7 +19,24 @@ class UiObject(object):
         
         if parentObj:
             self.__parentObj = parentObj
-            
+
+
+    def get_parentobj(self):
+        return self.__parentObj
+
+    def set_parentobj(self, value):
+        self.__parentObj = value
+
+    def del_row(self):
+        del self.__row
+
+
+    def del_column(self):
+        del self.__column
+
+
+    def del_parentobj(self):
+        del self.__parentObj
             
     def get_row(self):
         return self.__row
