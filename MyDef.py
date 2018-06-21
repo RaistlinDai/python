@@ -1,6 +1,8 @@
 '''
 Created on Jun 20, 2018
 
+This is a functional class for studying
+
 @author: ftd
 '''
 import math
@@ -40,4 +42,13 @@ def my_keyword01(name, age, nation='China', *city, **comments):
 # The input order 02
 def my_keyword02(name, age, nation='China', *, city, **comments):
     print(name, age, nation, city, comments)
+
+def my_Fibonacci(*, fir, maxC):
+    n, a = 0, 0
+    while n < maxC:
+        print(fir)
+        a, fir = fir, fir + a
+        n = n + 1
+    print('done')
+        
     
