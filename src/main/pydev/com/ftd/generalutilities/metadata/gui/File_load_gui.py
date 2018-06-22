@@ -20,30 +20,49 @@ class File_load_gui(Frame):
         
         #main window
         self.master.title('File loader')
-        self.pack()
+        self.master.geometry('600x200')
+        self.grid(column=0, row=0, sticky=(N,W,E,S))
+        self.columnconfigure(0, weight=1)
+        self.rowconfigure(0, weight=1)
+        #add children
+        self.create_widgets()
+        self.create_buttons()
+        #layout maintain
+        self.adjust_children()
         
-        self.createWidgets()
-            
-    
-    def createWidgets(self):
-        #label
-        self.label01 = Label(None, {'text':'Select the project path:'})
-        self.label01.pack(side=TOP)
         
-        self.nameInput = Entry(self)
-        self.nameInput.pack(fill=BOTH)
+    def create_widgets(self):
         
-        self.popupButton = Button(self, text='Hello', command=(lambda: self.hello()))
-        self.popupButton.pack()
+        feet = StringVar()
+
+        #label1
+        self.label01 = Label(self, text="Select or Input the project path:")
+        self.label01.grid(column=0, row=1, sticky=(W,E))
         
+        #input
+        self.nameInput = Entry(self, width=40, textvariable=feet)
+        self.nameInput.grid(column=1, row=1, sticky=(W,E))
+        
+        
+    def create_buttons(self):
+        #button
+        self.popupButton = Button(self, text='Convert', command=(lambda: self.hello()))
         self.quitButton = Button(self, text='Quit', command=self.quit)
-        self.quitButton.pack(side=LEFT, expand=YES, fill=X)
-    
-    
+        
+        self.popupButton.grid(column=3, row=3, sticky=(E,S))
+        self.quitButton.grid(column=4, row=3, sticky=(E,S))
+        
+        
     def hello(self):
         name = self.nameInput.get()
         if name == "":
             name = 'world'
-            
+        
         messagebox.showinfo('Message', 'Hello, %s' % name)
+
+
+    def adjust_children(self):
+        for child in self.winfo_children():
+            child.grid_configure(padx=5, pady=5)
+        self.nameInput.focus()
         
