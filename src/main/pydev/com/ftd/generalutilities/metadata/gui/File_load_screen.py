@@ -7,7 +7,7 @@ from tkinter import *
 from src.main.pydev.com.ftd.generalutilities.metadata.gui.Buttom_frame import Buttom_frame
 from src.main.pydev.com.ftd.generalutilities.metadata.gui.Load_body_frame import Load_body_frame
 
-class File_load_frame(Frame):
+class File_load_screen(Frame):
     '''
     classdocs
     '''
