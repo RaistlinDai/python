@@ -23,6 +23,7 @@ class Datagrid(UiObject):
         else:
             self.__datagridtable = None
 
+
     def get_tablename(self):
         return self.__tablename
 
