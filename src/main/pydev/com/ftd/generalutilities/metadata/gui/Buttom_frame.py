@@ -5,9 +5,10 @@ Created on Jun 23, 2018
 '''
 from tkinter import *
 from src.main.pydev.com.ftd.generalutilities.metadata.gui.Load_button import Load_button
+from src.main.pydev.com.ftd.generalutilities.metadata.gui.api.IFrameConf import IFrameConf
 
 
-class Buttom_frame(Frame):
+class Buttom_frame(Frame, IFrameConf):
     '''
     classdocs
     '''
@@ -20,10 +21,12 @@ class Buttom_frame(Frame):
         Frame.__init__(self, parent, **configs)
         #button
         self.loadButton = Load_button(self, exFunc, text='Load') #set function as input parameter
-        self.quitButton = Button(self, text='Quit', command=self.quit)
-        
         self.loadButton.grid(column=3, row=3, sticky=(E,S))
+        self.loadButton.config(cursor='hand2')
+        
+        self.quitButton = Button(self, text='Quit', command=self.quit)
         self.quitButton.grid(column=4, row=3, sticky=(E,S))
+        self.quitButton.config(cursor='hand2')
         
         self.adjust_children()
     

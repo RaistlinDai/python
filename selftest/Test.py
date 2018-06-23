@@ -30,7 +30,7 @@ elif testType == 3:
     
 elif testType == 4:
     dic = {111: 'FTD', 222: 'PDJ', 333: 'ZAL'}
-    str1 = 'Value in dic: ' , dic.keys()
+    str1 = print('Value in dic: ' , dic.keys())
     inputKey = int(input(str1))
     if inputKey in dic:
         print(dic[inputKey])
@@ -41,7 +41,7 @@ elif testType == 5:
     print(data)
     
 elif testType == 6:
-    MyDef.my_keyword01('Dai', 36, 'USA', 'a', job='SE')
+    MyDef.my_keyword01('Dai', 36, 'USA', 'a', job='SE', test='aaa')
     MyDef.my_keyword02('Dai', 36, 'England', city='Qingdao', job='QA')
     
 elif testType == 7:

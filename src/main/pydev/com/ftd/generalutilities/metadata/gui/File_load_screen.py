@@ -22,6 +22,9 @@ class File_load_screen(Frame):
         #main window
         self.master.title('File loader')
         self.master.geometry('600x200')
+        #font
+        self.labelfont = ('times', 15, 'bold')
+        
         self.grid(column=0, row=0, sticky=(N,W,E,S))
         self.columnconfigure(0, weight=1)
         self.rowconfigure(0, weight=1)
@@ -43,5 +46,7 @@ class File_load_screen(Frame):
     def adjust_children(self):
         for child in self.winfo_children():
             child.grid_configure(padx=5, pady=5)
+            child.set_conf(font=self.labelfont, bg='black', fg='yellow', relief=RAISED)
+        #focus
         self.body.nameInput.focus()
     
