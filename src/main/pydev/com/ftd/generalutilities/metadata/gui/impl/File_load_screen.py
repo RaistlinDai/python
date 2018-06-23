@@ -4,8 +4,8 @@ Created on Jun 20, 2018
 @author: ftd
 '''
 from tkinter import *
-from src.main.pydev.com.ftd.generalutilities.metadata.gui.Buttom_frame import Buttom_frame
-from src.main.pydev.com.ftd.generalutilities.metadata.gui.Load_body_frame import Load_body_frame
+from src.main.pydev.com.ftd.generalutilities.metadata.gui.impl.Buttom_frame import Buttom_frame
+from src.main.pydev.com.ftd.generalutilities.metadata.gui.impl.Load_body_frame import Load_body_frame
 
 class File_load_screen(Frame):
     '''
