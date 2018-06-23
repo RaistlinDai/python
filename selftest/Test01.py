@@ -3,7 +3,7 @@ Created on Jun 20, 2018
 
 @author: ftd
 '''
-from src.main.pydev.com.ftd.generalutilities.metadata.gui.impl.File_load_screen import File_load_screen
+from src.main.pydev.com.ftd.generalutilities.metadata.gui.impl.Screen_file_load import Screen_file_load
 
 
-if __name__ == '__main__': File_load_screen().mainloop()
+if __name__ == '__main__': Screen_file_load().mainloop()

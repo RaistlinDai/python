@@ -4,10 +4,11 @@ Created on Jun 20, 2018
 @author: ftd
 '''
 from tkinter import *
-from src.main.pydev.com.ftd.generalutilities.metadata.gui.impl.Buttom_frame import Buttom_frame
-from src.main.pydev.com.ftd.generalutilities.metadata.gui.impl.Load_body_frame import Load_body_frame
+from src.main.pydev.com.ftd.generalutilities.metadata.gui.impl.Frame_bottom import Frame_bottom
+from src.main.pydev.com.ftd.generalutilities.metadata.gui.impl.Frame_body_load import Frame_body_load
+from src.main.pydev.com.ftd.generalutilities.metadata.gui.impl.Popup_filelist import Popup_filelist
 
-class File_load_screen(Frame):
+class Screen_file_load(Frame):
     '''
     classdocs
     '''
@@ -36,10 +37,10 @@ class File_load_screen(Frame):
         
     def create_widgets(self):
         #body
-        self.body = Load_body_frame(self)
+        self.body = Frame_body_load(self)
         self.body.grid(column=0, row=0, sticky=(N))
         #buttom
-        self.buttom = Buttom_frame(self, self.body.nameInput.get)
+        self.buttom = Frame_bottom(self, self.data_load)
         self.buttom.grid(column=0, row=2, sticky=(S))
         
 
@@ -47,6 +48,8 @@ class File_load_screen(Frame):
         for child in self.winfo_children():
             child.grid_configure(padx=5, pady=5)
             child.set_conf(font=self.labelfont, bg='black', fg='yellow', relief=RAISED)
-        #focus
-        self.body.nameInput.focus()
+    
+        
+    def data_load(self):
+        Popup_filelist(self)
     

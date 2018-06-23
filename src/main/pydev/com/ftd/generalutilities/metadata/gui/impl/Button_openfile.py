@@ -1,23 +1,25 @@
 '''
-Created on Jun 22, 2018
+Created on Jun 23, 2018
 
 @author: ftd
 '''
 from tkinter import Button
+from tkinter.filedialog import askdirectory
 
-class Load_button(Button):
+class Button_openfile(Button):
     '''
     classdocs
     '''
 
 
-    def __init__(self, parent=None, exFunc=None, **configs):
+    def __init__(self, parent=None, exfunc=None, **configs):
         '''
         Constructor
         '''
         Button.__init__(self, parent, **configs)
         self.bind('<Button-1>', self.click_event) #bind button click event
-        self.exfunc = exFunc
+        self.config(text='...')
+        self.__exfunc = exfunc
         
     '''
     Event
@@ -25,4 +27,5 @@ class Load_button(Button):
     '''
     def click_event(self, event):
         
-        print('Message', 'Test this, %s' % self.exfunc())
+        self.__dic = askdirectory()
+        self.__exfunc(self.__dic)
