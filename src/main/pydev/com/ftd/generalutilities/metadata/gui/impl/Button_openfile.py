@@ -29,3 +29,6 @@ class Button_openfile(Button):
         
         self.__dic = askdirectory()
         self.__exfunc(self.__dic)
+        
+        
+    

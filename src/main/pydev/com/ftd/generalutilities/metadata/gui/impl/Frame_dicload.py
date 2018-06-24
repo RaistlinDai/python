@@ -7,7 +7,7 @@ from tkinter import *
 from src.main.pydev.com.ftd.generalutilities.metadata.gui.api.IFrameConf import IFrameConf
 from src.main.pydev.com.ftd.generalutilities.metadata.gui.impl.Button_openfile import Button_openfile
 
-class Frame_body_load(Frame, IFrameConf):
+class Frame_dicload(Frame, IFrameConf):
     '''
     classdocs
     '''
@@ -18,20 +18,16 @@ class Frame_body_load(Frame, IFrameConf):
         Constructor
         '''
         Frame.__init__(self, parent, **configs)
-        
         feet = StringVar()
-
         #label1
         self.__label01 = Label(self, text="Select or Input the project path:")
         self.__label01.grid(column=0, row=1, sticky=(W))
-        
         #input
         self.__dicinput = Entry(self, width=40, textvariable=feet)
         self.__dicinput.grid(column=0, row=2, sticky=(E))
-        
-        self.__dicload = Button_openfile(self, self.reset_dicinput)
+        #button
+        self.__dicload = Button_openfile(self, self.reset_dicinput, height=1)
         self.__dicload.grid(column=1, row=2, sticky=(W))
-        
         #focus
         self.__dicinput.focus()
         

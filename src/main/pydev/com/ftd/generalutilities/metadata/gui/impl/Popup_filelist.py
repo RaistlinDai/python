@@ -11,11 +11,21 @@ class Popup_filelist(Toplevel):
     '''
 
 
-    def __init__(self, parent=None, conf=None):
+    def __init__(self, parent=None, **configs):
         '''
         Constructor
         '''
-        Toplevel.__init__(self, parent, conf)
+        Toplevel.__init__(self, parent, **configs)
         
         self.title('File lsit')
         self.geometry('300x500')
+        
+        row = Frame(self)
+        lab = Label(row, width=5, text='Metadata list:')
+        
+        row.pack(side=TOP, fill=X)
+        lab.pack(side=TOP)
+        
+    
+    def show(self):
+        self.destroy()

@@ -5,7 +5,7 @@ Created on Jun 20, 2018
 '''
 from tkinter import *
 from src.main.pydev.com.ftd.generalutilities.metadata.gui.impl.Frame_bottom import Frame_bottom
-from src.main.pydev.com.ftd.generalutilities.metadata.gui.impl.Frame_body_load import Frame_body_load
+from src.main.pydev.com.ftd.generalutilities.metadata.gui.impl.Frame_dicload import Frame_dicload
 from src.main.pydev.com.ftd.generalutilities.metadata.gui.impl.Popup_filelist import Popup_filelist
 
 class Screen_file_load(Frame):
@@ -37,7 +37,7 @@ class Screen_file_load(Frame):
         
     def create_widgets(self):
         #body
-        self.body = Frame_body_load(self)
+        self.body = Frame_dicload(self)
         self.body.grid(column=0, row=0, sticky=(N))
         #buttom
         self.buttom = Frame_bottom(self, self.data_load)
