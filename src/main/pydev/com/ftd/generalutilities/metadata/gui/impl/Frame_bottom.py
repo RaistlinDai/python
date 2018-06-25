@@ -22,19 +22,20 @@ class Frame_bottom(Frame, IFrameConf):
         Frame.__init__(self, parent, **configs)
         #button
         self.loadButton = Button_load(self, exFunc, text='Load') #set function as input parameter
-        self.loadButton.grid(column=5, row=0, sticky=(E,S))
-        self.loadButton.config(cursor='hand2')
+        #self.loadButton.grid(column=5, row=0, sticky=(E,S))
+        self.loadButton.pack(side=LEFT)
         
         self.quitButton = Button(self, text='Quit', command=self.quit_callback)
-        self.quitButton.grid(column=7, row=0, sticky=(E,S))
-        self.quitButton.config(cursor='hand2')
+        #self.quitButton.grid(column=7, row=0, sticky=(E,S))
+        self.quitButton.pack(side=RIGHT)
         
         self.adjust_children()
     
     
     def adjust_children(self):
         for child in self.winfo_children():
-            child.grid_configure(padx=10, pady=10)
+            if isinstance(child, Button):
+                child.config(cursor='hand2')
             
     
     def quit_callback(self):

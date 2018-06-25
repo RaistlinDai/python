@@ -13,9 +13,7 @@ class IFrameConf(object):
     def set_conf(self, **confs):
         
         for child in self.winfo_children():
-            
-            child.grid_configure(padx=5, pady=5)
-            
+                        
             #config
             for key in confs.keys():
                 if key == 'font':

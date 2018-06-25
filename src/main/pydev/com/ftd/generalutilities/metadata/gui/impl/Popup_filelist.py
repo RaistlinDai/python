@@ -4,6 +4,7 @@ Created on Jun 23, 2018
 @author: ftd
 '''
 from tkinter import *
+from src.main.pydev.com.ftd.generalutilities.metadata.gui.impl.Frame_selectbox import Frame_selectbox
 
 class Popup_filelist(Toplevel):
     '''
@@ -11,7 +12,7 @@ class Popup_filelist(Toplevel):
     '''
 
 
-    def __init__(self, parent=None, **configs):
+    def __init__(self, filelists, parent=None, **configs):
         '''
         Constructor
         '''
@@ -21,10 +22,14 @@ class Popup_filelist(Toplevel):
         self.geometry('300x500')
         
         row = Frame(self)
-        lab = Label(row, width=5, text='Metadata list:')
+        lab = Label(row, width=15, text='Metadata list:')
         
         row.pack(side=TOP, fill=X)
-        lab.pack(side=TOP)
+        lab.pack(side=LEFT)
+        
+        for name in filelists:
+            checkbox_row = Frame_selectbox(name)
+            checkbox_row.pack(side=BOTTOM)
         
     
     def show(self):
