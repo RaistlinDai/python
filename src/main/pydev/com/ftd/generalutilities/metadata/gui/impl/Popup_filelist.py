@@ -37,7 +37,7 @@ class Popup_filelist(Toplevel):
         sb.pack(side=RIGHT, fill=Y)
         
         for name in filelists:
-            ls.insert(END, name)
+            ls.insert(0, name)
         
         sb.config(command = ls.yview)
         ls.pack(side=LEFT)
