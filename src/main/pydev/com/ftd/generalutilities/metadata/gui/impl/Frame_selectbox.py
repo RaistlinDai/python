@@ -4,8 +4,9 @@ Created on Jun 25, 2018
 @author: ftd
 '''
 from tkinter import *
+from src.main.pydev.com.ftd.generalutilities.metadata.gui.impl.FtdFrame import FtdFrame
 
-class Frame_selectbox(Frame):
+class Frame_selectbox(FtdFrame):
     '''
     classdocs
     '''

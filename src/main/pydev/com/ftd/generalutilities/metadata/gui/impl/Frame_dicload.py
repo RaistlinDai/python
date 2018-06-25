@@ -4,10 +4,10 @@ Created on Jun 23, 2018
 @author: ftd
 '''
 from tkinter import *
-from src.main.pydev.com.ftd.generalutilities.metadata.gui.api.IFrameConf import IFrameConf
+from src.main.pydev.com.ftd.generalutilities.metadata.gui.impl.FtdFrame import FtdFrame
 from src.main.pydev.com.ftd.generalutilities.metadata.gui.impl.Button_openfile import Button_openfile
 
-class Frame_dicload(Frame, IFrameConf):
+class Frame_dicload(FtdFrame):
     '''
     classdocs
     '''
@@ -18,13 +18,13 @@ class Frame_dicload(Frame, IFrameConf):
         Constructor
         '''
         Frame.__init__(self, parent, **configs)
-        feet = StringVar()
         #label1
         self.__label01 = Label(self, text="Select or Input the project src path:")
         #self.__label01.grid(column=0, row=1, sticky=(W))
         self.__label01.pack(side=TOP, fill=X)
         #input
-        self.__dicinput = Entry(self, width=40, textvariable=feet)
+        feet = StringVar()
+        self.__dicinput = Entry(self, width=50, textvariable=feet)
         #self.__dicinput.grid(column=0, row=2, sticky=(E))
         self.__dicinput.pack(side=LEFT, fill=Y)
         #button

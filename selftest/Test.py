@@ -31,9 +31,7 @@ elif testType == 3:
 elif testType == 4:
     dic = {111: 'FTD', 222: 'PDJ', 333: 'ZAL'}
     str1 = print('Value in dic: ' , dic.keys())
-    inputKey = int(input(str1))
-    if inputKey in dic:
-        print(dic[inputKey])
+    print(dic.get(111) )
 
 elif testType == 5:
     str1 = 123 # input('input a value:') 

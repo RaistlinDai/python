@@ -5,6 +5,7 @@ Created on Jun 23, 2018
 '''
 from tkinter import *
 from src.main.pydev.com.ftd.generalutilities.metadata.gui.impl.Frame_selectbox import Frame_selectbox
+from tkinter.messagebox import showwarning
 
 class Popup_filelist(Toplevel):
     '''
@@ -17,36 +18,34 @@ class Popup_filelist(Toplevel):
         Constructor
         '''
         Toplevel.__init__(self, parent, **configs)
-        
         self.title('File lsit')
-        #self.geometry('300x500')
+        
+        #forbidden resize
         self.resizable(width=False, height=False)
         
-        row = Frame(self)
-        lab = Label(row, width=15, text='Metadata list:')
+        #top label
+        self.__top = Frame(self)
+        self.__label = Label(self.__top, width=15, text='Metadata list:')
+        self.__top.pack(side=TOP, fill=X)
+        self.__label.pack(side=LEFT)
         
-        row.pack(side=TOP, fill=X)
-        lab.pack(side=LEFT)
-        
-        #listbox and scrolbar
+        #listbox and scrollbar
         body = Frame(self)
         body.pack(fill=BOTH)
-        ls = Listbox(body)
-        sb = Scrollbar(body)
-        ls.config(yscrollcommand = sb.set)
-        sb.pack(side=RIGHT, fill=Y)
-        
+        self.__listbox = Listbox(body, width=30)
+        self.__scroll = Scrollbar(body)
+        self.__listbox.config(yscrollcommand = self.__scroll.set)
+        self.__scroll.pack(side=RIGHT, fill=Y)
+        self.__scroll.config(command = self.__listbox.yview)
+        self.__listbox.pack(side=LEFT)
         for name in filelists:
-            ls.insert(0, name)
-        
-        sb.config(command = ls.yview)
-        ls.pack(side=LEFT)
-        
+            self.__listbox.insert(0, name)
+            
         #bottom frame
-        bot = Frame(self)
-        bot.pack(side=BOTTOM, fill=X)
-        btn = Button(bot, text='OK', command=self.ok_callback)
-        btn.pack(side=RIGHT)
+        self.__bottom = Frame(self)
+        self.__bottom.pack(side=BOTTOM, fill=X)
+        self.__button = Button(self.__bottom, text='OK', command=self.ok_callback)
+        self.__button.pack(side=RIGHT)
         
     
     def show(self):
@@ -54,4 +53,12 @@ class Popup_filelist(Toplevel):
         
         
     def ok_callback(self):
-        pass
+        if self.__listbox.curselection():
+            self.__curselection = self.__listbox.selection_get()
+            self.destroy()
+        else:
+            showwarning('Warning', 'Please select a metadata file.')
+    
+    
+    def return_selection(self):
+        return self.__curselection

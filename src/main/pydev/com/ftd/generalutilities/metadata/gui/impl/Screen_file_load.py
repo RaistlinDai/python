@@ -6,6 +6,7 @@ Created on Jun 20, 2018
 from tkinter import *
 from src.main.pydev.com.ftd.generalutilities.metadata.gui.impl.Frame_bottom import Frame_bottom
 from src.main.pydev.com.ftd.generalutilities.metadata.gui.impl.Frame_dicload import Frame_dicload
+from src.main.pydev.com.ftd.generalutilities.metadata.gui.impl.FtdFrame import FtdFrame
 from tkinter.messagebox import askyesno
 
 class Screen_file_load(Frame):
@@ -22,13 +23,10 @@ class Screen_file_load(Frame):
         
         #main window
         self.master.title('File loader')
-        self.master.geometry('500x200')
+        self.master.geometry('600x200')
         #font
         self.labelfont = ('times', 15, 'bold')
-        
-        #self.grid(column=0, row=0, sticky=(N,W,E,S))
         self.pack()
-        
         self.columnconfigure(0, weight=1)
         self.rowconfigure(0, weight=1)
         #add children
@@ -40,14 +38,18 @@ class Screen_file_load(Frame):
         
         
     def create_widgets(self):
-        #body
-        self.body = Frame_dicload(self)
-        #self.body.grid(column=0, row=0, sticky=(N))
-        self.body.pack(fill=X)
+        #load frame
+        self.__body = Frame_dicload(self)
+        self.__body.pack(fill=X)
+        #select result
+        self.__result_frame = FtdFrame(self)
+        self.__result_frame.pack(fill=X)
+        self.__label02 = Label(self.__result_frame, text="Selected metadata: ")
+        self.__label02.pack(side=LEFT)
         #bottom
-        self.buttom = Frame_bottom(self, self.body.get_dicinput)
-        #self.buttom.grid(column=0, row=2, sticky=(S))
-        self.buttom.pack(fill=X)
+        exFuncs = {'Load':{'loadFunc':self.__body.get_dicinput, 'setFunc':self.refresh_resultlabel}}
+        self.__buttom = Frame_bottom(self, exFuncs)
+        self.__buttom.pack(fill=X)
         
 
     def adjust_children(self):
@@ -59,3 +61,7 @@ class Screen_file_load(Frame):
         if askyesno("Quit", 'Do you want to quit?'):
             self.quit()
     
+    
+    def refresh_resultlabel(self, filename):
+        newname = "Selected metadata: " + filename
+        self.__label02.config(text=newname)

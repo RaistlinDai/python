@@ -3,8 +3,9 @@ Created on Jun 23, 2018
 
 @author: ftd
 '''
+from tkinter import Frame
 
-class IFrameConf(object):
+class IFtdFrame(object):
     '''
     classdocs
     '''
@@ -13,7 +14,12 @@ class IFrameConf(object):
     def set_conf(self, **confs):
         
         for child in self.winfo_children():
-                        
+            
+            if isinstance(child, IFtdFrame):
+                self.set_conf(child, **confs)
+            elif isinstance(child, Frame):
+                continue
+            
             #config
             for key in confs.keys():
                 if key == 'font':

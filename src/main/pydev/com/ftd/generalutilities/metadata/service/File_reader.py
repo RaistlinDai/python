@@ -31,10 +31,12 @@ class File_reader(object):
                     #print fullname 
                     filename=os.path.basename(fullname)
                     #filename
-                    print(filename)
                     classNames.insert(0, filename)
-                    
-                                
+            
+            #No files
+            if len(classNames) == 0:
+                return False, None, 'There is no correct files.'
+            
             return True, classNames, None
         
         except OSError as e:

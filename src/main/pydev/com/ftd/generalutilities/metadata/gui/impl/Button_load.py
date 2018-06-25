@@ -14,13 +14,16 @@ class Button_load(Button):
     '''
 
 
-    def __init__(self, parent=None, exFunc=None, **configs):
+    def __init__(self, parent=None, exFuncs=None, **configs):
         '''
         Constructor
         '''
         Button.__init__(self, parent, **configs)
         self.bind('<Button-1>', self.click_event) #bind button click event
-        self.__exfunc = exFunc
+        
+        if isinstance(exFuncs, dict):
+            self.__loadfunc = exFuncs.get('loadFunc')
+            self.__setfunc = exFuncs.get('setFunc')
         
     
     '''
@@ -32,13 +35,20 @@ class Button_load(Button):
         print('Message button_load click')
         #call reader service
         reader = File_reader()
-        result, metas, err_message = reader.read_dir(self.__exfunc())
+        if self.__loadfunc:
+            result, metas, err_message = reader.read_dir(self.__loadfunc())
+            
+            if result:
+                popup = Popup_filelist(metas)
+                popup.grab_set()
+                popup.focus_set()
+                popup.wait_window()
+                
+                if self.__setfunc:
+                    self.__setfunc(popup.return_selection())
+            else:
+                self.__returnvalue = None
+                showerror('Error', err_message)
         
-        if result:
-            popup = Popup_filelist(metas)
-            popup.grab_set()
-            popup.focus_set()
-            popup.wait_window()
         else:
-            showerror('Error', err_message)
-        
+            pass
