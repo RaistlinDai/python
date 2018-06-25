@@ -6,7 +6,6 @@ Created on Jun 20, 2018
 from tkinter import *
 from src.main.pydev.com.ftd.generalutilities.metadata.gui.impl.Frame_bottom import Frame_bottom
 from src.main.pydev.com.ftd.generalutilities.metadata.gui.impl.Frame_dicload import Frame_dicload
-from src.main.pydev.com.ftd.generalutilities.metadata.gui.impl.Popup_filelist import Popup_filelist
 from tkinter.messagebox import askyesno
 
 class Screen_file_load(Frame):

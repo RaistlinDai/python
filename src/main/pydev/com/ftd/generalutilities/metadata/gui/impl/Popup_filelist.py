@@ -19,7 +19,8 @@ class Popup_filelist(Toplevel):
         Toplevel.__init__(self, parent, **configs)
         
         self.title('File lsit')
-        self.geometry('300x500')
+        #self.geometry('300x500')
+        self.resizable(width=False, height=False)
         
         row = Frame(self)
         lab = Label(row, width=15, text='Metadata list:')
@@ -27,10 +28,30 @@ class Popup_filelist(Toplevel):
         row.pack(side=TOP, fill=X)
         lab.pack(side=LEFT)
         
+        #listbox and scrolbar
+        body = Frame(self)
+        body.pack(fill=BOTH)
+        ls = Listbox(body)
+        sb = Scrollbar(body)
+        ls.config(yscrollcommand = sb.set)
+        sb.pack(side=RIGHT, fill=Y)
+        
         for name in filelists:
-            checkbox_row = Frame_selectbox(name)
-            checkbox_row.pack(side=BOTTOM)
+            ls.insert(END, name)
+        
+        sb.config(command = ls.yview)
+        ls.pack(side=LEFT)
+        
+        #bottom frame
+        bot = Frame(self)
+        bot.pack(side=BOTTOM, fill=X)
+        btn = Button(bot, text='OK', command=self.ok_callback)
+        btn.pack(side=RIGHT)
         
     
     def show(self):
         self.destroy()
+        
+        
+    def ok_callback(self):
+        pass

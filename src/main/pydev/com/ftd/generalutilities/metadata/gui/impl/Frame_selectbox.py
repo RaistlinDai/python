@@ -17,7 +17,7 @@ class Frame_selectbox(Frame):
         '''
         Frame.__init__(self, parent, **configs)
         #checkbox
-        checkbox = Checkbutton()
+        checkbox = Checkbutton(self)
         checkbox.pack(side=LEFT)
         lab = Label(self, text=labelname)
-        lab.pack(side=RIGHT)
+        lab.pack(side=LEFT)
