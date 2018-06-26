@@ -5,7 +5,6 @@ Created on Jun 26, 2018
 '''
 from tkinter import *
 from src.main.pydev.com.ftd.generalutilities.metadata.gui.impl.frame.Frame_bottom import Frame_bottom
-from src.main.pydev.com.ftd.generalutilities.metadata.gui.api.frame.IFormatableFrame import IFormatableFrame
 from src.main.pydev.com.ftd.generalutilities.metadata.gui.impl.frame.Frame_checkbox import Frame_checkbox
 from src.main.pydev.com.ftd.generalutilities.metadata.gui.impl.base.FormatableFrame import FormatableFrame
 

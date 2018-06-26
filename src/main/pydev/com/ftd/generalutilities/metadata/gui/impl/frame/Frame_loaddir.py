@@ -6,7 +6,6 @@ Created on Jun 23, 2018
 from tkinter import *
 from src.main.pydev.com.ftd.generalutilities.metadata.gui.impl.button.Button_openfile import Button_openfile
 from src.main.pydev.com.ftd.generalutilities.metadata.gui.impl.frame.Frame_bottom import Frame_bottom
-from src.main.pydev.com.ftd.generalutilities.metadata.gui.api.frame.IFormatableFrame import IFormatableFrame
 from src.main.pydev.com.ftd.generalutilities.metadata.gui.impl.base.FormatableFrame import FormatableFrame
 
 class Frame_loaddir(FormatableFrame):
