@@ -4,12 +4,11 @@ Created on Jun 20, 2018
 @author: ftd
 '''
 from tkinter import *
-from src.main.pydev.com.ftd.generalutilities.metadata.gui.impl.frame.Frame_bottom import Frame_bottom
 from src.main.pydev.com.ftd.generalutilities.metadata.gui.impl.frame.Frame_loaddir import Frame_loaddir
+from src.main.pydev.com.ftd.generalutilities.metadata.gui.impl.frame.Frame_maintgene import Frame_maintgene
 from src.main.pydev.com.ftd.generalutilities.metadata.gui.impl.frame.Frame_main import Frame_main
 from src.main.pydev.com.ftd.generalutilities.metadata.gui.api.view.IViewForm import IViewForm
 from tkinter.messagebox import askyesno
-
 class ViewForm_fileload(IViewForm):
     '''
     classdocs
@@ -22,26 +21,8 @@ class ViewForm_fileload(IViewForm):
         '''
         #main frame
         self.__main = Frame_main()
-        #add children
-        self.create_widgets(self.__main)
-        #layout maintain
-        self.adjust_children(self.__main)
-        
-        
-    def create_widgets(self, master):
         #load frame
-        self.__body = Frame_loaddir(master)
-        self.__body.pack(fill=X)
-        #bottom frame
-        exFuncs = {'Load':{'loadFunc':self.__body.get_dicinput, 'setFunc':self.refresh_resultlabel},
-                   'Next':self.clean_mainframe}
-        self.__buttom = Frame_bottom(master, ['Next','Load'], exFuncs)
-        self.__buttom.pack(fill=X)
-        
-
-    def adjust_children(self, master):
-        for child in master.winfo_children():
-            child.set_conf(font=master.labelfont, bg='white', fg='black', relief=RAISED)
+        self.open_loaddir()
         
     
     def on_closing(self):
@@ -49,15 +30,19 @@ class ViewForm_fileload(IViewForm):
             self.__main.quit()
     
     
-    def refresh_resultlabel(self, filename):
-        newname = "Selected metadata: " + filename
-        self.__body.update_selection(newname)
-
-    
-    def clean_mainframe(self):
-        self.__main.destroy()
-        
-        
     def get_mainframe(self):
         return self.__main
+    
+    
+    def open_loaddir(self):
+        #load frame
+        self.__body = Frame_loaddir(self.__main, self.open_maintgene)
+        self.__body.pack(fill=X)
         
+        
+    def open_maintgene(self):
+        #destroy the body before rendering it
+        self.__body.destroy()
+        #maint generation frame
+        self.__body = Frame_maintgene(self.__main, None)
+        self.__body.pack(fill=X)

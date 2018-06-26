@@ -12,12 +12,6 @@ class IViewForm(object):
     '''
     __metaclass__ = ABCMeta #This is a abstract class
 
-    @abstractmethod
-    def create_widgets(self):
-        pass
-    
-    def adjust_children(self):
-        pass
-    
+    @abstractmethod    
     def clean_frame(self):
         pass
