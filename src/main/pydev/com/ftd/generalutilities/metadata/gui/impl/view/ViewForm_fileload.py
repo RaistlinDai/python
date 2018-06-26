@@ -50,7 +50,7 @@ class ViewForm_fileload(IViewForm):
     
     def open_loaddir(self):
         #load frame
-        self.__body = Frame_loaddir(self.__main, self.open_maintgene)
+        self.__body = Frame_loaddir(self, self.open_maintgene)
         self.__body.pack(fill=X)
         
         
@@ -61,5 +61,5 @@ class ViewForm_fileload(IViewForm):
         except AttributeError:
             pass
         #maint generation frame
-        self.__body = Frame_maintgene(self.__main, None)
+        self.__body = Frame_maintgene(self, None)
         self.__body.pack(fill=X)

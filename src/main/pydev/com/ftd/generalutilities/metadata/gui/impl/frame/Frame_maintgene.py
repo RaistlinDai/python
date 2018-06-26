@@ -18,7 +18,7 @@ class Frame_maintgene(FormatableFrame):
         '''
         Constructor
         '''
-        FormatableFrame.__init__(self, parent, nextframe)
+        FormatableFrame.__init__(self, parent.get_mainframe(), nextframe)
         self.__frame1 = FormatableFrame(self)
         self.__frame1.pack(side=TOP)
         #Title
@@ -44,7 +44,7 @@ class Frame_maintgene(FormatableFrame):
         self.add_bottom(self)
     
         #format
-        self.adjust_children(parent)
+        self.adjust_children(parent.get_mainframe())
         
     
     def add_bottom(self, parent):

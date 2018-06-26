@@ -19,7 +19,7 @@ class Frame_loaddir(FormatableFrame):
         Constructor
         '''
         #analysis parent viewForm
-        FormatableFrame.__init__(self, parent, nextframe, **configs)
+        FormatableFrame.__init__(self, parent.get_mainframe(), nextframe, **configs)
         self.__frame1 = FormatableFrame(self)
         self.__frame1.pack(side=TOP)
         #Title
@@ -45,7 +45,7 @@ class Frame_loaddir(FormatableFrame):
         self.add_bottom(self)
         
         #format
-        self.adjust_children(parent)
+        self.adjust_children(parent.get_mainframe())
         
     
     def add_bottom(self, parent):
