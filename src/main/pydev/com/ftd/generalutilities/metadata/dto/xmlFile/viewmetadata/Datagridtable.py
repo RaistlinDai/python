@@ -3,7 +3,7 @@ Created on Jun 21, 2018
 
 @author: ftd
 '''
-from src.main.pydev.com.ftd.generalutilities.metadata.dto.Datagridfield import Datagridfield
+from src.main.pydev.com.ftd.generalutilities.metadata.dto.xmlFile.viewmetadata.Datagridfield import Datagridfield
 
 class Datagridtable(object):
     '''
