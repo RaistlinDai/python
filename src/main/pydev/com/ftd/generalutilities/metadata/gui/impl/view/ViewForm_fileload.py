@@ -23,6 +23,7 @@ class ViewForm_fileload(IViewForm):
         self.__main = Frame_main()
         #load frame
         self.open_loaddir()
+        #self.open_maintgene()
         
     
     def on_closing(self):
@@ -42,7 +43,10 @@ class ViewForm_fileload(IViewForm):
         
     def open_maintgene(self):
         #destroy the body before rendering it
-        self.__body.destroy()
+        try:
+            self.__body.destroy()
+        except AttributeError:
+            pass
         #maint generation frame
         self.__body = Frame_maintgene(self.__main, None)
         self.__body.pack(fill=X)

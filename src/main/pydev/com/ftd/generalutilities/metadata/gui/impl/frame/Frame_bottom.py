@@ -7,8 +7,9 @@ from tkinter import *
 from src.main.pydev.com.ftd.generalutilities.metadata.gui.impl.button.Button_load import Button_load
 from src.main.pydev.com.ftd.generalutilities.metadata.gui.impl.button.Button_next import Button_next
 from src.main.pydev.com.ftd.generalutilities.metadata.gui.impl.button.Button_prev import Button_prev
+from src.main.pydev.com.ftd.generalutilities.metadata.gui.api.frame.IUnFormatableFrame import IUnFormatableFrame
 
-class Frame_bottom(Frame):
+class Frame_bottom(Frame, IUnFormatableFrame):
     '''
     classdocs
     '''
@@ -25,15 +26,16 @@ class Frame_bottom(Frame):
             nextFunc = exFuncs.get('Next')
             prevFunc = exFuncs.get('Prev')
         
+        curFont = dict(family='Courier New, monospace', size=25, color='#7f7f7f')
+        
         if 'Load' in buttons:
-            self.__loadButton = Button_load(self, loadFunc, text='Load', bg='white', fg='black', relief=RAISED) #set function as input parameter
+            self.__loadButton = Button_load(self, loadFunc, font=curFont, text='Load', bg='grey', fg='yellow', relief=RAISED, cursor='hand2')
             self.__loadButton.pack(side=LEFT)
             
         if 'Prev' in buttons:
-            self.__prevButton = Button_prev(self, prevFunc, text='Prev', bg='white', fg='black', relief=RAISED) #set function as input parameter
+            self.__prevButton = Button_prev(self, prevFunc, font=curFont, text='Prev', bg='grey', fg='yellow', relief=RAISED, cursor='hand2')
             self.__prevButton.pack(side=LEFT)
         
         if 'Next' in buttons:
-            self.__quitButton = Button_next(self, nextFunc, text='Next', bg='white', fg='black', relief=RAISED)
+            self.__quitButton = Button_next(self, nextFunc, font=curFont, text='Next', bg='grey', fg='yellow', relief=RAISED, cursor='hand2')
             self.__quitButton.pack(side=RIGHT)
-    
