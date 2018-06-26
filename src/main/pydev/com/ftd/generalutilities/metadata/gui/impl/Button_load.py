@@ -32,7 +32,6 @@ class Button_load(Button):
     '''
     def click_event(self, event):
         
-        print('Message button_load click')
         #call reader service
         reader = File_reader()
         if self.__loadfunc:

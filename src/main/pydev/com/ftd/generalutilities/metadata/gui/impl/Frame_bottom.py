@@ -5,8 +5,8 @@ Created on Jun 23, 2018
 '''
 from tkinter import *
 from src.main.pydev.com.ftd.generalutilities.metadata.gui.impl.Button_load import Button_load
+from src.main.pydev.com.ftd.generalutilities.metadata.gui.impl.Button_next import Button_next
 from src.main.pydev.com.ftd.generalutilities.metadata.gui.impl.FtdFrame import FtdFrame
-
 
 class Frame_bottom(FtdFrame):
     '''
@@ -23,12 +23,13 @@ class Frame_bottom(FtdFrame):
         loadFunc = None
         if isinstance(exFuncs, dict):
             loadFunc = exFuncs.get('Load')
+            nextFunc = exFuncs.get('Next')
         
-        self.loadButton = Button_load(self, loadFunc, text='Load') #set function as input parameter
-        self.loadButton.pack(side=LEFT)
+        self.__loadButton = Button_load(self, loadFunc, text='Load') #set function as input parameter
+        self.__loadButton.pack(side=LEFT)
         
-        self.quitButton = Button(self, text='Next', command=self.next_callback)
-        self.quitButton.pack(side=RIGHT)
+        self.__quitButton = Button_next(self, nextFunc, text='Next')
+        self.__quitButton.pack(side=RIGHT)
         
         self.adjust_children()
     
@@ -39,5 +40,3 @@ class Frame_bottom(FtdFrame):
                 child.config(cursor='hand2')
             
     
-    def next_callback(self):
-        pass

@@ -47,7 +47,8 @@ class Screen_file_load(Frame):
         self.__label02 = Label(self.__result_frame, text="Selected metadata: ")
         self.__label02.pack(side=LEFT)
         #bottom
-        exFuncs = {'Load':{'loadFunc':self.__body.get_dicinput, 'setFunc':self.refresh_resultlabel}}
+        exFuncs = {'Load':{'loadFunc':self.__body.get_dicinput, 'setFunc':self.refresh_resultlabel},
+                   'Next':self.clean_frame}
         self.__buttom = Frame_bottom(self, exFuncs)
         self.__buttom.pack(fill=X)
         
@@ -65,3 +66,8 @@ class Screen_file_load(Frame):
     def refresh_resultlabel(self, filename):
         newname = "Selected metadata: " + filename
         self.__label02.config(text=newname)
+
+    
+    def clean_frame(self):
+        self.destroy()
+        
