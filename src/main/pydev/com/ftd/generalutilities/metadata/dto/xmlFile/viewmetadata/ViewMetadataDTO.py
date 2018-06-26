@@ -10,6 +10,10 @@ class ViewMetadataDTO(object):
         '''
         Constructor
         '''
+        self.__datafields = {}
+        self.__datafields = {}
+        self.__datafields = {}
+        
         if isinstance(datafields, dict):
             self.__datafields = datafields
             

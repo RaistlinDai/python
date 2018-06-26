@@ -21,8 +21,16 @@ class FtdFrame(Frame):
         '''
         Frame.__init__(self, parent, **configs)
         #next frame
-        self.nextframe = nextframe
+        self.__nextframe = nextframe
         
+    
+    def get_nextframe(self):
+        return self.__nextframe
+    
+    
+    def set_nextframe(self, nextframe):
+        self.__nextframe = nextframe
+    
     
     def adjust_children(self, master):
         for child in master.winfo_children():

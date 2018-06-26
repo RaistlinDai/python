@@ -9,6 +9,8 @@ from src.main.pydev.com.ftd.generalutilities.metadata.gui.impl.frame.Frame_maint
 from src.main.pydev.com.ftd.generalutilities.metadata.gui.impl.frame.Frame_main import Frame_main
 from src.main.pydev.com.ftd.generalutilities.metadata.gui.api.view.IViewForm import IViewForm
 from tkinter.messagebox import askyesno
+from src.main.pydev.com.ftd.generalutilities.metadata.dto.xmlFile.viewmetadata.ViewMetadataDTO import ViewMetadataDTO
+
 class ViewForm_fileload(IViewForm):
     '''
     classdocs
@@ -21,6 +23,9 @@ class ViewForm_fileload(IViewForm):
         '''
         #main frame
         self.__main = Frame_main()
+        #dtos
+        viewDTO = ViewMetadataDTO()
+        self.__dtos = {'ViewMetaData':viewDTO}
         #load frame
         self.open_loaddir()
         #self.open_maintgene()
@@ -33,6 +38,14 @@ class ViewForm_fileload(IViewForm):
     
     def get_mainframe(self):
         return self.__main
+    
+    
+    def set_dtos(self, dtos):
+        self.__dtos = dtos
+        
+        
+    def get_dtos(self):
+        return self.__dtos
     
     
     def open_loaddir(self):

@@ -51,7 +51,7 @@ class Frame_loaddir(FormatableFrame):
     def add_bottom(self, parent):
         #bottom frame
         exFuncs = {'Load':{'loadFunc':self.get_dicinput, 'setFunc':self.refresh_resultlabel},
-                   'Next':self.nextframe}
+                   'Next':self.get_nextframe()}
         self.__buttom = Frame_bottom(parent, ['Next','Load'], exFuncs)
         self.__buttom.pack(side=BOTTOM, fill=X, ipady=10)
         
