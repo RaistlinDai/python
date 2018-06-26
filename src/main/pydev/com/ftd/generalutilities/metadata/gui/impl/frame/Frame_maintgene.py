@@ -27,18 +27,10 @@ class Frame_maintgene(FormatableFrame):
         #check buttons
         checkbut_frame1 = Frame_checkbox(self)
         checkbut_frame1.pack(fill=X)
-        CheckVar1 = IntVar()
-        CheckVar2 = IntVar()
-        CheckVar3 = IntVar()
-        CheckVar4 = IntVar()
-        chk1 = Checkbutton(checkbut_frame1, text = "Constants", variable = CheckVar1, onvalue = 1, offvalue = 0)
-        chk1.pack(side=LEFT)
-        chk2 = Checkbutton(checkbut_frame1, text = "TSHandler", variable = CheckVar2, onvalue = 2, offvalue = 0)
-        chk2.pack(side=LEFT)
-        chk3 = Checkbutton(checkbut_frame1, text = "MockDTO", variable = CheckVar3, onvalue = 3, offvalue = 0)
-        chk3.pack(side=LEFT)
-        chk4 = Checkbutton(checkbut_frame1, text = "ObservableObj", variable = CheckVar4, onvalue = 4, offvalue = 0)
-        chk4.pack(side=LEFT)
+        self.__checkvalues = {"Constants":IntVar(), "TSHandler":IntVar(), "MockDTO":IntVar(), "ObservableObj":IntVar() }
+        for chkv in self.__checkvalues.keys():
+            chk1 = Checkbutton(checkbut_frame1, text = chkv, variable = self.__checkvalues[chkv], onvalue = 1, offvalue = 0)
+            chk1.pack(side=LEFT)
         
         #bottom
         self.add_bottom(self)
@@ -49,9 +41,13 @@ class Frame_maintgene(FormatableFrame):
     
     def add_bottom(self, parent):
         #bottom frame
-        exFuncs = {'Next':None,
+        exFuncs = {'Next':self.get_checkbuttons,
                    'Prev':None}
         self.__buttom = Frame_bottom(self, ['Next','Prev'], exFuncs)
         self.__buttom.pack(fill=X, ipady=10)
-        
+    
+    
+    def get_checkbuttons(self):
+        for ck in self.__checkvalues.keys():
+            print(ck + ":" + str(self.__checkvalues[ck].get()))
         

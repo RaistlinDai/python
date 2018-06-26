@@ -27,8 +27,8 @@ class ViewForm_fileload(IViewForm):
         viewDTO = ViewMetadataDTO()
         self.__dtos = {'ViewMetaData':viewDTO}
         #load frame
-        self.open_loaddir()
-        #self.open_maintgene()
+        #self.open_loaddir()
+        self.open_maintgene()
         
     
     def on_closing(self):
