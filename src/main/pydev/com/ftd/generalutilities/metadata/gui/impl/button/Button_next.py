@@ -30,3 +30,5 @@ class Button_next(Button):
         if askyesno("Note", 'Please verify your selection before going to next step'):
             if self.__exfunc:
                 self.__exfunc()
+                
+    

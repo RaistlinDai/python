@@ -4,7 +4,6 @@ Created on Jun 23, 2018
 @author: ftd
 '''
 from tkinter import *
-from src.main.pydev.com.ftd.generalutilities.metadata.gui.impl.Frame_selectbox import Frame_selectbox
 from tkinter.messagebox import showwarning
 
 class Popup_filelist(Toplevel):

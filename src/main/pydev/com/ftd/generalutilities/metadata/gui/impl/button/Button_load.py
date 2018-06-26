@@ -4,7 +4,7 @@ Created on Jun 22, 2018
 @author: ftd
 '''
 from tkinter import Button
-from src.main.pydev.com.ftd.generalutilities.metadata.gui.impl.Popup_filelist import Popup_filelist
+from src.main.pydev.com.ftd.generalutilities.metadata.gui.impl.view.Popup_filelist import Popup_filelist
 from src.main.pydev.com.ftd.generalutilities.metadata.service.File_reader import File_reader
 from tkinter.messagebox import showerror
 
