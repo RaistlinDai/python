@@ -66,7 +66,7 @@ class ViewForm_fileload(IViewForm, FileDTOSet):
             self.__body.destroy()
         except AttributeError:
             pass
-        #maint generation frame
+        #maint verification frame
         self.__body = Frame_Verifyfile(self, None, self.__dtos)
         self.__body.config(width=540,height=280)
         self.__body.pack_propagate(0)

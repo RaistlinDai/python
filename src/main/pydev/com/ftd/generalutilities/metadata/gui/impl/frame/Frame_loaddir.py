@@ -22,9 +22,14 @@ class Frame_loaddir(FormatableFrame):
         '''
         #analysis parent viewForm
         FormatableFrame.__init__(self, parent.get_mainframe(), nextframe, dtos, **configs)
+                
+    
+    #overwrite create_widges
+    def create_widges(self):
+        #frame
         self.__frame1 = FormatableFrame(self)
         self.__frame1.pack(side=TOP)
-        #Title
+        #title
         self.__label01 = Label(self.__frame1, text="Select or Input the project src path:", width= 45)
         self.__label01.pack(side=TOP, fill=X, ipady=10)
         #input
@@ -42,14 +47,9 @@ class Frame_loaddir(FormatableFrame):
         self.__frame2.pack(fill=X)
         self.__label02 = Label(self.__frame2, text="Selected metadata: ")
         self.__label02.pack(side=LEFT, fill=X)
-                
-        #bottom
-        self.add_bottom(self)
-        
-        #format
-        self.adjust_children(parent.get_mainframe())
         
     
+    #overwrite create_widges
     def add_bottom(self, parent):
         #bottom frame
         exFuncs = {'Load':{'loadFunc':self.get_dicinput, 'setFunc':self.get_selection},
@@ -71,7 +71,7 @@ class Frame_loaddir(FormatableFrame):
         #update label
         newname = "Selected metadata: " + filename
         self.__label02.config(text=newname)
-        #set the entity name and full path in dtoset
+        #set the entity name and full path in dto set
         fileconstant = FileConstant(self)
         self.get_dtos().set_entityname(filename)
         self.get_dtos().set_fullpath(self.__dicinput.get() + fileconstant.viewmetadata_path + filename)

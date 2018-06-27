@@ -24,7 +24,17 @@ class FtdFrame(Frame):
         self.__nextframe = nextframe
         #dtos
         self.__dtos = dtos
+        #create children
+        self.create_widges()
+        #add buttom
+        self.add_bottom(self)
+        #format
+        self.adjust_children(parent)
         
+    
+    def create_widges(self):
+        print('create_widges is not overwrite')
+    
     
     def get_nextframe(self):
         return self.__nextframe

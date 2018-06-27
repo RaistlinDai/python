@@ -21,6 +21,10 @@ class Frame_maintgene(FormatableFrame):
         '''
         FormatableFrame.__init__(self, parent.get_mainframe(), nextframe, dtos, **configs)
         
+        
+    #overwrite create_widges
+    def create_widges(self):
+        #frame
         self.__frame1 = FormatableFrame(self)
         self.__frame1.pack(side=TOP)
         #Title
@@ -33,12 +37,7 @@ class Frame_maintgene(FormatableFrame):
         for chkv in self.__checkvalues.keys():
             chk1 = Checkbutton(checkbut_frame1, text = chkv, variable = self.__checkvalues[chkv], onvalue = 1, offvalue = 0)
             chk1.pack(side=LEFT)
-        
-        #bottom
-        self.add_bottom(self)
-        #format
-        self.adjust_children(parent.get_mainframe())
-        
+    
     
     #overwrite before_next
     def add_bottom(self, parent):

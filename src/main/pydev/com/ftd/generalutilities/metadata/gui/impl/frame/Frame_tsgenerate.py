@@ -1,5 +1,5 @@
 '''
-Created on Jun 26, 2018
+Created on Jun 27, 2018
 
 @author: ftd
 '''
@@ -7,8 +7,7 @@ from tkinter import *
 from src.main.pydev.com.ftd.generalutilities.metadata.gui.impl.frame.Frame_bottom import Frame_bottom
 from src.main.pydev.com.ftd.generalutilities.metadata.gui.impl.base.FormatableFrame import FormatableFrame
 
-
-class Frame_Verifyfile(FormatableFrame):
+class Frame_tsgenerate(FormatableFrame):
     '''
     classdocs
     '''
@@ -20,13 +19,13 @@ class Frame_Verifyfile(FormatableFrame):
         '''
         FormatableFrame.__init__(self, parent.get_mainframe(), nextframe, dtos, **configs)
         
-        
+    
     #overwrite create_widges
     def create_widges(self):
         pass
-        
     
-    #overwrite create_widges
+     
+    #overwrite create_widges   
     def add_bottom(self, parent):
         #bottom frame
         exFuncs = {'Next':{'process':self.get_nextframe(), 'before':self.before_next},
