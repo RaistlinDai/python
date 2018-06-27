@@ -1,0 +1,36 @@
+'''
+Created on Jun 26, 2018
+
+@author: ftd
+'''
+from tkinter import *
+from src.main.pydev.com.ftd.generalutilities.metadata.gui.impl.frame.Frame_bottom import Frame_bottom
+from src.main.pydev.com.ftd.generalutilities.metadata.gui.impl.base.FormatableFrame import FormatableFrame
+
+
+class Frame_Verifyfile(FormatableFrame):
+    '''
+    classdocs
+    '''
+
+
+    def __init__(self, parent=None, nextframe=None, dtos=None, **configs):
+        '''
+        Constructor
+        '''
+        FormatableFrame.__init__(self, parent.get_mainframe(), nextframe, dtos, **configs)
+        
+        
+        #bottom
+        self.add_bottom(self)
+        
+        #format
+        self.adjust_children(parent.get_mainframe())
+        
+        
+    def add_bottom(self, parent):
+        #bottom frame
+        exFuncs = {'Next':{'process':self.get_nextframe(), 'before':self.before_next},
+                   'Prev':None}
+        self.__buttom = Frame_bottom(parent, ['Next','Prev'], exFuncs)
+        self.__buttom.pack(fill=X, ipady=10,side=BOTTOM)

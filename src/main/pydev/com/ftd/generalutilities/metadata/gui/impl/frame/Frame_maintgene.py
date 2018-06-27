@@ -20,6 +20,7 @@ class Frame_maintgene(FormatableFrame):
         Constructor
         '''
         FormatableFrame.__init__(self, parent.get_mainframe(), nextframe, dtos, **configs)
+        
         self.__frame1 = FormatableFrame(self)
         self.__frame1.pack(side=TOP)
         #Title
@@ -35,27 +36,24 @@ class Frame_maintgene(FormatableFrame):
         
         #bottom
         self.add_bottom(self)
-    
         #format
         self.adjust_children(parent.get_mainframe())
         
     
+    #overwrite before_next
     def add_bottom(self, parent):
         #bottom frame
-        exFuncs = {'Next':{'process':self.get_checkbuttons, 'before':self.before_next},
+        exFuncs = {'Next':{'process':self.get_nextframe(), 'before':self.before_next},
                    'Prev':None}
-        self.__buttom = Frame_bottom(self, ['Next','Prev'], exFuncs)
+        self.__buttom = Frame_bottom(parent, ['Next','Prev'], exFuncs)
         self.__buttom.pack(fill=X, ipady=10,side=BOTTOM)
-    
-    
-    def get_checkbuttons(self):
-        for ck in self.__checkvalues.keys():
-            print(ck + ":" + str(self.__checkvalues[ck].get()))
         
     
+    #overwrite before_next
     def before_next(self):
         
-        print(self.get_dtos())
+        for ck in self.__checkvalues.keys():
+            print(ck + ":" + str(self.__checkvalues[ck].get()))
         
         for val in self.__checkvalues.values():
             if val.get() == 1:

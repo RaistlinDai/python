@@ -49,9 +49,6 @@ class Frame_loaddir(FormatableFrame):
         #format
         self.adjust_children(parent.get_mainframe())
         
-        print(dtos)
-        print(self.get_dtos())
-        
     
     def add_bottom(self, parent):
         #bottom frame

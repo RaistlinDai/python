@@ -19,7 +19,8 @@ class Frame_main(Frame):
         Frame.__init__(self, master)
         
         #main window
-        self.master.title('File loader')
+        #update the title
+        self.master.title('File Generator')
         self.master.geometry('600x300')
         self.master.resizable(width=False, height=False)
         #font

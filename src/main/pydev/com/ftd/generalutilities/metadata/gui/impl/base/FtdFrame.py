@@ -50,6 +50,10 @@ class FtdFrame(Frame):
         pass
     
     
+    def add_bottom(self, parent):
+        pass
+    
+    
     def adjust_children(self, master):
         for child in master.winfo_children():
             try:
