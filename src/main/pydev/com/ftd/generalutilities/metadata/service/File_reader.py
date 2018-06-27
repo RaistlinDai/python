@@ -15,23 +15,25 @@ class File_reader(object):
         try:
             self.__direxisting = False
             fileconstant = FileConstant(self)
+            #view metadata file list
+            viewMetadataNames = {}
             
-            classNames = []
-            
+            #change the work path
             os.chdir(dirpath)
-            #Go through the inner files
+            #go through the inner files
             for fullname in self.iterbrowse(dirpath):
+                #get the view metadata files
                 if (fullname.startswith(dirpath + fileconstant.viewmetadata_path)):
-                    #print fullname 
+                    #trim the file name
                     filename=os.path.basename(fullname)
-                    #filename
-                    classNames.insert(0, filename)
+                    #insert into file list
+                    viewMetadataNames[filename] = fullname
             
-            #No files
-            if len(classNames) == 0:
-                return False, None, 'There is no correct files.'
+            #no files
+            if len(viewMetadataNames) == 0:
+                return False, None, 'There is no correct view metadata.'
             
-            return True, classNames, None
+            return True, viewMetadataNames, None
         
         except OSError as e:
             print('expect:', e)
@@ -42,7 +44,8 @@ class File_reader(object):
         finally:
             pass
         
-                
+    
+    #get the inner files (full path)
     def iterbrowse(self, path):
         for home, dirs, files in os.walk(path):
             for filename in files:

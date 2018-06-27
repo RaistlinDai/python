@@ -17,7 +17,7 @@ class Popup_filelist(Toplevel):
         Constructor
         '''
         Toplevel.__init__(self, parent, **configs)
-        self.title('File lsit')
+        self.title('File list')
         
         #forbidden resize
         self.resizable(width=False, height=False)
@@ -37,7 +37,8 @@ class Popup_filelist(Toplevel):
         self.__scroll.pack(side=RIGHT, fill=Y)
         self.__scroll.config(command = self.__listbox.yview)
         self.__listbox.pack(side=LEFT)
-        for name in filelists:
+        self.__filelists = filelists
+        for name in filelists.keys():
             self.__listbox.insert(0, name)
             
         #bottom frame
@@ -53,7 +54,11 @@ class Popup_filelist(Toplevel):
         
     def ok_callback(self):
         if self.__listbox.curselection():
-            self.__curselection = self.__listbox.selection_get()
+            selection = self.__listbox.selection_get()
+            #the dict.items() will convert to tuple
+            for tup in self.__filelists.items():
+                if tup[0] == selection:
+                    self.__curselection = tup
             self.destroy()
         else:
             showwarning('Warning', 'Please select a metadata file.')
@@ -61,3 +66,5 @@ class Popup_filelist(Toplevel):
     
     def return_selection(self):
         return self.__curselection
+    
+    

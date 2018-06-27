@@ -33,7 +33,7 @@ class FtdFrame(Frame):
         
     
     def create_widges(self):
-        print('create_widges is not overwrite')
+        pass
     
     
     def get_nextframe(self):
