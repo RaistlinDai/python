@@ -7,6 +7,8 @@ from tkinter import *
 from src.main.pydev.com.ftd.generalutilities.metadata.gui.impl.button.Button_openfile import Button_openfile
 from src.main.pydev.com.ftd.generalutilities.metadata.gui.impl.frame.Frame_bottom import Frame_bottom
 from src.main.pydev.com.ftd.generalutilities.metadata.gui.impl.base.FormatableFrame import FormatableFrame
+from tkinter.messagebox import showerror
+from src.main.pydev.com.ftd.generalutilities.metadata.service.FileConstant import FileConstant
 
 class Frame_loaddir(FormatableFrame):
     '''
@@ -14,12 +16,12 @@ class Frame_loaddir(FormatableFrame):
     '''
 
 
-    def __init__(self, parent=None, nextframe=None, **configs):
+    def __init__(self, parent=None, nextframe=None, dtos=None, **configs):
         '''
         Constructor
         '''
         #analysis parent viewForm
-        FormatableFrame.__init__(self, parent.get_mainframe(), nextframe, **configs)
+        FormatableFrame.__init__(self, parent.get_mainframe(), nextframe, dtos, **configs)
         self.__frame1 = FormatableFrame(self)
         self.__frame1.pack(side=TOP)
         #Title
@@ -47,11 +49,14 @@ class Frame_loaddir(FormatableFrame):
         #format
         self.adjust_children(parent.get_mainframe())
         
+        print(dtos)
+        print(self.get_dtos())
+        
     
     def add_bottom(self, parent):
         #bottom frame
-        exFuncs = {'Load':{'loadFunc':self.get_dicinput, 'setFunc':self.refresh_resultlabel},
-                   'Next':self.get_nextframe()}
+        exFuncs = {'Load':{'loadFunc':self.get_dicinput, 'setFunc':self.get_selection},
+                   'Next':{'process':self.get_nextframe(), 'before':self.before_next}}
         self.__buttom = Frame_bottom(parent, ['Next','Load'], exFuncs)
         self.__buttom.pack(side=BOTTOM, fill=X, ipady=10)
         
@@ -65,8 +70,19 @@ class Frame_loaddir(FormatableFrame):
         return self.__dicinput.get()
         
     
-    def refresh_resultlabel(self, filename):
+    def get_selection(self, filename):
+        #update label
         newname = "Selected metadata: " + filename
         self.__label02.config(text=newname)
-        
-        
+        #set the entity name and full path in dtoset
+        fileconstant = FileConstant(self)
+        self.get_dtos().set_entityname(filename)
+        self.get_dtos().set_fullpath(self.__dicinput.get() + fileconstant.viewmetadata_path + filename)
+    
+    
+    def before_next(self):
+        if self.__dicinput.get():
+            return True
+        else:
+            showerror('Error', 'You must select an existing metadata!')
+            return False

@@ -7,6 +7,7 @@ from tkinter import *
 from src.main.pydev.com.ftd.generalutilities.metadata.gui.impl.frame.Frame_bottom import Frame_bottom
 from src.main.pydev.com.ftd.generalutilities.metadata.gui.impl.frame.Frame_checkbox import Frame_checkbox
 from src.main.pydev.com.ftd.generalutilities.metadata.gui.impl.base.FormatableFrame import FormatableFrame
+from tkinter.messagebox import showerror
 
 class Frame_maintgene(FormatableFrame):
     '''
@@ -14,11 +15,11 @@ class Frame_maintgene(FormatableFrame):
     '''
 
 
-    def __init__(self, parent=None, nextframe=None, **configs):
+    def __init__(self, parent=None, nextframe=None, dtos=None, **configs):
         '''
         Constructor
         '''
-        FormatableFrame.__init__(self, parent.get_mainframe(), nextframe)
+        FormatableFrame.__init__(self, parent.get_mainframe(), nextframe, dtos, **configs)
         self.__frame1 = FormatableFrame(self)
         self.__frame1.pack(side=TOP)
         #Title
@@ -41,13 +42,24 @@ class Frame_maintgene(FormatableFrame):
     
     def add_bottom(self, parent):
         #bottom frame
-        exFuncs = {'Next':self.get_checkbuttons,
+        exFuncs = {'Next':{'process':self.get_checkbuttons, 'before':self.before_next},
                    'Prev':None}
         self.__buttom = Frame_bottom(self, ['Next','Prev'], exFuncs)
-        self.__buttom.pack(fill=X, ipady=10)
+        self.__buttom.pack(fill=X, ipady=10,side=BOTTOM)
     
     
     def get_checkbuttons(self):
         for ck in self.__checkvalues.keys():
             print(ck + ":" + str(self.__checkvalues[ck].get()))
         
+    
+    def before_next(self):
+        
+        print(self.get_dtos())
+        
+        for val in self.__checkvalues.values():
+            if val.get() == 1:
+                return True
+        else:
+            showerror('Error', 'You must select at least one generation file!')
+            return False

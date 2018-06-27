@@ -9,9 +9,9 @@ from src.main.pydev.com.ftd.generalutilities.metadata.gui.impl.frame.Frame_maint
 from src.main.pydev.com.ftd.generalutilities.metadata.gui.impl.frame.Frame_main import Frame_main
 from src.main.pydev.com.ftd.generalutilities.metadata.gui.api.view.IViewForm import IViewForm
 from tkinter.messagebox import askyesno
-from src.main.pydev.com.ftd.generalutilities.metadata.dto.xmlFile.viewmetadata.ViewMetadataDTO import ViewMetadataDTO
+from src.main.pydev.com.ftd.generalutilities.metadata.gui.impl.base.FileDTOSet import FileDTOSet
 
-class ViewForm_fileload(IViewForm):
+class ViewForm_fileload(IViewForm, FileDTOSet):
     '''
     classdocs
     '''
@@ -23,12 +23,10 @@ class ViewForm_fileload(IViewForm):
         '''
         #main frame
         self.__main = Frame_main()
-        #dtos
-        viewDTO = ViewMetadataDTO()
-        self.__dtos = {'ViewMetaData':viewDTO}
+        self.__dtos = FileDTOSet()
         #load frame
-        #self.open_loaddir()
-        self.open_maintgene()
+        self.open_loaddir()
+        #self.open_maintgene()
         
     
     def on_closing(self):
@@ -40,17 +38,11 @@ class ViewForm_fileload(IViewForm):
         return self.__main
     
     
-    def set_dtos(self, dtos):
-        self.__dtos = dtos
-        
-        
-    def get_dtos(self):
-        return self.__dtos
-    
-    
     def open_loaddir(self):
         #load frame
-        self.__body = Frame_loaddir(self, self.open_maintgene)
+        self.__body = Frame_loaddir(self, self.open_maintgene, self.__dtos)
+        self.__body.config(width=540,height=280)
+        self.__body.pack_propagate(0)
         self.__body.pack(fill=X)
         
         
@@ -61,5 +53,7 @@ class ViewForm_fileload(IViewForm):
         except AttributeError:
             pass
         #maint generation frame
-        self.__body = Frame_maintgene(self, None)
+        self.__body = Frame_maintgene(self, None, self.__dtos)
+        self.__body.config(width=540,height=280)
+        self.__body.pack_propagate(0)
         self.__body.pack(fill=X)

@@ -19,7 +19,9 @@ class Button_next(Button):
         Button.__init__(self, parent, **configs)
         self.bind('<Button-1>', self.click_event)
         
-        self.__exfunc = exFuncs
+        if isinstance(exFuncs, dict):
+            self.__click_event = exFuncs.get('process')
+            self.__before_click_event = exFuncs.get('before')
         
         
     '''
@@ -27,8 +29,22 @@ class Button_next(Button):
     
     '''
     def click_event(self, event):
+        #Before button click
+        if not self.before_click_event():
+            return 
+        #Button click
         if askyesno("Note", 'Please verify your selection before going to next step'):
-            if self.__exfunc:
-                self.__exfunc()
+            if self.__click_event:
+                self.__click_event()
                 
     
+    def before_click_event(self):
+        if self.__before_click_event:
+            result = self.__before_click_event()
+            if result:
+                return True
+            else:
+                return False
+        else:
+            return True
+        

@@ -5,8 +5,8 @@ Created on Jun 25, 2018
 '''
 from tkinter import *
 from builtins import AttributeError
-from src.main.pydev.com.ftd.generalutilities.metadata.gui.api.frame.IFormatableFrame import IFormatableFrame
-from src.main.pydev.com.ftd.generalutilities.metadata.gui.api.frame.IUnFormatableFrame import IUnFormatableFrame
+from src.main.pydev.com.ftd.generalutilities.metadata.gui.api.base.IFormatableFrame import IFormatableFrame
+from src.main.pydev.com.ftd.generalutilities.metadata.gui.api.base.IUnFormatableFrame import IUnFormatableFrame
 
 
 class FtdFrame(Frame):
@@ -15,13 +15,15 @@ class FtdFrame(Frame):
     '''
 
 
-    def __init__(self, parent=None, nextframe=None, **configs):
+    def __init__(self, parent=None, nextframe=None, dtos=None, **configs):
         '''
         Constructor
         '''
         Frame.__init__(self, parent, **configs)
         #next frame
         self.__nextframe = nextframe
+        #dtos
+        self.__dtos = dtos
         
     
     def get_nextframe(self):
@@ -30,6 +32,22 @@ class FtdFrame(Frame):
     
     def set_nextframe(self, nextframe):
         self.__nextframe = nextframe
+        
+
+    def set_dtos(self, dtos):
+        self.__dtos = dtos
+        
+        
+    def get_dtos(self):
+        return self.__dtos
+    
+
+    def before_next(self):
+        pass
+    
+    
+    def after_next(self):
+        pass
     
     
     def adjust_children(self, master):

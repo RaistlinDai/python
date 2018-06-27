@@ -4,7 +4,7 @@ Created on Jun 23, 2018
 @author: ftd
 '''
 from src.main.pydev.com.ftd.generalutilities.metadata.gui.impl.base.FtdFrame import FtdFrame
-from src.main.pydev.com.ftd.generalutilities.metadata.gui.api.frame.IFormatableFrame import IFormatableFrame
+from src.main.pydev.com.ftd.generalutilities.metadata.gui.api.base.IFormatableFrame import IFormatableFrame
 
 class FormatableFrame(FtdFrame, IFormatableFrame):
     '''
@@ -12,8 +12,8 @@ class FormatableFrame(FtdFrame, IFormatableFrame):
     '''
     
     
-    def __init__(self, parent=None, nextframe=None, **configs):
+    def __init__(self, parent=None, nextframe=None, dtos=None, **configs):
         '''
         Constructor
         '''
-        FtdFrame.__init__(self, parent, nextframe)
+        FtdFrame.__init__(self, parent, nextframe, dtos, **configs)

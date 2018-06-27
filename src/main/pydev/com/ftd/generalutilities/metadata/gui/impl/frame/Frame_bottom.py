@@ -7,7 +7,7 @@ from tkinter import *
 from src.main.pydev.com.ftd.generalutilities.metadata.gui.impl.button.Button_load import Button_load
 from src.main.pydev.com.ftd.generalutilities.metadata.gui.impl.button.Button_next import Button_next
 from src.main.pydev.com.ftd.generalutilities.metadata.gui.impl.button.Button_prev import Button_prev
-from src.main.pydev.com.ftd.generalutilities.metadata.gui.api.frame.IUnFormatableFrame import IUnFormatableFrame
+from src.main.pydev.com.ftd.generalutilities.metadata.gui.api.base.IUnFormatableFrame import IUnFormatableFrame
 
 class Frame_bottom(Frame, IUnFormatableFrame):
     '''

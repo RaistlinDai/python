@@ -20,7 +20,7 @@ class Frame_main(Frame):
         
         #main window
         self.master.title('File loader')
-        self.master.geometry('600x200')
+        self.master.geometry('600x300')
         self.master.resizable(width=False, height=False)
         #font
         self.labelfont = ('times', 15, 'bold')

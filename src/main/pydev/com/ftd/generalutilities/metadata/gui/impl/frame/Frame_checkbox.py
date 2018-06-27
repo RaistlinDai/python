@@ -4,10 +4,9 @@ Created on Jun 25, 2018
 @author: ftd
 '''
 from tkinter import *
-from src.main.pydev.com.ftd.generalutilities.metadata.gui.impl.base.FtdFrame import FtdFrame
-from src.main.pydev.com.ftd.generalutilities.metadata.gui.api.frame.IUnFormatableFrame import IUnFormatableFrame
+from src.main.pydev.com.ftd.generalutilities.metadata.gui.impl.base.UnFormatableFrame import UnFormatableFrame
 
-class Frame_checkbox(FtdFrame, IUnFormatableFrame):
+class Frame_checkbox(UnFormatableFrame):
     '''
     classdocs
     '''
