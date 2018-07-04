@@ -19,6 +19,9 @@ class Popup_filelist(Toplevel):
         Toplevel.__init__(self, parent, **configs)
         self.title('File list')
         
+        #default parameters
+        self.__curselection = None
+        
         #forbidden resize
         self.resizable(width=False, height=False)
         
@@ -65,6 +68,9 @@ class Popup_filelist(Toplevel):
     
     
     def return_selection(self):
-        return self.__curselection
+        if self.__curselection:
+            return self.__curselection
+        else:
+            return None
     
     

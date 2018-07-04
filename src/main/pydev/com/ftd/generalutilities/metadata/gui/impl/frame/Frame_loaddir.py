@@ -68,15 +68,18 @@ class Frame_loaddir(FormatableFrame):
         
     
     def get_selection(self, fileinfo):
-        #path constant
-        fileconstant = FileConstant(self)
         #update label
         if isinstance(fileinfo, tuple):
             filename = fileinfo[0]
             fullpath = fileinfo[1]
-        else:
+        elif isinstance(fileinfo, str):
+            #path constant
+            fileconstant = FileConstant(self)
             filename = fileinfo
             fullpath = self.__dicinput.get() + fileconstant.viewmetadata_path + filename
+        else:
+            return
+            
         newname = "Selected metadata: " + filename
         self.__label02.config(text=newname)
         #set the entity name and full path in dto set
