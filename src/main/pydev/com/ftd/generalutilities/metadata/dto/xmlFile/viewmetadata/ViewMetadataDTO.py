@@ -11,8 +11,8 @@ class ViewMetadataDTO(object):
         Constructor
         '''
         self.__datafields = {}
-        self.__datafields = {}
-        self.__datafields = {}
+        self.__datalabels = {}
+        self.__datagrids = {}
         
         if isinstance(datafields, dict):
             self.__datafields = datafields

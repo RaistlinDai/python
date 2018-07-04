@@ -8,7 +8,7 @@ from src.main.pydev.com.ftd.generalutilities.metadata.gui.impl.frame.Frame_botto
 from src.main.pydev.com.ftd.generalutilities.metadata.gui.impl.base.FormatableFrame import FormatableFrame
 
 
-class Frame_Verifyfile(FormatableFrame):
+class Frame_verify_file(FormatableFrame):
     '''
     classdocs
     '''

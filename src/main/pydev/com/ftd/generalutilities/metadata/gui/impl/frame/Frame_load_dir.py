@@ -7,12 +7,12 @@ from tkinter import *
 from tkinter.messagebox import showerror
 from src.main.pydev.com.ftd.generalutilities.metadata.gui.impl.button.Button_openfile import Button_openfile
 from src.main.pydev.com.ftd.generalutilities.metadata.gui.impl.frame.Frame_bottom import Frame_bottom
-from src.main.pydev.com.ftd.generalutilities.metadata.service.FileConstant import FileConstant
+from src.main.pydev.com.ftd.generalutilities.metadata.service.File_constant import File_constant
 from src.main.pydev.com.ftd.generalutilities.metadata.gui.impl.base.FormatableFrame import FormatableFrame
 from src.main.pydev.com.ftd.generalutilities.metadata.gui.impl.base.UnFormatableFrame import UnFormatableFrame
 from src.main.pydev.com.ftd.generalutilities.metadata.service.File_reader import File_reader
 
-class Frame_loaddir(FormatableFrame):
+class Frame_load_dir(FormatableFrame):
     '''
     classdocs
     '''
@@ -81,7 +81,7 @@ class Frame_loaddir(FormatableFrame):
     
     def get_selection(self, fileinfo):
         #path constant
-        fileconstant = FileConstant()
+        fileconstant = File_constant()
         #update label
         if isinstance(fileinfo, tuple):
             filename = fileinfo[0]
@@ -95,7 +95,7 @@ class Frame_loaddir(FormatableFrame):
         #verify source metadata
         resource_exist = False
         if filename:
-            resourcefullpath = self.__dicinput.get() + fileconstant.resourcemetadata_path + filename +fileconstant.resourcemetadata_suffix
+            resourcefullpath = self.__dicinput.get() + fileconstant.resource_metadata_path + filename +fileconstant.resource_metadata_suffix
             resource_exist = File_reader.verify_file(resourcefullpath)
         
         newname = "Selected entity: " + filename

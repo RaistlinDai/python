@@ -10,7 +10,7 @@ from src.main.pydev.com.ftd.generalutilities.metadata.gui.impl.base.FormatableFr
 from tkinter.messagebox import showerror
 from src.main.pydev.com.ftd.generalutilities.metadata.service.File_reader import File_reader
 
-class Frame_maintgene(FormatableFrame):
+class Frame_maint_gene(FormatableFrame):
     '''
     classdocs
     '''

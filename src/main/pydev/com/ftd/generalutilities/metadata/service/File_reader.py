@@ -5,7 +5,7 @@ Created on Jun 21, 2018
 '''
 import os
 import xml.dom.minidom
-from src.main.pydev.com.ftd.generalutilities.metadata.service.FileConstant import FileConstant
+from src.main.pydev.com.ftd.generalutilities.metadata.service.File_constant import File_constant
 
 class File_reader(object):
     '''
@@ -15,8 +15,8 @@ class File_reader(object):
     @staticmethod
     def read_dir(dirpath):
         try:
-            direxisting = False
-            fileconstant = FileConstant()
+            dir_existing = False
+            fileconstant = File_constant()
             #view metadata file list
             viewMetadataNames = {}
             
@@ -25,7 +25,7 @@ class File_reader(object):
             #go through the inner files
             for fullname in File_reader.iterbrowse(dirpath):
                 #get the view metadata files
-                if (fullname.startswith(dirpath + fileconstant.viewmetadata_path)):
+                if (fullname.startswith(dirpath + fileconstant.view_metadata_path)):
                     #trim the file name
                     filename=os.path.basename(fullname)
                     #remove the suffix
