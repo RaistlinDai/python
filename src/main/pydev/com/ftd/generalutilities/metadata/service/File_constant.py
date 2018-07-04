@@ -17,8 +17,8 @@ class File_constant(object):
         self.view_metadata_path = '\\main\\resources\\com\\qad\\erp\\financials\\view\\'
         self.resource_metadata_path = '\\main\\resources\\com\\qad\\erp\\financials\\data\\meta\\'
         self.java_controller_path = '\\main\\java\\com\\qad\\erp\\financials\\'
-        self.entity_map_path = '\\main\\resources\\com\\qad\\erp\\financials\\data\\doc\\'
-        self.bean_app_context_path = '\\main\\resources\\WEB-INF\\qad\\erp\\financials\\'
+        self.entity_map_path = '\\main\\resources\\com\\qad\\erp\\financials\\data\\doc\\entityMap.xml'
+        self.bean_app_context_path = '\\main\\resources\\WEB-INF\\qad\\erp\\financials\\beans-app-context.xml'
         
         self.xml_suffix = ".xml"
         self.resource_metadata_suffix = "-ViewResourceMeta.xml"

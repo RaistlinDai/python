@@ -115,6 +115,7 @@ class Frame_load_dir(FormatableFrame):
         
         #set the entity name and full path in dto set
         self.get_dtos().set_entityname(filename)
+        self.get_dtos().set_projectpath(self.__dicinput.get())
         self.get_dtos().set_viewfullpath(viewfullpath)
         self.get_dtos().set_resourcefullpath(resourcefullpath)
         

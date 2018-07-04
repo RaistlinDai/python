@@ -5,7 +5,9 @@ Created on Jun 21, 2018
 '''
 import os
 import xml.dom.minidom
+from xml.etree.ElementTree import ElementTree,Element
 from src.main.pydev.com.ftd.generalutilities.metadata.service.File_constant import File_constant
+from src.main.pydev.com.ftd.generalutilities.metadata.dto.xmlFile.resourcemetadata.ResourceMetadataDTO import ResourceMetadataDTO
 
 class File_reader(object):
     '''
@@ -59,16 +61,46 @@ class File_reader(object):
                 
     
     @staticmethod
-    def read_resourcemetadata(path):
+    def read_resource_metadata(path, file_dto):
+        # verify if file is existing
+        if not os.path.exists(path):
+            return False
+        
+        #get the root of resource metadata
         dom = xml.dom.minidom.parse(path)
         root = dom.documentElement
-        print(root.nodeName)
-        print(root.nodeName)
-        print(root.nodeName)
-        print(root.nodeName)
-        print(root.nodeName)
-        print(root.nodeName)
-        print(root.nodeName)
+        #elements=root.getElementsByTagName('element')
+        
+        #create new resource dto
+        resDto = ResourceMetadataDTO()
+        
+        #root node information
+        if root.nodeName == 'ViewResourceMetadata':
+            resDto.update_header(root.getAttribute('MetaUri'), 
+                                 root.getAttribute('ViewUri'), 
+                                 root.getAttribute('NameStringCode'), 
+                                 root.getAttribute('IsEligibleForMenu'), 
+                                 root.getAttribute('IsSecure'), 
+                                 root.getAttribute('PrimarySecureUri'))
+            
+        print(root.childNodes)
+        
+        #update the ResourceMetadataDTO in FileDTOSet
+        file_dto.set_resourceDTO(resDto)
+    
+    
+    @staticmethod
+    def read_bean_app_context(path):
+        # verify if file is existing
+        if not os.path.exists(path):
+            return False
+        
+        #get the root of resource metadata
+        tree = ElementTree()
+        tree.parse(path)
+        
+        '''https://blog.csdn.net/wklken/article/details/7603071'''
+                    
         
     
     @staticmethod
