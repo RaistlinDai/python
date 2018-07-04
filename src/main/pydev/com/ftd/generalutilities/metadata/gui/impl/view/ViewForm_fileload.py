@@ -9,10 +9,10 @@ from src.main.pydev.com.ftd.generalutilities.metadata.gui.impl.frame.Frame_load_
 from src.main.pydev.com.ftd.generalutilities.metadata.gui.impl.frame.Frame_maint_gene import Frame_maint_gene
 from src.main.pydev.com.ftd.generalutilities.metadata.gui.impl.frame.Frame_main import Frame_main
 from src.main.pydev.com.ftd.generalutilities.metadata.gui.api.view.IViewForm import IViewForm
-from src.main.pydev.com.ftd.generalutilities.metadata.gui.impl.base.FileDTOSet import FileDTOSet
+from src.main.pydev.com.ftd.generalutilities.metadata.dto.base.EntityDTOSet import EntityDTOSet
 from src.main.pydev.com.ftd.generalutilities.metadata.gui.impl.frame.Frame_verify_file import Frame_verify_file
 
-class ViewForm_fileload(IViewForm, FileDTOSet):
+class ViewForm_fileload(IViewForm, EntityDTOSet):
     '''
     classdocs
     '''
@@ -24,7 +24,7 @@ class ViewForm_fileload(IViewForm, FileDTOSet):
         '''
         #main frame
         self.__main = Frame_main()
-        self.__dtos = FileDTOSet()
+        self.__dtos = EntityDTOSet()
         #load frame
         self.open_loaddir()
         #self.open_maintgene()

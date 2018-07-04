@@ -6,7 +6,7 @@ Created on Jun 27, 2018
 from src.main.pydev.com.ftd.generalutilities.metadata.dto.xmlFile.viewmetadata.ViewMetadataDTO import ViewMetadataDTO
 from src.main.pydev.com.ftd.generalutilities.metadata.dto.xmlFile.resourcemetadata.ResourceMetadataDTO import ResourceMetadataDTO
 
-class FileDTOSet(object):
+class EntityDTOSet(object):
     '''
     classdocs
     '''
@@ -79,9 +79,7 @@ class FileDTOSet(object):
             return None
         
     
-    ################################################################
-    #                resource metadata dto                         #
-    ################################################################
+#-------------------- resource metadata dto ---------
     def get_resourceDTO(self):
         if self.__dto:
             return self.__dto['ResourceMetaData']

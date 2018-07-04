@@ -5,9 +5,9 @@ Created on Jun 21, 2018
 '''
 import os
 import xml.dom.minidom
-from xml.etree.ElementTree import ElementTree,Element
 from src.main.pydev.com.ftd.generalutilities.metadata.service.File_constant import File_constant
 from src.main.pydev.com.ftd.generalutilities.metadata.dto.xmlFile.resourcemetadata.ResourceMetadataDTO import ResourceMetadataDTO
+from src.main.pydev.com.ftd.generalutilities.metadata.dto.xmlFile.beanappcontext.BeanAppContext import BeanAppContext
 
 class File_reader(object):
     '''
@@ -63,7 +63,7 @@ class File_reader(object):
     @staticmethod
     def read_resource_metadata(path, file_dto):
         # verify if file is existing
-        if not os.path.exists(path):
+        if not File_reader.verify_file(path):
             return False
         
         #get the root of resource metadata
@@ -83,7 +83,7 @@ class File_reader(object):
                                  root.getAttribute('IsSecure'), 
                                  root.getAttribute('PrimarySecureUri'))
             
-        print(root.childNodes)
+        #print(root.childNodes)
         
         #update the ResourceMetadataDTO in FileDTOSet
         file_dto.set_resourceDTO(resDto)
@@ -92,19 +92,34 @@ class File_reader(object):
     @staticmethod
     def read_bean_app_context(path):
         # verify if file is existing
-        if not os.path.exists(path):
-            return False
+        if not File_reader.verify_file(path):
+            return None, False
         
         #get the root of resource metadata
-        tree = ElementTree()
-        tree.parse(path)
-        
-        '''https://blog.csdn.net/wklken/article/details/7603071'''
-                    
-        
+        bean_app = BeanAppContext()
+        dom = xml.dom.minidom.parse(path)
+        for node in dom.getElementsByTagName('bean'):
+            bean_app.set_bean_id(node.getAttribute('id'))
+            bean_app.set_bean_class(node.getAttribute('class'))
+            break
+            
+        for node in dom.getElementsByTagName('property'):
+            node_name = node.getAttribute('name')
+            if node_name == 'entityUriMapString':
+                bean_app.set_entity_uri_mapstring(node.getAttribute('value'))
+            elif node_name == 'labelService':
+                bean_app.set_label_service(node.getAttribute('value'))
+            elif node_name == 'entityMetadataService':
+                bean_app.set_entity_metadata_service(node.getAttribute('value'))
+            elif node_name == 'viewMetadataService':
+                bean_app.set_view_metadata_service(node.getAttribute('value'))
+                
+        return bean_app, True
+            
     
     @staticmethod
     def verify_file(path):
         return os.path.exists(path)
-            
+    
+    
     

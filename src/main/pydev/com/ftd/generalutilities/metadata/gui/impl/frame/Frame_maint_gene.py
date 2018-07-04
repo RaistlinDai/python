@@ -9,7 +9,6 @@ from src.main.pydev.com.ftd.generalutilities.metadata.gui.impl.frame.Frame_check
 from src.main.pydev.com.ftd.generalutilities.metadata.gui.impl.base.FormatableFrame import FormatableFrame
 from tkinter.messagebox import showerror
 from src.main.pydev.com.ftd.generalutilities.metadata.service.File_reader import File_reader
-from src.main.pydev.com.ftd.generalutilities.metadata.service.File_constant import File_constant
 
 class Frame_maint_gene(FormatableFrame):
     '''
@@ -72,7 +71,6 @@ class Frame_maint_gene(FormatableFrame):
     def before_next(self):
         #checkbox flag
         checkFlag = False
-        fileconstant = File_constant()
         
         for ck in self.__checkvalues01.keys():
             print(ck + ":" + str(self.__checkvalues01[ck].get()))
@@ -97,9 +95,6 @@ class Frame_maint_gene(FormatableFrame):
             resourcepath = curDtos.get_resourcefullpath()
             #read the resource metadata and load the data into ResourceMetadataDTO
             File_reader.read_resource_metadata(resourcepath, self.get_dtos())
-            
-            ''' test '''
-            File_reader.read_bean_app_context(curDtos.get_projectpath() + fileconstant.bean_app_context_path)       
             
             return True
         else:
