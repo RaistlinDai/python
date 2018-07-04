@@ -33,9 +33,8 @@ class Button_load(Button):
     def click_event(self, event):
         
         #call reader service
-        reader = File_reader()
         if self.__loadfunc:
-            result, metas, err_message = reader.read_dir(self.__loadfunc())
+            result, metas, err_message = File_reader.read_dir(self.__loadfunc())
             
             if result:
                 popup = Popup_filelist(metas)

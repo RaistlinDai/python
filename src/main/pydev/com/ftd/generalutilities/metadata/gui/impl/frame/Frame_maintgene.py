@@ -8,6 +8,7 @@ from src.main.pydev.com.ftd.generalutilities.metadata.gui.impl.frame.Frame_botto
 from src.main.pydev.com.ftd.generalutilities.metadata.gui.impl.frame.Frame_checkbox import Frame_checkbox
 from src.main.pydev.com.ftd.generalutilities.metadata.gui.impl.base.FormatableFrame import FormatableFrame
 from tkinter.messagebox import showerror
+from src.main.pydev.com.ftd.generalutilities.metadata.service.File_reader import File_reader
 
 class Frame_maintgene(FormatableFrame):
     '''
@@ -30,12 +31,30 @@ class Frame_maintgene(FormatableFrame):
         #Title
         self.__label01 = Label(self.__frame1, text="Select the generated file", width= 45)
         self.__label01.pack(side=TOP, fill=X, ipady=10)
+        
         #check buttons
         checkbut_frame1 = Frame_checkbox(self)
         checkbut_frame1.pack(fill=X)
-        self.__checkvalues = {"Constants":IntVar(), "TSHandler":IntVar(), "MockDTO":IntVar(), "ObservableObj":IntVar() }
-        for chkv in self.__checkvalues.keys():
-            chk1 = Checkbutton(checkbut_frame1, text = chkv, variable = self.__checkvalues[chkv], onvalue = 1, offvalue = 0)
+        Label(checkbut_frame1, text = 'XML:', width=10).pack(side=LEFT)
+        self.__checkvalues01 = {"EntityMap":IntVar(), "BeanAppContext":IntVar() }
+        for chkv in self.__checkvalues01.keys():
+            chk1 = Checkbutton(checkbut_frame1, text = chkv, variable = self.__checkvalues01[chkv], onvalue = 1, offvalue = 0)
+            chk1.pack(side=LEFT)
+        
+        checkbut_frame2 = Frame_checkbox(self)
+        checkbut_frame2.pack(fill=X)
+        Label(checkbut_frame2, text = 'Java:', width=10).pack(side=LEFT)
+        self.__checkvalues02 = {"DataController":IntVar(), "ServiceImpl":IntVar() }
+        for chkv in self.__checkvalues02.keys():
+            chk1 = Checkbutton(checkbut_frame2, text = chkv, variable = self.__checkvalues02[chkv], onvalue = 1, offvalue = 0)
+            chk1.pack(side=LEFT)
+            
+        checkbut_frame3 = Frame_checkbox(self)
+        checkbut_frame3.pack(fill=X)
+        Label(checkbut_frame3, text = 'TsHandler:', width=10).pack(side=LEFT)
+        self.__checkvalues03 = {"Constants":IntVar(), "TSHandler":IntVar(), "MockDTO":IntVar(), "ObservableObj":IntVar() }
+        for chkv in self.__checkvalues03.keys():
+            chk1 = Checkbutton(checkbut_frame3, text = chkv, variable = self.__checkvalues03[chkv], onvalue = 1, offvalue = 0)
             chk1.pack(side=LEFT)
     
     
@@ -50,13 +69,33 @@ class Frame_maintgene(FormatableFrame):
     
     #overwrite before_next
     def before_next(self):
+        #checkbox flag
+        checkFlag = False
         
-        for ck in self.__checkvalues.keys():
-            print(ck + ":" + str(self.__checkvalues[ck].get()))
+        for ck in self.__checkvalues01.keys():
+            print(ck + ":" + str(self.__checkvalues01[ck].get()))
         
-        for val in self.__checkvalues.values():
+        for val in self.__checkvalues01.values():
             if val.get() == 1:
-                return True
+                checkFlag = True
+                break
+        
+        for val in self.__checkvalues02.values():
+            if val.get() == 1:
+                checkFlag = True
+                break
+            
+        for val in self.__checkvalues03.values():
+            if val.get() == 1:
+                checkFlag = True
+                break
+                
+        if checkFlag:
+            curDtos = self.get_dtos()
+            resourcepath = curDtos.get_resourcefullpath()
+            File_reader.read_resourcemetadata(resourcepath)
+            
+            return True
         else:
             showerror('Error', 'You must select at least one generation file!')
             return False

@@ -4,11 +4,13 @@ Created on Jun 23, 2018
 @author: ftd
 '''
 from tkinter import *
+from tkinter.messagebox import showerror
 from src.main.pydev.com.ftd.generalutilities.metadata.gui.impl.button.Button_openfile import Button_openfile
 from src.main.pydev.com.ftd.generalutilities.metadata.gui.impl.frame.Frame_bottom import Frame_bottom
-from src.main.pydev.com.ftd.generalutilities.metadata.gui.impl.base.FormatableFrame import FormatableFrame
-from tkinter.messagebox import showerror
 from src.main.pydev.com.ftd.generalutilities.metadata.service.FileConstant import FileConstant
+from src.main.pydev.com.ftd.generalutilities.metadata.gui.impl.base.FormatableFrame import FormatableFrame
+from src.main.pydev.com.ftd.generalutilities.metadata.gui.impl.base.UnFormatableFrame import UnFormatableFrame
+from src.main.pydev.com.ftd.generalutilities.metadata.service.File_reader import File_reader
 
 class Frame_loaddir(FormatableFrame):
     '''
@@ -42,11 +44,21 @@ class Frame_loaddir(FormatableFrame):
         #focus
         self.__dicinput.focus()
         
-        #select result
+        #selected result
         self.__frame2 = FormatableFrame(self)
         self.__frame2.pack(fill=X)
-        self.__label02 = Label(self.__frame2, text="Selected metadata: ")
+        self.__label02 = Label(self.__frame2, text="Selected entity: ")
         self.__label02.pack(side=LEFT, fill=X)
+        
+        #selected details
+        self.__frame3 = UnFormatableFrame(self)
+        self.__frame3.pack(fill=X)
+        self.__label03 = Label(self.__frame3, text="View metadata: ")
+        self.__label03.pack(side=LEFT, fill=X)
+        self.__frame4 = UnFormatableFrame(self)
+        self.__frame4.pack(fill=X)
+        self.__label04 = Label(self.__frame4, text="Source metadata: ")
+        self.__label04.pack(side=LEFT, fill=X)
         
     
     #overwrite create_widges
@@ -68,28 +80,48 @@ class Frame_loaddir(FormatableFrame):
         
     
     def get_selection(self, fileinfo):
+        #path constant
+        fileconstant = FileConstant()
         #update label
         if isinstance(fileinfo, tuple):
             filename = fileinfo[0]
-            fullpath = fileinfo[1]
+            viewfullpath = fileinfo[1]
         elif isinstance(fileinfo, str):
-            #path constant
-            fileconstant = FileConstant(self)
             filename = fileinfo
-            fullpath = self.__dicinput.get() + fileconstant.viewmetadata_path + filename
+            viewfullpath = self.__dicinput.get() + fileconstant.viewmetadata_path + filename
         else:
             return
-            
-        newname = "Selected metadata: " + filename
+        
+        #verify source metadata
+        resource_exist = False
+        if filename:
+            resourcefullpath = self.__dicinput.get() + fileconstant.resourcemetadata_path + filename +fileconstant.resourcemetadata_suffix
+            resource_exist = File_reader.verify_file(resourcefullpath)
+        
+        newname = "Selected entity: " + filename
         self.__label02.config(text=newname)
+        
+        newviewpath = "View metadata: Verified"
+        self.__label03.config(text=newviewpath)
+        
+        if resource_exist:
+            newsourcepath = "Source metadata: Verified"
+            self.__label04.config(text=newsourcepath)
+        else:
+            newsourcepath = "Source metadata: Failed"
+            self.__label04.config(text=newsourcepath)
+            showerror('Error', 'There is no matching resource metadata!')
+            return
+        
         #set the entity name and full path in dto set
         self.get_dtos().set_entityname(filename)
-        self.get_dtos().set_fullpath(fullpath)
-    
+        self.get_dtos().set_viewfullpath(viewfullpath)
+        self.get_dtos().set_resourcefullpath(resourcefullpath)
+        
     
     def before_next(self):
         if self.__dicinput.get():
             return True
         else:
-            showerror('Error', 'You must select an existing metadata!')
+            showerror('Error', 'You must select an existing entity!')
             return False

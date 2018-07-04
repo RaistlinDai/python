@@ -10,9 +10,15 @@ class FileConstant(object):
     '''
 
 
-    def __init__(self, params):
+    def __init__(self):
         '''
         Constructor
         '''
         self.viewmetadata_path = '\\main\\resources\\com\\qad\\erp\\financials\\view\\'
+        self.resourcemetadata_path = '\\main\\resources\\com\\qad\\erp\\financials\\data\\meta\\'
         self.javacontroller_path = '\\main\\java\\com\\qad\\erp\\financials\\'
+        self.entitymap_path = '\\main\\resources\\com\\qad\\erp\\financials\\data\\doc\\'
+        self.beanappcontext_path = '\\main\\resources\\WEB-INF\\qad\\erp\\financials\\'
+        
+        self.xml_suffix = ".xml"
+        self.resourcemetadata_suffix = "-ViewResourceMeta.xml"

@@ -13,25 +13,51 @@ class FileDTOSet(object):
     def __init__(self):
         #dtos
         viewDTO = ViewMetadataDTO()
-        self.dto = {'Entity':None,
-                    'FullPath':None,
-                    'ViewMetaData':viewDTO}
+        self.__dto = {'Entity':None,
+                      'ViewFullPath':None,
+                      'ResourceFullPath':None,
+                      'ViewMetaData':viewDTO}
         
     
     def set_dtos(self, dtos):
-        self.dto = dtos
+        self.__dto = dtos
         
         
     def get_dtos(self):
-        return self.dto
+        return self.__dto
     
     
     def set_entityname(self, entityname):
-        if self.dto:
-            self.dto['Entity'] = entityname
+        if self.__dto:
+            self.__dto['Entity'] = entityname
+            
+            
+    def get_entityname(self):
+        if self.__dto:
+            return self.__dto['Entity']
+        else:
+            return None
 
 
-    def set_fullpath(self, fullpath):
-        if self.dto:
-            self.dto['FullPath'] = fullpath
-        print(self.dto['FullPath'])
+    def set_viewfullpath(self, fullpath):
+        if self.__dto:
+            self.__dto['ViewFullPath'] = fullpath
+        
+        
+    def get_viewfullpath(self):
+        if self.__dto:
+            return self.__dto['ViewFullPath']
+        else:
+            return None
+        
+        
+    def set_resourcefullpath(self, fullpath):
+        if self.__dto:
+            self.__dto['ResourceFullPath'] = fullpath
+        
+        
+    def get_resourcefullpath(self):
+        if self.__dto:
+            return self.__dto['ResourceFullPath']
+        else:
+            return None

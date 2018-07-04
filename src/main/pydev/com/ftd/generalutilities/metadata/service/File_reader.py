@@ -4,6 +4,7 @@ Created on Jun 21, 2018
 @author: ftd
 '''
 import os
+import xml.dom.minidom
 from src.main.pydev.com.ftd.generalutilities.metadata.service.FileConstant import FileConstant
 
 class File_reader(object):
@@ -11,21 +12,24 @@ class File_reader(object):
     classdocs
     '''
     
-    def read_dir(self, dirpath):
+    @staticmethod
+    def read_dir(dirpath):
         try:
-            self.__direxisting = False
-            fileconstant = FileConstant(self)
+            direxisting = False
+            fileconstant = FileConstant()
             #view metadata file list
             viewMetadataNames = {}
             
             #change the work path
             os.chdir(dirpath)
             #go through the inner files
-            for fullname in self.iterbrowse(dirpath):
+            for fullname in File_reader.iterbrowse(dirpath):
                 #get the view metadata files
                 if (fullname.startswith(dirpath + fileconstant.viewmetadata_path)):
                     #trim the file name
                     filename=os.path.basename(fullname)
+                    #remove the suffix
+                    filename = filename[:-4]
                     #insert into file list
                     viewMetadataNames[filename] = fullname
             
@@ -46,10 +50,29 @@ class File_reader(object):
         
     
     #get the inner files (full path)
-    def iterbrowse(self, path):
+    @staticmethod
+    def iterbrowse(path):
         for home, dirs, files in os.walk(path):
             for filename in files:
+                #generator
                 yield os.path.join(home, filename)
                 
-                
+    
+    @staticmethod
+    def read_resourcemetadata(path):
+        dom = xml.dom.minidom.parse(path)
+        root = dom.documentElement
+        print(root.nodeName)
+        print(root.nodeName)
+        print(root.nodeName)
+        print(root.nodeName)
+        print(root.nodeName)
+        print(root.nodeName)
+        print(root.nodeName)
+        
+    
+    @staticmethod
+    def verify_file(path):
+        return os.path.exists(path)
+            
     
