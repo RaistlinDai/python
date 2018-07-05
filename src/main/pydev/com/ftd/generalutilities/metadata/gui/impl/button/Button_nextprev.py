@@ -6,23 +6,28 @@ Created on Jun 26, 2018
 from tkinter import Button
 from tkinter.messagebox import askyesno
 
-class Button_next(Button):
+class Button_nextprev(Button):
     '''
     classdocs
     '''
 
 
-    def __init__(self, parent=None, exFuncs=None, **configs):
+    def __init__(self, parent=None, exFuncs=None, module=None, **configs):
         '''
         Constructor
         '''
         Button.__init__(self, parent, **configs)
         self.bind('<Button-1>', self.click_event)
         
+        self.__module = module
+        
         if isinstance(exFuncs, dict):
             self.__click_event = exFuncs.get('process')
             self.__before_click_event = exFuncs.get('before')
-        
+        else:
+            self.__click_event = None
+            self.__before_click_event = None
+    
         
     '''
     Event
@@ -32,8 +37,15 @@ class Button_next(Button):
         #Before button click
         if not self.before_click_event():
             return 
-        #Button click
-        if askyesno("Note", 'Please verify your selection before going to next step'):
+        
+        if self.__module == 'Next':
+            title = "Note"
+            message = 'Please verify your selection before going to next step.'
+        else:
+            title = "Warning"
+            message = 'Are you sure roll back to the previous step?'
+        
+        if askyesno(title, message):
             if self.__click_event:
                 self.__click_event()
                 

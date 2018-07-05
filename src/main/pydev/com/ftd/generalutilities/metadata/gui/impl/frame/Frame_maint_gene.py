@@ -62,13 +62,15 @@ class Frame_maint_gene(FormatableFrame):
     def add_bottom(self, parent):
         #bottom frame
         exFuncs = {'Next':{'process':self.get_nextframe(), 'before':self.before_next},
-                   'Prev':None}
+                   'Prev':{'process':self.get_prevframe(), 'before':self.before_prev}}
         self.__buttom = Frame_bottom(parent, ['Next','Prev'], exFuncs)
         self.__buttom.pack(fill=X, ipady=10,side=BOTTOM)
         
     
-    #overwrite before_next
     def before_next(self):
+        '''
+        overwrite the function in super class
+        '''
         #checkbox flag
         checkFlag = False
         
@@ -100,3 +102,6 @@ class Frame_maint_gene(FormatableFrame):
         else:
             showerror('Error', 'You must select at least one generation file!')
             return False
+        
+    
+    

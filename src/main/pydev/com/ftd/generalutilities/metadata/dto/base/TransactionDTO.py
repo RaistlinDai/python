@@ -163,9 +163,42 @@ class TransactionDTO(object):
                 return True, proc[idx+1], None
         except ValueError as e:
             print('expect:', e)
-            return False, None, e 
+            return False, None, e
         
+    
+    def get_prev_process(self, curr_step=None):
+        '''
+        get the previous processing step
+        @param curr_step: the current processing step
+        @return: return status (True/False)
+        @return: the next step
+        @return: the error message when the validation failed
+        '''
+        #verify the transaction dto
+        if not self.__dto:
+            return False, None, 'There is no transaction info, please re-open the app'
+        elif not self.__dto['ProcessFlow']:
+            return False, None, 'There is no process info'
         
+        #verify the input type
+        if not curr_step:
+            curr_step = self.get_currentframe()
+        elif not isinstance(curr_step, FrameEnum):
+            return False, None, 'The input parameter is incorrect'
+        
+        try:
+            proc = self.__dto['ProcessFlow']
+            idx = proc.index(curr_step)
+            #verify if current step is the last step
+            if idx == 0:
+                return True, None, 'This is the first processing'
+            else:
+                return True, proc[idx-1], None
+        except ValueError as e:
+            print('expect:', e)
+            return False, None, e
+    
+    
     def print_processflow(self):
         '''
         debug function, it will print the process flow in CONSOLE_SCREEN_BUFFER_INFO

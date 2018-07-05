@@ -5,8 +5,7 @@ Created on Jun 23, 2018
 '''
 from tkinter import *
 from src.main.pydev.com.ftd.generalutilities.metadata.gui.impl.button.Button_load import Button_load
-from src.main.pydev.com.ftd.generalutilities.metadata.gui.impl.button.Button_next import Button_next
-from src.main.pydev.com.ftd.generalutilities.metadata.gui.impl.button.Button_prev import Button_prev
+from src.main.pydev.com.ftd.generalutilities.metadata.gui.impl.button.Button_nextprev import Button_nextprev
 from src.main.pydev.com.ftd.generalutilities.metadata.gui.api.base.IUnFormatableFrame import IUnFormatableFrame
 
 class Frame_bottom(Frame, IUnFormatableFrame):
@@ -33,9 +32,9 @@ class Frame_bottom(Frame, IUnFormatableFrame):
             self.__loadButton.pack(side=LEFT)
             
         if 'Prev' in buttons:
-            self.__prevButton = Button_prev(self, prevFunc, font=curFont, text='Prev', bg='grey', fg='yellow', relief=RAISED, cursor='hand2')
+            self.__prevButton = Button_nextprev(self, prevFunc, 'Prev', font=curFont, text='Prev', bg='grey', fg='yellow', relief=RAISED, cursor='hand2')
             self.__prevButton.pack(side=LEFT)
         
         if 'Next' in buttons:
-            self.__quitButton = Button_next(self, nextFunc, font=curFont, text='Next', bg='grey', fg='yellow', relief=RAISED, cursor='hand2')
+            self.__quitButton = Button_nextprev(self, nextFunc, 'Next', font=curFont, text='Next', bg='grey', fg='yellow', relief=RAISED, cursor='hand2')
             self.__quitButton.pack(side=RIGHT)

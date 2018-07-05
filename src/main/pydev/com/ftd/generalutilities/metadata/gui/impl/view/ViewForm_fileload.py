@@ -61,6 +61,9 @@ class ViewForm_fileload(IViewForm):
 #------------------------- frame workflow ---------------
             
     def open_firstframe(self):
+        '''
+        open the first frame according to the processing list
+        '''
         trans = self.__trans
         trans.print_processflow()  # debugging
         result, procfunc, message = trans.get_first_process()
@@ -68,17 +71,13 @@ class ViewForm_fileload(IViewForm):
         if not result:
             showerror('Error', message)
         else:
-            self.__body = procfunc.value(self, self.__dtos, self.__trans)
-            self.__body.config(width=540,height=300)
-            self.__body.pack_propagate(0)
-            self.__body.pack(fill=X)
-            
-            for ii in FrameEnum:
-                if self.__body.__class__ == ii.value:
-                    self.__trans.set_currentframe(ii)
+            self.__contruct_newframe__(procfunc)
             
         
     def open_nextframe(self):
+        '''
+        open the next frame according to the processing list
+        '''
         #destroy the body before rendering it
         try:
             self.__body.destroy()
@@ -91,21 +90,36 @@ class ViewForm_fileload(IViewForm):
         if not result:
             showerror('Error', message)
         else:
-            self.__body = procfunc.value(self, self.__dtos, self.__trans)
-            self.__body.config(width=540,height=300)
-            self.__body.pack_propagate(0)
-            self.__body.pack(fill=X)
-            
-            for ii in FrameEnum:
-                if self.__body.__class__ == ii.value:
-                    self.__trans.set_currentframe(ii)
+            self.__contruct_newframe__(procfunc)
                     
     
     def open_prevframe(self):
+        '''
+        open the previous frame according to the processing list
+        '''
         #destroy the body before rendering it
         try:
             self.__body.destroy()
         except AttributeError:
             pass
         
+        trans = self.__trans
+        result, procfunc, message = trans.get_prev_process()
+        #verify the result
+        if not result:
+            showerror('Error', message)
+        else:
+            self.__contruct_newframe__(procfunc)
         
+        
+#----------------- private function -----------------
+
+    def __contruct_newframe__(self, procfunc):
+        self.__body = procfunc.value(self, self.__dtos, self.__trans)
+        self.__body.config(width=540,height=300)
+        self.__body.pack_propagate(0)
+        self.__body.pack(fill=X)
+        
+        for ii in FrameEnum:
+            if self.__body.__class__ == ii.value:
+                self.__trans.set_currentframe(ii)

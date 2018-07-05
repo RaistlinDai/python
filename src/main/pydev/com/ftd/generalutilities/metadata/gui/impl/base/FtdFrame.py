@@ -39,7 +39,12 @@ class FtdFrame(Frame):
     def get_nextframe(self):
         func = self.__trans.get_next_frame_func()
         return func
-            
+    
+    
+    def get_prevframe(self):
+        func = self.__trans.get_prev_frame_func()
+        return func
+        
 
     def set_dtos(self, dtos):
         self.__dtos = dtos
@@ -58,11 +63,19 @@ class FtdFrame(Frame):
     
 
     def before_next(self):
-        pass
+        return True
     
     
     def after_next(self):
-        pass
+        return True
+    
+    
+    def before_prev(self):
+        return True
+    
+    
+    def after_prev(self):
+        return True
     
     
     def add_bottom(self, parent):
