@@ -16,11 +16,11 @@ class Frame_maint_gene(FormatableFrame):
     '''
 
 
-    def __init__(self, parent=None, nextframe=None, dtos=None, **configs):
+    def __init__(self, parent=None, nextframe=None, dtos=None, trans=None, **configs):
         '''
         Constructor
         '''
-        FormatableFrame.__init__(self, parent.get_mainframe(), nextframe, dtos, **configs)
+        FormatableFrame.__init__(self, parent.get_mainframe(), nextframe, dtos, trans, **configs)
         
         
     #overwrite create_widges

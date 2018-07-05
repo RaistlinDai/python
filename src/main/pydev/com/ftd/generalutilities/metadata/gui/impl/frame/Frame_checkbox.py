@@ -12,8 +12,8 @@ class Frame_checkbox(UnFormatableFrame):
     '''
 
 
-    def __init__(self, parent=None, **configs):
+    def __init__(self, parent=None, nextframe=None, dtos=None, trans=None, **configs):
         '''
         Constructor
         '''
-        Frame.__init__(self, parent, **configs)
+        UnFormatableFrame.__init__(self, parent, nextframe, dtos, trans, **configs)

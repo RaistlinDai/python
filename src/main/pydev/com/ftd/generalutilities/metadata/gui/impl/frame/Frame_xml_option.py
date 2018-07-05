@@ -10,17 +10,17 @@ from src.main.pydev.com.ftd.generalutilities.metadata.service.File_reader import
 from src.main.pydev.com.ftd.generalutilities.metadata.service.File_constant import File_constant
 
 
-class Frame_verify_file(FormatableFrame):
+class Frame_xml_option(FormatableFrame):
     '''
     classdocs
     '''
 
 
-    def __init__(self, parent=None, nextframe=None, dtos=None, **configs):
+    def __init__(self, parent=None, nextframe=None, dtos=None, trans=None, **configs):
         '''
         Constructor
         '''
-        FormatableFrame.__init__(self, parent.get_mainframe(), nextframe, dtos, **configs)
+        FormatableFrame.__init__(self, parent.get_mainframe(), nextframe, dtos, trans, **configs)
         
         
     #overwrite create_widges
@@ -42,9 +42,10 @@ class Frame_verify_file(FormatableFrame):
     def before_next(self):    
         fileconstant = File_constant()
         curDtos = self.get_dtos()
+        curTrans = self.get_trans()
         
         ''' test '''
-        result, status = File_reader.read_bean_app_context(curDtos.get_projectpath() + fileconstant.bean_app_context_path)       
+        result, status = File_reader.read_bean_app_context(curTrans.get_projectpath() + fileconstant.bean_app_context_path)
         if status:
             #verify if the target entity uri is existing in the bean-app-context
             if curDtos.get_resourceDTO().get_primary_secure_uri() in result.get_entity_uri_mapstring():

@@ -15,7 +15,7 @@ class FtdFrame(Frame):
     '''
 
 
-    def __init__(self, parent=None, nextframe=None, dtos=None, **configs):
+    def __init__(self, parent=None, nextframe=None, dtos=None, trans=None, **configs):
         '''
         Constructor
         '''
@@ -24,6 +24,8 @@ class FtdFrame(Frame):
         self.__nextframe = nextframe
         #dtos
         self.__dtos = dtos
+        #trans
+        self.__trans = trans
         #create children
         self.create_widges()
         #add buttom
@@ -50,6 +52,14 @@ class FtdFrame(Frame):
         
     def get_dtos(self):
         return self.__dtos
+    
+    
+    def set_trans(self, trans):
+        self.__trans = trans
+        
+        
+    def get_trans(self):
+        return self.__trans
     
 
     def before_next(self):

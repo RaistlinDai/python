@@ -18,12 +18,12 @@ class Frame_load_dir(FormatableFrame):
     '''
 
 
-    def __init__(self, parent=None, nextframe=None, dtos=None, **configs):
+    def __init__(self, parent=None, nextframe=None, dtos=None, trans=None, **configs):
         '''
         Constructor
         '''
         #analysis parent viewForm
-        FormatableFrame.__init__(self, parent.get_mainframe(), nextframe, dtos, **configs)
+        FormatableFrame.__init__(self, parent.get_mainframe(), nextframe, dtos, trans, **configs)
                 
     
     #overwrite create_widges
@@ -113,11 +113,12 @@ class Frame_load_dir(FormatableFrame):
             showerror('Error', 'There is no matching resource metadata!')
             return
         
-        #set the entity name and full path in dto set
+        #set the entity name and full path into entity dto
         self.get_dtos().set_entityname(filename)
-        self.get_dtos().set_projectpath(self.__dicinput.get())
         self.get_dtos().set_viewfullpath(viewfullpath)
         self.get_dtos().set_resourcefullpath(resourcefullpath)
+        #set the project path into transaction dto
+        self.get_trans().set_projectpath(self.__dicinput.get())
         
     
     def before_next(self):

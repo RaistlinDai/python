@@ -6,7 +6,7 @@ Created on Jun 27, 2018
 from src.main.pydev.com.ftd.generalutilities.metadata.dto.xmlFile.viewmetadata.ViewMetadataDTO import ViewMetadataDTO
 from src.main.pydev.com.ftd.generalutilities.metadata.dto.xmlFile.resourcemetadata.ResourceMetadataDTO import ResourceMetadataDTO
 
-class EntityDTOSet(object):
+class EntityDTO(object):
     '''
     classdocs
     '''
@@ -18,7 +18,6 @@ class EntityDTOSet(object):
         self.__dto = {'Entity':None,
                       'ViewFullPath':None,
                       'ResourceFullPath':None,
-                      'ProjectPath':None,
                       'ViewMetaData':viewDTO,
                       'ResourceMetaData':resourceDTO}
         
@@ -46,18 +45,6 @@ class EntityDTOSet(object):
     def set_viewfullpath(self, fullpath):
         if self.__dto:
             self.__dto['ViewFullPath'] = fullpath
-        
-    
-    def get_projectpath(self):
-        if self.__dto:
-            return self.__dto['ProjectPath']
-        else:
-            return None
-
-
-    def set_projectpath(self, projectpath):
-        if self.__dto:
-            self.__dto['ProjectPath'] = projectpath
             
         
     def get_viewfullpath(self):
