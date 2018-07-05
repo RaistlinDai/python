@@ -5,15 +5,14 @@ Created on Jun 20, 2018
 '''
 from tkinter import *
 from tkinter.messagebox import askyesno
-from src.main.pydev.com.ftd.generalutilities.metadata.gui.impl.frame.Frame_load_dir import Frame_load_dir
-from src.main.pydev.com.ftd.generalutilities.metadata.gui.impl.frame.Frame_maint_gene import Frame_maint_gene
+from tkinter.messagebox import showerror
 from src.main.pydev.com.ftd.generalutilities.metadata.gui.impl.frame.Frame_main import Frame_main
 from src.main.pydev.com.ftd.generalutilities.metadata.gui.api.view.IViewForm import IViewForm
 from src.main.pydev.com.ftd.generalutilities.metadata.dto.base.EntityDTO import EntityDTO
-from src.main.pydev.com.ftd.generalutilities.metadata.gui.impl.frame.Frame_xml_option import Frame_xml_option
 from src.main.pydev.com.ftd.generalutilities.metadata.dto.base.TransactionDTO import TransactionDTO
+from src.main.pydev.com.ftd.generalutilities.metadata.gui.impl.base.FrameEnum import FrameEnum
 
-class ViewForm_fileload(IViewForm, EntityDTO):
+class ViewForm_fileload(IViewForm):
     '''
     classdocs
     '''
@@ -25,11 +24,21 @@ class ViewForm_fileload(IViewForm, EntityDTO):
         '''
         #main frame
         self.__main = Frame_main()
+        self.__body = None
         self.__dtos = EntityDTO()
         self.__trans = TransactionDTO()
+        
+        #inject the functions into transaction dto
+        self.__trans.set_next_frame_func(self.open_nextframe)
+        self.__trans.set_prev_frame_func(self.open_prevframe)
+        
+        #mock processing flow
+        self.__trans.add_next_process(FrameEnum.LOAD_DIR)
+        self.__trans.add_next_process(FrameEnum.MAINT_GENE)
+        self.__trans.add_next_process(FrameEnum.XML_OPTION)
+        
         #load frame
-        self.open_loaddir()
-        #self.open_maintgene()
+        self.open_firstframe()
         
     
     def on_closing(self):
@@ -41,39 +50,62 @@ class ViewForm_fileload(IViewForm, EntityDTO):
         return self.__main
     
     
-    def open_loaddir(self):
-        #load frame
-        self.__body = Frame_load_dir(self, self.open_maintgene, self.__dtos, self.__trans)
-        self.__body.config(width=540,height=280)
-        self.__body.pack_propagate(0)
-        self.__body.pack(fill=X)
+    def get_bodyframe(self):
+        return self.__body
+    
+    
+    def set_bodyframe(self, body):
+        self.__body = body
+
+
+#------------------------- frame workflow ---------------
+            
+    def open_firstframe(self):
+        trans = self.__trans
+        trans.print_processflow()  # debugging
+        result, procfunc, message = trans.get_first_process()
+        #verify the result
+        if not result:
+            showerror('Error', message)
+        else:
+            self.__body = procfunc.value(self, self.__dtos, self.__trans)
+            self.__body.config(width=540,height=300)
+            self.__body.pack_propagate(0)
+            self.__body.pack(fill=X)
+            
+            for ii in FrameEnum:
+                if self.__body.__class__ == ii.value:
+                    self.__trans.set_currentframe(ii)
+            
         
-        
-    def open_maintgene(self):
+    def open_nextframe(self):
         #destroy the body before rendering it
         try:
             self.__body.destroy()
         except AttributeError:
             pass
-        #maint generation frame
-        self.__body = Frame_maint_gene(self, self.open_verifyfile, self.__dtos, self.__trans)
-        self.__body.config(width=540,height=280)
-        self.__body.pack_propagate(0)
-        self.__body.pack(fill=X)
         
-        
-    def open_verifyfile(self):
+        trans = self.__trans
+        result, procfunc, message = trans.get_next_process()
+        #verify the result
+        if not result:
+            showerror('Error', message)
+        else:
+            self.__body = procfunc.value(self, self.__dtos, self.__trans)
+            self.__body.config(width=540,height=300)
+            self.__body.pack_propagate(0)
+            self.__body.pack(fill=X)
+            
+            for ii in FrameEnum:
+                if self.__body.__class__ == ii.value:
+                    self.__trans.set_currentframe(ii)
+                    
+    
+    def open_prevframe(self):
         #destroy the body before rendering it
         try:
             self.__body.destroy()
         except AttributeError:
             pass
-        #maint verification frame
-        self.__body = Frame_xml_option(self, None, self.__dtos, self.__trans)
-        self.__body.config(width=540,height=280)
-        self.__body.pack_propagate(0)
-        self.__body.pack(fill=X)
-        
-        
         
         

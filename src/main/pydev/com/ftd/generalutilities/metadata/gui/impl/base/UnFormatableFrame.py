@@ -11,9 +11,9 @@ class UnFormatableFrame(FtdFrame, IUnFormatableFrame):
     classdocs
     '''
 
-    def __init__(self, parent=None, nextframe=None, dtos=None, trans=None, **configs):
+    def __init__(self, parent=None, dtos=None, trans=None, **configs):
         '''
         Constructor
         '''
-        FtdFrame.__init__(self, parent, nextframe, dtos, trans, **configs)
+        FtdFrame.__init__(self, parent, dtos, trans, **configs)
         

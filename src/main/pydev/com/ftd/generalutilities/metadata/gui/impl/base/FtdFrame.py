@@ -15,13 +15,11 @@ class FtdFrame(Frame):
     '''
 
 
-    def __init__(self, parent=None, nextframe=None, dtos=None, trans=None, **configs):
+    def __init__(self, parent=None, dtos=None, trans=None, **configs):
         '''
         Constructor
         '''
         Frame.__init__(self, parent, **configs)
-        #next frame
-        self.__nextframe = nextframe
         #dtos
         self.__dtos = dtos
         #trans
@@ -31,7 +29,7 @@ class FtdFrame(Frame):
         #add buttom
         self.add_bottom(self)
         #format
-        self.adjust_children(parent)
+        self.__adjust_children__(parent)
         
     
     def create_widges(self):
@@ -39,12 +37,9 @@ class FtdFrame(Frame):
     
     
     def get_nextframe(self):
-        return self.__nextframe
-    
-    
-    def set_nextframe(self, nextframe):
-        self.__nextframe = nextframe
-        
+        func = self.__trans.get_next_frame_func()
+        return func
+            
 
     def set_dtos(self, dtos):
         self.__dtos = dtos
@@ -74,14 +69,16 @@ class FtdFrame(Frame):
         pass
     
     
-    def adjust_children(self, master):
+#------------------ private function -------------
+
+    def __adjust_children__(self, master):
         for child in master.winfo_children():
             try:
                 child.set_conf(font=master.labelfont, bg='white', fg='black', relief=RAISED)
             except AttributeError:
                 continue
             
-            
+    
     def set_conf(self, **confs):
         
         for child in self.winfo_children():

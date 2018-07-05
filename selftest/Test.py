@@ -10,7 +10,6 @@ from selftest import MyDef
 print('hello,world')
 
 testType = int(input('Test type (1 - 9): '))
-print(testType)
 
 if testType == 1:
     xyz = ('E', 'T', 'RT')
@@ -19,8 +18,8 @@ if testType == 1:
     
 elif testType == 2:
     abc = ['M', 'S', 'WQ']
-    for abcd in abc:
-        print(abcd)
+    print(abc.index('S'))
+    print(len(abc))
         
 elif testType == 3:
     sumx = 0

@@ -17,14 +17,12 @@ class Frame_load_dir(FormatableFrame):
     classdocs
     '''
 
-
-    def __init__(self, parent=None, nextframe=None, dtos=None, trans=None, **configs):
+    def __init__(self, parent=None, dtos=None, trans=None, **configs):
         '''
         Constructor
         '''
-        #analysis parent viewForm
-        FormatableFrame.__init__(self, parent.get_mainframe(), nextframe, dtos, trans, **configs)
-                
+        FormatableFrame.__init__(self, parent.get_mainframe(), dtos, trans, **configs)
+        
     
     #overwrite create_widges
     def create_widges(self):

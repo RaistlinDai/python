@@ -16,11 +16,11 @@ class Frame_xml_option(FormatableFrame):
     '''
 
 
-    def __init__(self, parent=None, nextframe=None, dtos=None, trans=None, **configs):
+    def __init__(self, parent=None, dtos=None, trans=None, **configs):
         '''
         Constructor
         '''
-        FormatableFrame.__init__(self, parent.get_mainframe(), nextframe, dtos, trans, **configs)
+        FormatableFrame.__init__(self, parent.get_mainframe(), dtos, trans, **configs)
         
         
     #overwrite create_widges
