@@ -32,6 +32,16 @@ class Frame_xml_option(FormatableFrame):
         self.__label01 = Label(self.__frame1, text="Xml generator options", width= 45)
         self.__label01.pack(side=TOP, fill=X, ipady=10)
         
+        canv1 = Canvas(self, height=70, width=550, bg='pink')
+        label1 = Label(canv1, text='EntityMap:')
+        label1.place(height=20, width=60, relx= 0, rely=0)
+        canv1.pack()
+        
+        canv2 = Canvas(self, height=70, width=550)
+        label2 = Label(canv2, text='BeanAppContext:')
+        label2.place(height=20, width=100, relx= 0, rely=0)
+        canv2.pack()
+        
     
     #overwrite create_widges
     def add_bottom(self, parent):
@@ -40,7 +50,6 @@ class Frame_xml_option(FormatableFrame):
                    'Prev':{'process':self.get_prevframe(), 'before':self.before_prev}}
         self.__buttom = Frame_bottom(parent, ['Next','Prev'], exFuncs)
         self.__buttom.pack(fill=X, ipady=10,side=BOTTOM)
-        
         
         
     #overwrite before_next
