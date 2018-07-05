@@ -25,14 +25,19 @@ class Frame_xml_option(FormatableFrame):
         
     #overwrite create_widges
     def create_widges(self):
-        pass
+        #frame
+        self.__frame1 = FormatableFrame(self)
+        self.__frame1.pack(side=TOP)
+        #Title
+        self.__label01 = Label(self.__frame1, text="Xml generator options", width= 45)
+        self.__label01.pack(side=TOP, fill=X, ipady=10)
         
     
     #overwrite create_widges
     def add_bottom(self, parent):
         #bottom frame
         exFuncs = {'Next':{'process':self.get_nextframe(), 'before':self.before_next},
-                   'Prev':None}
+                   'Prev':{'process':self.get_prevframe(), 'before':self.before_prev}}
         self.__buttom = Frame_bottom(parent, ['Next','Prev'], exFuncs)
         self.__buttom.pack(fill=X, ipady=10,side=BOTTOM)
         
@@ -44,6 +49,10 @@ class Frame_xml_option(FormatableFrame):
         curDtos = self.get_dtos()
         curTrans = self.get_trans()
         
+        #read the resource metadata and load the data into ResourceMetadataDTO
+        resourcepath = curDtos.get_resourcefullpath()
+        File_reader.read_resource_metadata(resourcepath, self.get_dtos())
+        
         ''' test '''
         result, status = File_reader.read_bean_app_context(curTrans.get_projectpath() + fileconstant.bean_app_context_path)
         if status:
@@ -53,4 +62,4 @@ class Frame_xml_option(FormatableFrame):
             else:
                 print(False)
             
-            
+        return True    

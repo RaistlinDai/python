@@ -3,7 +3,7 @@ Created on Jul 5, 2018
 
 @author: ftd
 '''
-from src.main.pydev.com.ftd.generalutilities.metadata.gui.impl.base.FrameEnum import FrameEnum
+from src.main.pydev.com.ftd.generalutilities.metadata.gui.impl.base.MainFrameEnum import MainFrameEnum
 
 class TransactionDTO(object):
     '''
@@ -91,7 +91,7 @@ class TransactionDTO(object):
             return None
         
     
-#----------------- change ----------------
+#----------------- maintain the process ----------------
     def get_first_process(self):
         '''
         get the first processing step
@@ -118,7 +118,7 @@ class TransactionDTO(object):
         @return: the error message when the validation failed
         '''
         #verify the input type
-        if not isinstance(next_step, FrameEnum):
+        if not isinstance(next_step, MainFrameEnum):
             return False, 'The input parameter is incorrect'
         
         if self.__dto:
@@ -150,15 +150,15 @@ class TransactionDTO(object):
         #verify the input type
         if not curr_step:
             curr_step = self.get_currentframe()
-        elif not isinstance(curr_step, FrameEnum):
+        elif not isinstance(curr_step, MainFrameEnum):
             return False, None, 'The input parameter is incorrect'
         
         try:
             proc = self.__dto['ProcessFlow']
             idx = proc.index(curr_step)
             #verify if current step is the last step
-            if idx >= len(proc):
-                return True, None, 'This is the last processing'
+            if idx+1 >= len(proc):
+                return True, None, 'This is the last processing.'
             else:
                 return True, proc[idx+1], None
         except ValueError as e:
@@ -183,7 +183,7 @@ class TransactionDTO(object):
         #verify the input type
         if not curr_step:
             curr_step = self.get_currentframe()
-        elif not isinstance(curr_step, FrameEnum):
+        elif not isinstance(curr_step, MainFrameEnum):
             return False, None, 'The input parameter is incorrect'
         
         try:
@@ -199,6 +199,22 @@ class TransactionDTO(object):
             return False, None, e
     
     
+    def update_process_flow_by_selection(self, selections):
+        '''
+        update the process flow according to the selections from 'Generate Selection' frame
+        @param selections: the selections from 'Generate Selection' frame
+        '''
+        for key, value in selections.items():
+            print(key + ':'+ str(value.get()))
+            if value.get() == 1:
+                #matching the short name in frame enums
+                for ii in MainFrameEnum:
+                    if key == ii.value[1]:
+                        self.add_next_process(ii)
+            else:
+                continue
+        
+        
     def print_processflow(self):
         '''
         debug function, it will print the process flow in CONSOLE_SCREEN_BUFFER_INFO

@@ -8,9 +8,8 @@ from src.main.pydev.com.ftd.generalutilities.metadata.gui.impl.frame.Frame_botto
 from src.main.pydev.com.ftd.generalutilities.metadata.gui.impl.frame.Frame_checkbox import Frame_checkbox
 from src.main.pydev.com.ftd.generalutilities.metadata.gui.impl.base.FormatableFrame import FormatableFrame
 from tkinter.messagebox import showerror
-from src.main.pydev.com.ftd.generalutilities.metadata.service.File_reader import File_reader
 
-class Frame_maint_gene(FormatableFrame):
+class Frame_gene_selection(FormatableFrame):
     '''
     classdocs
     '''
@@ -35,8 +34,8 @@ class Frame_maint_gene(FormatableFrame):
         #check buttons
         checkbut_frame1 = Frame_checkbox(self)
         checkbut_frame1.pack(fill=X)
-        Label(checkbut_frame1, text = 'XML:', width=10).pack(side=LEFT)
-        self.__checkvalues01 = {"EntityMap":IntVar(), "BeanAppContext":IntVar() }
+        Label(checkbut_frame1, text = 'Xml:', width=10).pack(side=LEFT)
+        self.__checkvalues01 = {"EntityMap & BeanAppContext":IntVar()}
         for chkv in self.__checkvalues01.keys():
             chk1 = Checkbutton(checkbut_frame1, text = chkv, variable = self.__checkvalues01[chkv], onvalue = 1, offvalue = 0)
             chk1.pack(side=LEFT)
@@ -70,34 +69,20 @@ class Frame_maint_gene(FormatableFrame):
     def before_next(self):
         '''
         overwrite the function in super class
+        generating the next frames according to the selections
         '''
-        #checkbox flag
+        #check box flag
         checkFlag = False
+        selections = dict(self.__checkvalues01, **self.__checkvalues02, **self.__checkvalues03)
         
-        for ck in self.__checkvalues01.keys():
-            print(ck + ":" + str(self.__checkvalues01[ck].get()))
-        
-        for val in self.__checkvalues01.values():
-            if val.get() == 1:
-                checkFlag = True
-                break
-        
-        for val in self.__checkvalues02.values():
-            if val.get() == 1:
-                checkFlag = True
-                break
-            
-        for val in self.__checkvalues03.values():
+        for val in selections.values():
             if val.get() == 1:
                 checkFlag = True
                 break
                 
         if checkFlag:
-            curDtos = self.get_dtos()
-            resourcepath = curDtos.get_resourcefullpath()
-            #read the resource metadata and load the data into ResourceMetadataDTO
-            File_reader.read_resource_metadata(resourcepath, self.get_dtos())
-            
+            #merge the selections into process flow
+            self.get_trans().update_process_flow_by_selection(selections)
             return True
         else:
             showerror('Error', 'You must select at least one generation file!')

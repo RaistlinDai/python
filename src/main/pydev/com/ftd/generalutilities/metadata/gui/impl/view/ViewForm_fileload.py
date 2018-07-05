@@ -4,13 +4,13 @@ Created on Jun 20, 2018
 @author: ftd
 '''
 from tkinter import *
-from tkinter.messagebox import askyesno
+from tkinter.messagebox import askyesno, showinfo
 from tkinter.messagebox import showerror
 from src.main.pydev.com.ftd.generalutilities.metadata.gui.impl.frame.Frame_main import Frame_main
 from src.main.pydev.com.ftd.generalutilities.metadata.gui.api.view.IViewForm import IViewForm
 from src.main.pydev.com.ftd.generalutilities.metadata.dto.base.EntityDTO import EntityDTO
 from src.main.pydev.com.ftd.generalutilities.metadata.dto.base.TransactionDTO import TransactionDTO
-from src.main.pydev.com.ftd.generalutilities.metadata.gui.impl.base.FrameEnum import FrameEnum
+from src.main.pydev.com.ftd.generalutilities.metadata.gui.impl.base.MainFrameEnum import MainFrameEnum
 
 class ViewForm_fileload(IViewForm):
     '''
@@ -33,9 +33,8 @@ class ViewForm_fileload(IViewForm):
         self.__trans.set_prev_frame_func(self.open_prevframe)
         
         #mock processing flow
-        self.__trans.add_next_process(FrameEnum.LOAD_DIR)
-        self.__trans.add_next_process(FrameEnum.MAINT_GENE)
-        self.__trans.add_next_process(FrameEnum.XML_OPTION)
+        self.__trans.add_next_process(MainFrameEnum.LOAD_DIR)
+        self.__trans.add_next_process(MainFrameEnum.GENE_SELECTION)
         
         #load frame
         self.open_firstframe()
@@ -89,6 +88,10 @@ class ViewForm_fileload(IViewForm):
         #verify the result
         if not result:
             showerror('Error', message)
+            return
+        elif not procfunc:
+            showinfo('Note', message)
+            return
         else:
             self.__contruct_newframe__(procfunc)
                     
@@ -115,11 +118,11 @@ class ViewForm_fileload(IViewForm):
 #----------------- private function -----------------
 
     def __contruct_newframe__(self, procfunc):
-        self.__body = procfunc.value(self, self.__dtos, self.__trans)
+        self.__body = procfunc.value[0](self, self.__dtos, self.__trans)
         self.__body.config(width=540,height=300)
         self.__body.pack_propagate(0)
         self.__body.pack(fill=X)
         
-        for ii in FrameEnum:
-            if self.__body.__class__ == ii.value:
+        for ii in MainFrameEnum:
+            if self.__body.__class__ == ii.value[0]:
                 self.__trans.set_currentframe(ii)
