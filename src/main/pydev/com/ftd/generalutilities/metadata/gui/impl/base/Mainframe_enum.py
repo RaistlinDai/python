@@ -11,7 +11,7 @@ from src.main.pydev.com.ftd.generalutilities.metadata.gui.impl.frame.Frame_contr
 from src.main.pydev.com.ftd.generalutilities.metadata.gui.impl.frame.Frame_serviceimpl_option import Frame_serviceimpl_option
 
 @unique
-class MainFrameEnum(Enum):
+class Mainframe_enum(Enum):
     '''
     classdocs
     @attention: the value structure: [frame class constructor, frame short name]

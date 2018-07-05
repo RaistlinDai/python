@@ -54,7 +54,7 @@ class Frame_xml_option(FormatableFrame):
         File_reader.read_resource_metadata(resourcepath, self.get_dtos())
         
         ''' test '''
-        result, status = File_reader.read_bean_app_context(curTrans.get_projectpath() + fileconstant.bean_app_context_path)
+        result, status = File_reader.read_bean_app_context(curTrans.get_projectpath() + fileconstant.BEAN_APP_CONTEXT_PATH)
         if status:
             #verify if the target entity uri is existing in the bean-app-context
             if curDtos.get_resourceDTO().get_primary_secure_uri() in result.get_entity_uri_mapstring():

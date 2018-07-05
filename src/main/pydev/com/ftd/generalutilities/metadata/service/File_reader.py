@@ -27,7 +27,7 @@ class File_reader(object):
             #go through the inner files
             for fullname in File_reader.iterbrowse(dirpath):
                 #get the view metadata files
-                if (fullname.startswith(dirpath + fileconstant.view_metadata_path)):
+                if (fullname.startswith(dirpath + fileconstant.VIEW_METADATA_PATH)):
                     #trim the file name
                     filename=os.path.basename(fullname)
                     #remove the suffix

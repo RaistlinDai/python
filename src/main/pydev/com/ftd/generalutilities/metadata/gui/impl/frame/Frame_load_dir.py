@@ -93,7 +93,7 @@ class Frame_load_dir(FormatableFrame):
         #verify source metadata
         resource_exist = False
         if filename:
-            resourcefullpath = self.__dicinput.get() + fileconstant.resource_metadata_path + filename +fileconstant.resource_metadata_suffix
+            resourcefullpath = self.__dicinput.get() + fileconstant.RESOURCE_METADATA_PATH + filename +fileconstant.RESOURCE_METADATA_SUFFIX
             resource_exist = File_reader.verify_file(resourcefullpath)
         
         newname = "Selected entity: " + filename

@@ -3,7 +3,7 @@ Created on Jul 5, 2018
 
 @author: ftd
 '''
-from src.main.pydev.com.ftd.generalutilities.metadata.gui.impl.base.MainFrameEnum import MainFrameEnum
+from src.main.pydev.com.ftd.generalutilities.metadata.gui.impl.base.Mainframe_enum import Mainframe_enum
 
 class TransactionDTO(object):
     '''
@@ -118,7 +118,7 @@ class TransactionDTO(object):
         @return: the error message when the validation failed
         '''
         #verify the input type
-        if not isinstance(next_step, MainFrameEnum):
+        if not isinstance(next_step, Mainframe_enum):
             return False, 'The input parameter is incorrect'
         
         if self.__dto:
@@ -150,7 +150,7 @@ class TransactionDTO(object):
         #verify the input type
         if not curr_step:
             curr_step = self.get_currentframe()
-        elif not isinstance(curr_step, MainFrameEnum):
+        elif not isinstance(curr_step, Mainframe_enum):
             return False, None, 'The input parameter is incorrect'
         
         try:
@@ -183,7 +183,7 @@ class TransactionDTO(object):
         #verify the input type
         if not curr_step:
             curr_step = self.get_currentframe()
-        elif not isinstance(curr_step, MainFrameEnum):
+        elif not isinstance(curr_step, Mainframe_enum):
             return False, None, 'The input parameter is incorrect'
         
         try:
@@ -205,10 +205,9 @@ class TransactionDTO(object):
         @param selections: the selections from 'Generate Selection' frame
         '''
         for key, value in selections.items():
-            print(key + ':'+ str(value.get()))
             if value.get() == 1:
                 #matching the short name in frame enums
-                for ii in MainFrameEnum:
+                for ii in Mainframe_enum:
                     if key == ii.value[1]:
                         self.add_next_process(ii)
             else:

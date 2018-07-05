@@ -8,6 +8,7 @@ from src.main.pydev.com.ftd.generalutilities.metadata.gui.impl.frame.Frame_botto
 from src.main.pydev.com.ftd.generalutilities.metadata.gui.impl.frame.Frame_checkbox import Frame_checkbox
 from src.main.pydev.com.ftd.generalutilities.metadata.gui.impl.base.FormatableFrame import FormatableFrame
 from tkinter.messagebox import showerror
+from src.main.pydev.com.ftd.generalutilities.metadata.gui.impl.base.Frame_constant import Frame_constant
 
 class Frame_gene_selection(FormatableFrame):
     '''
@@ -31,11 +32,13 @@ class Frame_gene_selection(FormatableFrame):
         self.__label01 = Label(self.__frame1, text="Select the generated file", width= 45)
         self.__label01.pack(side=TOP, fill=X, ipady=10)
         
+        frame_constant = Frame_constant()
+        
         #check buttons
         checkbut_frame1 = Frame_checkbox(self)
         checkbut_frame1.pack(fill=X)
         Label(checkbut_frame1, text = 'Xml:', width=10).pack(side=LEFT)
-        self.__checkvalues01 = {"EntityMap & BeanAppContext":IntVar()}
+        self.__checkvalues01 = {frame_constant.ENTITY_MAP_AND_BEAN_APP:IntVar()}
         for chkv in self.__checkvalues01.keys():
             chk1 = Checkbutton(checkbut_frame1, text = chkv, variable = self.__checkvalues01[chkv], onvalue = 1, offvalue = 0)
             chk1.pack(side=LEFT)
@@ -43,7 +46,8 @@ class Frame_gene_selection(FormatableFrame):
         checkbut_frame2 = Frame_checkbox(self)
         checkbut_frame2.pack(fill=X)
         Label(checkbut_frame2, text = 'Java:', width=10).pack(side=LEFT)
-        self.__checkvalues02 = {"DataController":IntVar(), "ServiceImpl":IntVar() }
+        self.__checkvalues02 = {frame_constant.DATA_CONTROLLER:IntVar(), 
+                                frame_constant.SERVICE_IMPL:IntVar() }
         for chkv in self.__checkvalues02.keys():
             chk1 = Checkbutton(checkbut_frame2, text = chkv, variable = self.__checkvalues02[chkv], onvalue = 1, offvalue = 0)
             chk1.pack(side=LEFT)
@@ -51,7 +55,10 @@ class Frame_gene_selection(FormatableFrame):
         checkbut_frame3 = Frame_checkbox(self)
         checkbut_frame3.pack(fill=X)
         Label(checkbut_frame3, text = 'TsHandler:', width=10).pack(side=LEFT)
-        self.__checkvalues03 = {"Constants":IntVar(), "TSHandler":IntVar(), "MockDTO":IntVar(), "ObservableObj":IntVar() }
+        self.__checkvalues03 = {frame_constant.TS_CONSTANTS:IntVar(), 
+                                frame_constant.TS_HANDLER:IntVar(), 
+                                frame_constant.MOCK_DTO:IntVar(), 
+                                frame_constant.OBSERVABLE_OBJ:IntVar() }
         for chkv in self.__checkvalues03.keys():
             chk1 = Checkbutton(checkbut_frame3, text = chkv, variable = self.__checkvalues03[chkv], onvalue = 1, offvalue = 0)
             chk1.pack(side=LEFT)

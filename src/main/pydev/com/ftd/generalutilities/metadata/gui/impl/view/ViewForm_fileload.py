@@ -10,7 +10,7 @@ from src.main.pydev.com.ftd.generalutilities.metadata.gui.impl.frame.Frame_main 
 from src.main.pydev.com.ftd.generalutilities.metadata.gui.api.view.IViewForm import IViewForm
 from src.main.pydev.com.ftd.generalutilities.metadata.dto.base.EntityDTO import EntityDTO
 from src.main.pydev.com.ftd.generalutilities.metadata.dto.base.TransactionDTO import TransactionDTO
-from src.main.pydev.com.ftd.generalutilities.metadata.gui.impl.base.MainFrameEnum import MainFrameEnum
+from src.main.pydev.com.ftd.generalutilities.metadata.gui.impl.base.Mainframe_enum import Mainframe_enum
 
 class ViewForm_fileload(IViewForm):
     '''
@@ -33,8 +33,8 @@ class ViewForm_fileload(IViewForm):
         self.__trans.set_prev_frame_func(self.open_prevframe)
         
         #mock processing flow
-        self.__trans.add_next_process(MainFrameEnum.LOAD_DIR)
-        self.__trans.add_next_process(MainFrameEnum.GENE_SELECTION)
+        self.__trans.add_next_process(Mainframe_enum.LOAD_DIR)
+        self.__trans.add_next_process(Mainframe_enum.GENE_SELECTION)
         
         #load frame
         self.open_firstframe()
@@ -123,6 +123,6 @@ class ViewForm_fileload(IViewForm):
         self.__body.pack_propagate(0)
         self.__body.pack(fill=X)
         
-        for ii in MainFrameEnum:
+        for ii in Mainframe_enum:
             if self.__body.__class__ == ii.value[0]:
                 self.__trans.set_currentframe(ii)
