@@ -13,16 +13,17 @@ class TransactionDTO(object):
     '''
 
 
-    def __init__(self, current_frame=None, process_flow=None, proj_path=None, next_frame_func=None, prev_frame_func=None):
+    def __init__(self):
         '''
         Constructor
         '''
-        self.__dto = {'CurrentFrame':current_frame,
-                      'ProcessFlow':process_flow,
-                      'NextFrameFunc':next_frame_func,
-                      'PrevFrameFunc':prev_frame_func,
-                      'ProjectPath':proj_path,
-                      'GenerateOption':{}
+        self.__dto = {'CurrentFrame':None,
+                      'ProcessFlow':None,
+                      'NextFrameFunc':None,
+                      'PrevFrameFunc':None,
+                      'GenerateOption':{},
+                      'WorkspacePath':None,
+                      'ProjectPath':None
                       }
         
         
@@ -82,18 +83,6 @@ class TransactionDTO(object):
             return None 
      
         
-    def set_projectpath(self, projpath):
-        if self.__dto:
-            self.__dto['ProjectPath'] = projpath
-            
-            
-    def get_projectpath(self):
-        if self.__dto:
-            return self.__dto['ProjectPath']
-        else:
-            return None
-        
-        
     def set_generateoption(self, generateoption):
         if self.__dto and isinstance(generateoption, dict):
             self.__dto['GenerateOption'] = generateoption
@@ -104,7 +93,33 @@ class TransactionDTO(object):
             return self.__dto['GenerateOption']
         else:
             return None
-
+        
+            
+    def set_projectpath(self, projpath):
+        if self.__dto:
+            self.__dto['ProjectPath'] = projpath
+            
+            
+    def get_projectpath(self):
+        if self.__dto:
+            return self.__dto['ProjectPath']
+        else:
+            return None
+    
+        
+    def set_workspacepath(self, workpath):
+        if self.__dto:
+            if not workpath.endswith('\\'):
+                workpath = workpath + '\\'
+            self.__dto['WorkspacePath'] = workpath
+            
+            
+    def get_workspacepath(self):
+        if self.__dto:
+            return self.__dto['WorkspacePath']
+        else:
+            return None    
+    
 
 #----------------- packaged functions ------------------
 
@@ -118,8 +133,8 @@ class TransactionDTO(object):
         '''
         #verify the input type
         if self.__dto:
-            if self.__dto['ProcessFlow'] and len(self.__dto['ProcessFlow']):
-                proc = self.__dto['ProcessFlow'] 
+            if self.get_processflow() and len(self.get_processflow())>0:
+                proc = self.get_processflow()
                 return True, proc[0], None
             else:
                 return False, None, 'There is no process info'
@@ -139,12 +154,11 @@ class TransactionDTO(object):
             return False, 'The input parameter is incorrect'
         
         if self.__dto:
-            if self.__dto['ProcessFlow']:
-                proc = self.__dto['ProcessFlow']
-                proc.append(next_step)
+            if self.get_processflow():
+                self.get_processflow().append(next_step)
                 return True, None
             else:
-                self.__dto['ProcessFlow'] = [next_step]
+                self.set_processflow([next_step])
                 return True, None
         else:
             return False, 'There is no transaction info, please re-open the app'
@@ -161,7 +175,7 @@ class TransactionDTO(object):
         #verify the transaction dto
         if not self.__dto:
             return False, None, 'There is no transaction info, please re-open the app'
-        elif not self.__dto['ProcessFlow']:
+        elif not self.get_processflow():
             return False, None, 'There is no process info'
         
         #verify the input type
@@ -171,7 +185,7 @@ class TransactionDTO(object):
             return False, None, 'The input parameter is incorrect'
         
         try:
-            proc = self.__dto['ProcessFlow']
+            proc = self.get_processflow()
             idx = proc.index(curr_step)
             #verify if current step is the last step
             if idx+1 >= len(proc):
@@ -194,7 +208,7 @@ class TransactionDTO(object):
         #verify the transaction dto
         if not self.__dto:
             return False, None, 'There is no transaction info, please re-open the app'
-        elif not self.__dto['ProcessFlow']:
+        elif not self.get_processflow():
             return False, None, 'There is no process info'
         
         #verify the input type
@@ -204,7 +218,7 @@ class TransactionDTO(object):
             return False, None, 'The input parameter is incorrect'
         
         try:
-            proc = self.__dto['ProcessFlow']
+            proc = self.get_processflow()
             idx = proc.index(curr_step)
             #verify if current step is the last step
             if idx == 0:
@@ -237,15 +251,14 @@ class TransactionDTO(object):
         @param selections: the selections from 'Generate Selection' frame
         '''
         for case in switch(selections):
-            if case(1):
-                print('model 1')
+            if case(1): #select entity from folder
                 self.add_next_process(Mainframe_enum.LOAD_DIR)
                 self.add_next_process(Mainframe_enum.GENE_SELECTION)
                 break
-            if case(2):
+            if case(2): #select a entity directly
                 print('model 2')
                 break
-            if case(3):
+            if case(3): #customize the process flow
                 print('model 3')
                 break
             if case(): # default, could also just omit condition or 'if True'
@@ -258,7 +271,7 @@ class TransactionDTO(object):
         '''
         debug function, it will print the process flow in CONSOLE_SCREEN_BUFFER_INFO
         '''
-        proc = self.__dto['ProcessFlow']
+        proc = self.get_processflow()
         idx = 1
         for ii in proc:
             print(str(idx) + ':' + str(ii))
@@ -283,7 +296,7 @@ class TransactionDTO(object):
             return False, 'The input parameter is incorrect'
         
         const = Frame_constant()
-        opts = self.__dto['GenerateOption']
+        opts = self.get_generateoption()
         if action == const.ACTION_UPDATE:
             for key, value in option.items():
                 opts[key] = value
@@ -299,5 +312,5 @@ class TransactionDTO(object):
         '''
         debug function, it will print the generate options in CONSOLE_SCREEN_BUFFER_INFO
         '''
-        opts = self.__dto['GenerateOption']
+        opts = self.get_generateoption()
         print(opts)

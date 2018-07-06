@@ -9,11 +9,13 @@ from src.main.pydev.com.ftd.generalutilities.metadata.service.File_constant impo
 from src.main.pydev.com.ftd.generalutilities.metadata.dto.xmlFile.resourcemetadata.ResourceMetadataDTO import ResourceMetadataDTO
 from src.main.pydev.com.ftd.generalutilities.metadata.dto.xmlFile.beanappcontext.BeanAppContext import BeanAppContext
 
-class File_reader(object):
+class File_processor(object):
     '''
     classdocs
     '''
-    
+
+#------------------------ Reader ------------------
+
     @staticmethod
     def read_dir(dirpath):
         try:
@@ -25,7 +27,7 @@ class File_reader(object):
             #change the work path
             os.chdir(dirpath)
             #go through the inner files
-            for fullname in File_reader.iterbrowse(dirpath):
+            for fullname in File_processor.iterbrowse(dirpath):
                 #get the view metadata files
                 if (fullname.startswith(dirpath + fileconstant.VIEW_METADATA_PATH)):
                     #trim the file name
@@ -63,7 +65,7 @@ class File_reader(object):
     @staticmethod
     def read_resource_metadata(path, file_dto):
         # verify if file is existing
-        if not File_reader.verify_file(path):
+        if not File_processor.verify_dir_existing(path):
             return False
         
         #get the root of resource metadata
@@ -92,7 +94,7 @@ class File_reader(object):
     @staticmethod
     def read_bean_app_context(path):
         # verify if file is existing
-        if not File_reader.verify_file(path):
+        if not File_processor.verify_dir_existing(path):
             return None, False
         
         #get the root of resource metadata
@@ -118,8 +120,25 @@ class File_reader(object):
             
     
     @staticmethod
-    def verify_file(path):
+    def verify_dir_existing(path):
         return os.path.exists(path)
     
     
+    @staticmethod
+    def verify_dir_format(path):
+        return os.path.isdir(path)
     
+#------------------------ Generator ------------------
+    
+    @staticmethod
+    def create_folder(directory):
+        os.makedirs(directory)
+    
+    
+    @staticmethod
+    def update_bean_app_context(filepath):
+        # verify if file is existing
+        if os.path.exists(filepath):
+            #backup file
+            filepath_new = filepath + '.bck'
+            

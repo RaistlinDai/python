@@ -10,7 +10,7 @@ from src.main.pydev.com.ftd.generalutilities.metadata.gui.impl.frame.Frame_botto
 from src.main.pydev.com.ftd.generalutilities.metadata.service.File_constant import File_constant
 from src.main.pydev.com.ftd.generalutilities.metadata.gui.impl.base.FormatableFrame import FormatableFrame
 from src.main.pydev.com.ftd.generalutilities.metadata.gui.impl.base.UnFormatableFrame import UnFormatableFrame
-from src.main.pydev.com.ftd.generalutilities.metadata.service.File_reader import File_reader
+from src.main.pydev.com.ftd.generalutilities.metadata.service.File_processor import File_processor
 
 class Frame_load_dir(FormatableFrame):
     '''
@@ -94,7 +94,7 @@ class Frame_load_dir(FormatableFrame):
         resource_exist = False
         if filename:
             resourcefullpath = self.__dicinput.get() + fileconstant.RESOURCE_METADATA_PATH + filename +fileconstant.RESOURCE_METADATA_SUFFIX
-            resource_exist = File_reader.verify_file(resourcefullpath)
+            resource_exist = File_processor.verify_dir_existing(resourcefullpath)
         
         newname = "Selected entity: " + filename
         self.__label02.config(text=newname)
@@ -120,7 +120,15 @@ class Frame_load_dir(FormatableFrame):
         
     
     def before_next(self):
+        '''
+        overwrite the function in super class
+        verify the input directory
+        '''
         if self.__dicinput.get():
+            if not File_processor.verify_dir_format(self.__dicinput.get()):
+                showerror('Error', 'The directory format is incorrect!')
+                return False
+            
             return True
         else:
             showerror('Error', 'You must select an existing entity!')

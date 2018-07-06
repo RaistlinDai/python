@@ -62,7 +62,6 @@ class ViewForm_fileload(IViewForm):
         '''
         open the first frame according to the processing list
         '''
-        self.__trans.print_processflow()  # debugging
         result, procfunc, message = self.__trans.get_first_process()
         #verify the result
         if not result:

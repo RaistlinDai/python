@@ -6,7 +6,7 @@ Created on Jun 26, 2018
 from tkinter import *
 from src.main.pydev.com.ftd.generalutilities.metadata.gui.impl.frame.Frame_bottom import Frame_bottom
 from src.main.pydev.com.ftd.generalutilities.metadata.gui.impl.base.FormatableFrame import FormatableFrame
-from src.main.pydev.com.ftd.generalutilities.metadata.service.File_reader import File_reader
+from src.main.pydev.com.ftd.generalutilities.metadata.service.File_processor import File_processor
 from src.main.pydev.com.ftd.generalutilities.metadata.service.File_constant import File_constant
 from src.main.pydev.com.ftd.generalutilities.metadata.gui.impl.base.Frame_constant import Frame_constant
 
@@ -88,10 +88,10 @@ class Frame_xml_option(FormatableFrame):
         
         #--- read the resource metadata and load the data into ResourceMetadataDTO ---
         resourcepath = curDtos.get_resourcefullpath()
-        File_reader.read_resource_metadata(resourcepath, self.get_dtos())
+        File_processor.read_resource_metadata(resourcepath, self.get_dtos())
         
         ''' test file '''
-        result, status = File_reader.read_bean_app_context(curTrans.get_projectpath() + fileconstant.BEAN_APP_CONTEXT_PATH)
+        result, status = File_processor.read_bean_app_context(curTrans.get_projectpath() + fileconstant.BEAN_APP_CONTEXT_PATH)
         if status:
             #verify if the target entity uri is existing in the bean-app-context
             if curDtos.get_resourceDTO().get_primary_secure_uri() in result.get_entity_uri_mapstring():

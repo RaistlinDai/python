@@ -5,7 +5,7 @@ Created on Jun 22, 2018
 '''
 from tkinter import Button
 from src.main.pydev.com.ftd.generalutilities.metadata.gui.impl.view.Popup_filelist import Popup_filelist
-from src.main.pydev.com.ftd.generalutilities.metadata.service.File_reader import File_reader
+from src.main.pydev.com.ftd.generalutilities.metadata.service.File_processor import File_processor
 from tkinter.messagebox import showerror
 
 class Button_load(Button):

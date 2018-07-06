@@ -3,10 +3,13 @@ Created on Jul 6, 2018
 
 @author: ftd
 '''
+import os
 from tkinter import *
 from src.main.pydev.com.ftd.generalutilities.metadata.gui.impl.frame.Frame_bottom import Frame_bottom
 from src.main.pydev.com.ftd.generalutilities.metadata.gui.impl.base.FormatableFrame import FormatableFrame
 from src.main.pydev.com.ftd.generalutilities.metadata.gui.impl.button.Button_openfile import Button_openfile
+from src.main.pydev.com.ftd.generalutilities.metadata.service.File_processor import File_processor
+from tkinter.messagebox import showerror, showinfo
 
 class Frame_startup(FormatableFrame):
     '''
@@ -79,8 +82,36 @@ class Frame_startup(FormatableFrame):
     def before_next(self):
         '''
         overwrite the function in super class
+        verify the input directory
         generating the next frames according to the selections
         '''
+        #--- verify the input value
+        if self.__dicinput.get():
+            if not File_processor.verify_dir_format(self.__dicinput.get()):
+                showerror('Error', 'The directory format is incorrect!')
+                return False
+            
+            if not File_processor.verify_dir_existing(self.__dicinput.get()):
+                File_processor.create_folder(self.__dicinput.get())
+                showinfo('Note', 'A new folder has been created in your workspace path.')
+                
+            #--- set the workspace path into transaction dto
+            self.get_trans().set_workspacepath(self.__dicinput.get())
+        else:
+            tempdir = os.path.join(os.path.expanduser('~'), "Desktop") + '\\PyWorkspace'
+            #--- desktop temp folder already existing
+            if File_processor.verify_dir_existing(tempdir):
+                showinfo('Note', 'The temp folder(PyWorkspace) on your desktop has been set as the default workspace.')
+            else:
+                File_processor.create_folder(tempdir)
+                showinfo('Note', 'A temp folder(PyWorkspace) has been created on your desktop.')
+                
+            #--- set the workspace path into transaction dto
+            self.get_trans().set_workspacepath(tempdir)
+        
+        print(self.get_trans().get_workspacepath())
+        
+        #--- set the process flow according to the selection
         self.get_trans().update_process_flow_by_start_selection(self.__vari1.get())
         
         return True
