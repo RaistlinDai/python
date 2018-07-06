@@ -5,6 +5,7 @@ Created on Jul 5, 2018
 '''
 from src.main.pydev.com.ftd.generalutilities.metadata.gui.impl.base.Mainframe_enum import Mainframe_enum
 from src.main.pydev.com.ftd.generalutilities.metadata.gui.impl.base.Frame_constant import Frame_constant
+from src.main.pydev.com.ftd.generalutilities.metadata.util.switch import switch
 
 class TransactionDTO(object):
     '''
@@ -103,7 +104,10 @@ class TransactionDTO(object):
             return self.__dto['GenerateOption']
         else:
             return None
-    
+
+
+#----------------- packaged functions ------------------
+
 #----------------- maintain the process ----------------
     def get_first_process(self):
         '''
@@ -212,7 +216,7 @@ class TransactionDTO(object):
             return False, None, e
     
     
-    def update_process_flow_by_selection(self, selections):
+    def update_process_flow_by_gene_selection(self, selections):
         '''
         update the process flow according to the selections from 'Generate Selection' frame
         @param selections: the selections from 'Generate Selection' frame
@@ -225,6 +229,29 @@ class TransactionDTO(object):
                         self.add_next_process(ii)
             else:
                 continue
+            
+            
+    def update_process_flow_by_start_selection(self, selections):
+        '''
+        update the process flow according to the selections from 'Generate Selection' frame
+        @param selections: the selections from 'Generate Selection' frame
+        '''
+        for case in switch(selections):
+            if case(1):
+                print('model 1')
+                self.add_next_process(Mainframe_enum.LOAD_DIR)
+                self.add_next_process(Mainframe_enum.GENE_SELECTION)
+                break
+            if case(2):
+                print('model 2')
+                break
+            if case(3):
+                print('model 3')
+                break
+            if case(): # default, could also just omit condition or 'if True'
+                print('default')
+                # No need to break here, it'll stop anyway
+        return True
         
         
     def print_processflow(self):
@@ -237,6 +264,7 @@ class TransactionDTO(object):
             print(str(idx) + ':' + str(ii))
             idx = idx + 1
             
+    
 #----------------- maintain the generate options ----------------
 
     def update_options(self, option, action):

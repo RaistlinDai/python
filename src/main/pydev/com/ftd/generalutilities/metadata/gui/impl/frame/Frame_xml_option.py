@@ -37,7 +37,6 @@ class Frame_xml_option(FormatableFrame):
         #label
         label1 = Label(canv1, text='EntityMap:')
         label1.place(height=20, width=60, relx= 0, rely=0)
-        #check box
         #radio box
         self.__vari1 = IntVar()
         self.__rad1 = Radiobutton(canv1, text='Save the backup', variable=self.__vari1, value=1)

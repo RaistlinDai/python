@@ -89,7 +89,7 @@ class Frame_gene_selection(FormatableFrame):
                 
         if checkFlag:
             #merge the selections into process flow
-            self.get_trans().update_process_flow_by_selection(selections)
+            self.get_trans().update_process_flow_by_gene_selection(selections)
             self.get_trans().print_processflow()
             return True
         else:

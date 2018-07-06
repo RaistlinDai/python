@@ -33,9 +33,7 @@ class ViewForm_fileload(IViewForm):
         self.__trans.set_prev_frame_func(self.open_prevframe)
         
         #mock processing flow
-        #self.__trans.add_next_process(Mainframe_enum.LOAD_DIR)
-        #self.__trans.add_next_process(Mainframe_enum.GENE_SELECTION)
-        self.__trans.add_next_process(Mainframe_enum.XML_OPTION)
+        self.__trans.add_next_process(Mainframe_enum.START_UP)
         
         #load frame
         self.open_firstframe()
@@ -64,9 +62,8 @@ class ViewForm_fileload(IViewForm):
         '''
         open the first frame according to the processing list
         '''
-        trans = self.__trans
-        trans.print_processflow()  # debugging
-        result, procfunc, message = trans.get_first_process()
+        self.__trans.print_processflow()  # debugging
+        result, procfunc, message = self.__trans.get_first_process()
         #verify the result
         if not result:
             showerror('Error', message)
@@ -84,8 +81,7 @@ class ViewForm_fileload(IViewForm):
         except AttributeError:
             pass
         
-        trans = self.__trans
-        result, procfunc, message = trans.get_next_process()
+        result, procfunc, message = self.__trans.get_next_process()
         #verify the result
         if not result:
             showerror('Error', message)
@@ -107,8 +103,7 @@ class ViewForm_fileload(IViewForm):
         except AttributeError:
             pass
         
-        trans = self.__trans
-        result, procfunc, message = trans.get_prev_process()
+        result, procfunc, message = self.__trans.get_prev_process()
         #verify the result
         if not result:
             showerror('Error', message)
