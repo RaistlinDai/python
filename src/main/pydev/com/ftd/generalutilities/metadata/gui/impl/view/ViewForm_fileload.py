@@ -33,8 +33,9 @@ class ViewForm_fileload(IViewForm):
         self.__trans.set_prev_frame_func(self.open_prevframe)
         
         #mock processing flow
-        self.__trans.add_next_process(Mainframe_enum.LOAD_DIR)
-        self.__trans.add_next_process(Mainframe_enum.GENE_SELECTION)
+        #self.__trans.add_next_process(Mainframe_enum.LOAD_DIR)
+        #self.__trans.add_next_process(Mainframe_enum.GENE_SELECTION)
+        self.__trans.add_next_process(Mainframe_enum.XML_OPTION)
         
         #load frame
         self.open_firstframe()

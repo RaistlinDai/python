@@ -35,3 +35,7 @@ class Frame_constant:
         self.TS_HANDLER = 'TSHandler'
         self.MOCK_DTO = 'MockDTO'
         self.OBSERVABLE_OBJ = 'ObservableObj'
+        
+        #----------------- action ------------
+        self.ACTION_UPDATE = 'update'
+        self.ACTION_DELETE = 'delete'

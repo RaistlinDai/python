@@ -4,6 +4,7 @@ Created on Jul 5, 2018
 @author: ftd
 '''
 from src.main.pydev.com.ftd.generalutilities.metadata.gui.impl.base.Mainframe_enum import Mainframe_enum
+from src.main.pydev.com.ftd.generalutilities.metadata.gui.impl.base.Frame_constant import Frame_constant
 
 class TransactionDTO(object):
     '''
@@ -19,7 +20,8 @@ class TransactionDTO(object):
                       'ProcessFlow':process_flow,
                       'NextFrameFunc':next_frame_func,
                       'PrevFrameFunc':prev_frame_func,
-                      'ProjectPath':proj_path
+                      'ProjectPath':proj_path,
+                      'GenerateOption':{}
                       }
         
         
@@ -90,6 +92,17 @@ class TransactionDTO(object):
         else:
             return None
         
+        
+    def set_generateoption(self, generateoption):
+        if self.__dto and isinstance(generateoption, dict):
+            self.__dto['GenerateOption'] = generateoption
+            
+            
+    def get_generateoption(self):
+        if self.__dto:
+            return self.__dto['GenerateOption']
+        else:
+            return None
     
 #----------------- maintain the process ----------------
     def get_first_process(self):
@@ -223,3 +236,40 @@ class TransactionDTO(object):
         for ii in proc:
             print(str(idx) + ':' + str(ii))
             idx = idx + 1
+            
+#----------------- maintain the generate options ----------------
+
+    def update_options(self, option, action):
+        '''
+        update options in transaction dto.
+        if the action is 'update', it will add/replace the related info in the transaction dto
+        if the action is 'delete', it will remove the related info in the transaction dto 
+        @param options: the options (type must be dict)
+        '''
+        #verify the transaction dto
+        if not self.__dto:
+            return False, 'There is no transaction info, please re-open the app'
+        
+        #verify the input type
+        if not isinstance(option, dict):
+            return False, 'The input parameter is incorrect'
+        
+        const = Frame_constant()
+        opts = self.__dto['GenerateOption']
+        if action == const.ACTION_UPDATE:
+            for key, value in option.items():
+                opts[key] = value
+        elif action == const.ACTION_DELETE:
+            for key, value in option.items():
+                if key in opts.keys():
+                    opts.pop(key)
+        
+        return True, None
+    
+
+    def print_options(self):
+        '''
+        debug function, it will print the generate options in CONSOLE_SCREEN_BUFFER_INFO
+        '''
+        opts = self.__dto['GenerateOption']
+        print(opts)
