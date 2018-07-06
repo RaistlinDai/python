@@ -124,11 +124,7 @@ class Frame_load_dir(FormatableFrame):
         overwrite the function in super class
         verify the input directory
         '''
-        if self.__dicinput.get():
-            if not File_processor.verify_dir_format(self.__dicinput.get()):
-                showerror('Error', 'The directory format is incorrect!')
-                return False
-            
+        if self.get_dtos().get_entityname() and self.get_dtos().get_viewfullpath():
             return True
         else:
             showerror('Error', 'You must select an existing entity!')

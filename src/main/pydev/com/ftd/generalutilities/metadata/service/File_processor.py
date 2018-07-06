@@ -4,10 +4,11 @@ Created on Jun 21, 2018
 @author: ftd
 '''
 import os
+import shutil
 import xml.dom.minidom
 from src.main.pydev.com.ftd.generalutilities.metadata.service.File_constant import File_constant
 from src.main.pydev.com.ftd.generalutilities.metadata.dto.xmlFile.resourcemetadata.ResourceMetadataDTO import ResourceMetadataDTO
-from src.main.pydev.com.ftd.generalutilities.metadata.dto.xmlFile.beanappcontext.BeanAppContext import BeanAppContext
+from src.main.pydev.com.ftd.generalutilities.metadata.dto.xmlFile.beanappcontext.BeanAppContextDTO import BeanAppContextDTO
 
 class File_processor(object):
     '''
@@ -93,12 +94,19 @@ class File_processor(object):
     
     @staticmethod
     def read_bean_app_context(path):
+        '''
+        read the bean-app-context.xml file, and load the details into BeanAppContextDTO
+        @param path: the full path of bean-app-context.xml
+        @return: return status
+        @return: BeanAppContextDTO
+        @return: message if validation failed
+        '''
         # verify if file is existing
         if not File_processor.verify_dir_existing(path):
-            return None, False
+            return False, None, 'The bean-app-context is not exist, please check.'
         
         #get the root of resource metadata
-        bean_app = BeanAppContext()
+        bean_app = BeanAppContextDTO()
         dom = xml.dom.minidom.parse(path)
         for node in dom.getElementsByTagName('bean'):
             bean_app.set_bean_id(node.getAttribute('id'))
@@ -116,7 +124,7 @@ class File_processor(object):
             elif node_name == 'viewMetadataService':
                 bean_app.set_view_metadata_service(node.getAttribute('value'))
                 
-        return bean_app, True
+        return True, bean_app, None
             
     
     @staticmethod
@@ -133,6 +141,31 @@ class File_processor(object):
     @staticmethod
     def create_folder(directory):
         os.makedirs(directory)
+    
+    
+    @staticmethod
+    def create_file(filename, directory=None):
+        if directory:
+            os.chdir(directory)
+        
+    
+    @staticmethod
+    def copy_file(srcfile, dstfile):
+        '''
+        copy file
+        @param srcfile: the source file
+        @param dstfile: the new file
+        @return: return status
+        @return: message if validation failed
+        '''
+        if not os.path.isfile(srcfile):
+            return False, "File not exist!"
+        else:
+            fpath,fname=os.path.split(dstfile)
+            if not os.path.exists(fpath):
+                os.makedirs(fpath)
+            shutil.copyfile(srcfile, dstfile)
+        return True, None
     
     
     @staticmethod

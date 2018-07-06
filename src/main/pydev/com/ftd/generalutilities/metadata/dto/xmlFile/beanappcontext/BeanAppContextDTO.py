@@ -4,13 +4,14 @@ Created on Jul 04, 2018
 @author: ftd
 '''
 
-class BeanAppContext(object):
+class BeanAppContextDTO(object):
     '''
     classdocs
     '''
 
 
-    def __init__(self, bean_id=None, 
+    def __init__(self, 
+                 bean_id=None, 
                  bean_class=None, 
                  entity_uri_mapstring=None, 
                  label_service=None, 
@@ -19,12 +20,21 @@ class BeanAppContext(object):
         '''
         Constructor
         '''
+        self.__filename = 'bean-app-context.xml'
         self.__bean_id = bean_id
         self.__bean_class = bean_class
         self.__entity_uri_mapstring = entity_uri_mapstring
         self.__label_service = label_service
         self.__entity_metadata_service = entity_metadata_service
         self.__view_metadata_service = view_metadata_service
+
+
+    def get_filename(self):
+        return self.__filename
+
+
+    def set_filename(self, value):
+        self.__filename = value
 
 
     def get_bean_class(self):

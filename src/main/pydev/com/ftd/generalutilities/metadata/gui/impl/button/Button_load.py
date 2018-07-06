@@ -34,7 +34,7 @@ class Button_load(Button):
         
         #call reader service
         if self.__loadfunc:
-            result, metas, err_message = File_reader.read_dir(self.__loadfunc())
+            result, metas, err_message = File_processor.read_dir(self.__loadfunc())
             
             if result:
                 popup = Popup_filelist(metas)

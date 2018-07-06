@@ -9,6 +9,8 @@ from src.main.pydev.com.ftd.generalutilities.metadata.gui.impl.base.FormatableFr
 from src.main.pydev.com.ftd.generalutilities.metadata.service.File_processor import File_processor
 from src.main.pydev.com.ftd.generalutilities.metadata.service.File_constant import File_constant
 from src.main.pydev.com.ftd.generalutilities.metadata.gui.impl.base.Frame_constant import Frame_constant
+from tkinter.messagebox import showerror, showwarning
+from pip._internal.utils.misc import file_contents
 
 
 class Frame_xml_option(FormatableFrame):
@@ -90,13 +92,23 @@ class Frame_xml_option(FormatableFrame):
         resourcepath = curDtos.get_resourcefullpath()
         File_processor.read_resource_metadata(resourcepath, self.get_dtos())
         
-        ''' test file '''
-        result, status = File_processor.read_bean_app_context(curTrans.get_projectpath() + fileconstant.BEAN_APP_CONTEXT_PATH)
+        ''' process file '''
+        beanpath = curTrans.get_projectpath() + fileconstant.BEAN_APP_CONTEXT_PATH
+        status, beanDTO, message = File_processor.read_bean_app_context(beanpath)
         if status:
-            #verify if the target entity uri is existing in the bean-app-context
-            if curDtos.get_resourceDTO().get_primary_secure_uri() in result.get_entity_uri_mapstring():
-                print(True)
+            #--- verify if the target entity uri is existing in the bean-app-context
+            if curDtos.get_resourceDTO().get_primary_secure_uri() in beanDTO.get_entity_uri_mapstring():
+                showwarning('Note', 'The entity uri has been added in the bean-app-context.xml.')
+                return True
             else:
+                #--- backup
+                File_processor.copy_file(beanpath, curTrans.get_workspacepath() + beanDTO.get_filename() + fileconstant.BACKUP_SUFFIX)
+                #--- update
+                 
+                
                 print(False)
-            
+        else:
+            showerror('Error', message)
+            return False
+        
         return True    

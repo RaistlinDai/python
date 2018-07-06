@@ -39,6 +39,7 @@ class File_constant(object):
         self.ENTITY_MAP_PATH = '\\main\\resources\\com\\qad\\erp\\financials\\data\\doc\\entityMap.xml'
         self.BEAN_APP_CONTEXT_PATH = '\\main\\resources\\WEB-INF\\qad\\erp\\financials\\beans-app-context.xml'
         
+        self.BACKUP_SUFFIX = '.bck'
         self.XML_SUFFIX = ".xml"
         self.RESOURCE_METADATA_SUFFIX = "-ViewResourceMeta.xml"
         
