@@ -6,6 +6,7 @@ course from: https://www.liaoxuefeng.com/wiki/0014316089557264a6b348958f449949df
 @author: ftd
 '''
 from selftest import MyDef
+import xml.dom.minidom
 
 print('hello,world')
 
@@ -46,3 +47,38 @@ elif testType == 6:
 elif testType == 7:
     data = MyDef.my_fact(7)
     print(data)
+    
+elif testType == 8:
+    value = 'xxxxx'
+    linecontents = []
+    with open('D:\\beans-app-context.xml', "r", encoding="utf-8") as f:
+        entityuri_start, entityuri_end = -1, -1
+        for cur_line_number, line in enumerate(f):
+            linecontents.append(line)
+            if 'name=\"entityUriMapString\"' in line: 
+                entityuri_start = cur_line_number
+            elif '/>' in line and entityuri_start > -1 and entityuri_end == -1 and cur_line_number >= entityuri_start:
+                entityuri_end = cur_line_number
+    
+    f.close()
+    print(str(entityuri_start) + ',' + str(entityuri_end))
+    
+    # --- the node in a single line
+    if entityuri_start == entityuri_end:
+        print(linecontents[entityuri_end])
+    else:
+        print(linecontents[entityuri_end])
+        strtrim = linecontents[entityuri_end].replace('/>', '').replace('\t', '').replace('\n', '').rstrip(' ')
+        if strtrim == '' or strtrim == '\"':
+            linecontents.insert(entityuri_end, value+'\n')
+        else:
+            linecontents[entityuri_end] = linecontents[entityuri_end].replace('\"', ';'+value+'\"')
+            print(linecontents[entityuri_end])
+    
+    newfile = ''.join(linecontents)
+    f = open('D:\\beans-app-context.xml', "w", encoding="utf-8")
+    f.write(newfile)
+    f.close()
+    
+    del linecontents[:] 
+    

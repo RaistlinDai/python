@@ -104,7 +104,7 @@ class Frame_xml_option(FormatableFrame):
                 #--- backup
                 File_processor.copy_file(beanpath, curTrans.get_workspacepath() + beanDTO.get_filename() + fileconstant.BACKUP_SUFFIX)
                 #--- update
-                 
+                
                 
                 print(False)
         else:
