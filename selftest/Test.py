@@ -51,7 +51,7 @@ elif testType == 7:
 elif testType == 8:
     value = 'xxxxx'
     linecontents = []
-    with open('D:\\beans-app-context.xml', "r", encoding="utf-8") as f:
+    with open('C:\\beans-app-context.xml', "r", encoding="utf-8") as f:
         entityuri_start, entityuri_end = -1, -1
         for cur_line_number, line in enumerate(f):
             linecontents.append(line)
@@ -76,7 +76,7 @@ elif testType == 8:
             print(linecontents[entityuri_end])
     
     newfile = ''.join(linecontents)
-    f = open('D:\\beans-app-context.xml', "w", encoding="utf-8")
+    f = open('C:\\beans-app-context.xml', "w", encoding="utf-8")
     f.write(newfile)
     f.close()
     
