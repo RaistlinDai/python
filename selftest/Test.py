@@ -65,6 +65,7 @@ elif testType == 8:
     
     # --- the node in a single line
     if entityuri_start == entityuri_end:
+        
         print(linecontents[entityuri_end])
     else:
         print(linecontents[entityuri_end])
