@@ -126,7 +126,7 @@ class File_processor(object):
                 bean_app.set_view_metadata_service(node.getAttribute('value'))
                 
         return True, bean_app, None
-            
+        
     
     @staticmethod
     def write_bean_app_context(path, value):
@@ -144,29 +144,57 @@ class File_processor(object):
         
         #get the root of resource metadata
         linecontents = []
-        with open(path, "r", encoding="utf-8") as f:
-            entityuri_start, entityuri_end = -1, -1
+        entityuri_start, entityuri_end, value_start = -1, -1, -1
+        with open('D:\\beans-app-context.xml', "r", encoding="utf-8") as f:
             for cur_line_number, line in enumerate(f):
                 linecontents.append(line)
-                if 'name=\"entityUriMapString\"' in line: 
+                if 'name=\"entityUriMapString\"' in line:
                     entityuri_start = cur_line_number
-                elif '/>' in line and entityuri_start > -1 and entityuri_end == -1 and cur_line_number >= entityuri_start:
+                if 'value=' in line and entityuri_start > -1 and value_start == -1 and cur_line_number >= entityuri_start:
+                    value_start = cur_line_number
+                if '\"/>' in line and entityuri_start > -1 and entityuri_end == -1 and cur_line_number >= entityuri_start:
                     entityuri_end = cur_line_number
         
         f.close()
         
+        if entityuri_start == -1 or entityuri_end == -1:
+            return False, 'The file format of beans-app-context is incorrect, cannot find \'entityUriMapString\''
+        
         # --- the node in a single line
-        if entityuri_start == entityuri_end:
-            print(linecontents[entityuri_end])
+        if entityuri_start == entityuri_end or value_start == entityuri_end:
+            idxarr = linecontents[entityuri_end].index('\"/>')
+            linecontents[entityuri_end] = linecontents[entityuri_end][:idxarr].rstrip(' ') + ';'+value + linecontents[entityuri_end][idxarr:]            
         else:
-            strtrim = linecontents[entityuri_end].replace('/>', '').replace('\t', '').replace('\n', '').rstrip(' ')
-            if strtrim == '' or strtrim == '\"':
-                linecontents.insert(entityuri_end, value+'\n')
+            strtrim = linecontents[entityuri_end].replace('\"/>', '').replace('\t', '').replace('\n', '').strip(' ')
+            # --- the end flag in a single line
+            if strtrim == '':
+                # --- add ';' in previous line
+                idxarr = linecontents[entityuri_end-1].index('\n')
+                linecontents[entityuri_end-1] = linecontents[entityuri_end-1][:idxarr].rstrip(' ') + ';\n'
+                # --- clone the tab format in previous line
+                tabpre = ''
+                if (entityuri_end-1 != value_start):
+                    tabpre = linecontents[entityuri_end-1][:linecontents[entityuri_end-1].index('urn')]
+                # --- insert new line
+                value = tabpre + value + '\n'
+                linecontents.insert(entityuri_end, value)
             else:
-                linecontents[entityuri_end] = linecontents[entityuri_end].replace('\"', ';'+value+'\"')
+                idxarr = linecontents[entityuri_end].index('\"/>')
+                linesuf = linecontents[entityuri_end][idxarr:]
+                # --- only one uri in the last line
+                if len(linecontents[entityuri_end].split(';')) == 1:
+                    linecontents[entityuri_end] = linecontents[entityuri_end][:idxarr].rstrip(' ') + ';\n'
+                    # --- clone the tab format in current line
+                    tabpre = linecontents[entityuri_end][:linecontents[entityuri_end].index('urn')]
+                    # --- insert new line
+                    value = tabpre + value + linesuf
+                    linecontents.insert(entityuri_end+1, value)
+                else:
+                    # --- add the new uri at the end of this line
+                    linecontents[entityuri_end] = linecontents[entityuri_end][:idxarr].rstrip(' ') + ';'+value+ linecontents[entityuri_end][idxarr:]
         
         newfile = ''.join(linecontents)
-        f = open(path, "w", encoding="utf-8")
+        f = open('D:\\beans-app-context.xml', "w", encoding="utf-8")
         f.write(newfile)
         f.close()
         
