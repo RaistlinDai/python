@@ -8,7 +8,7 @@ from tkinter import *
 from src.main.pydev.com.ftd.generalutilities.metadata.gui.impl.frame.Frame_bottom import Frame_bottom
 from src.main.pydev.com.ftd.generalutilities.metadata.gui.impl.base.FormatableFrame import FormatableFrame
 from src.main.pydev.com.ftd.generalutilities.metadata.gui.impl.button.Button_openfile import Button_openfile
-from src.main.pydev.com.ftd.generalutilities.metadata.service.File_processor import File_processor
+from src.main.pydev.com.ftd.generalutilities.metadata.service.fileproc.Xmlfile_processor import Xmlfile_processor
 from tkinter.messagebox import showerror, showinfo
 
 class Frame_startup(FormatableFrame):
@@ -87,12 +87,12 @@ class Frame_startup(FormatableFrame):
         '''
         #--- verify the input value
         if self.__dicinput.get():
-            if not File_processor.verify_dir_format(self.__dicinput.get()):
+            if not Xmlfile_processor.verify_dir_format(self.__dicinput.get()):
                 showerror('Error', 'The directory format is incorrect!')
                 return False
             
-            if not File_processor.verify_dir_existing(self.__dicinput.get()):
-                File_processor.create_folder(self.__dicinput.get())
+            if not Xmlfile_processor.verify_dir_existing(self.__dicinput.get()):
+                Xmlfile_processor.create_folder(self.__dicinput.get())
                 showinfo('Note', 'A new folder has been created in your workspace path.')
                 
             #--- set the workspace path into transaction dto
@@ -100,10 +100,10 @@ class Frame_startup(FormatableFrame):
         else:
             tempdir = os.path.join(os.path.expanduser('~'), "Desktop") + '\\PyWorkspace'
             #--- desktop temp folder already existing
-            if File_processor.verify_dir_existing(tempdir):
+            if Xmlfile_processor.verify_dir_existing(tempdir):
                 showinfo('Note', 'The temp folder(PyWorkspace) on your desktop has been set as the default workspace.')
             else:
-                File_processor.create_folder(tempdir)
+                Xmlfile_processor.create_folder(tempdir)
                 showinfo('Note', 'A temp folder(PyWorkspace) has been created on your desktop.')
                 
             #--- set the workspace path into transaction dto

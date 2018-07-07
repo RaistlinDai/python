@@ -52,7 +52,7 @@ elif testType == 8:
     value = 'xxxxx'
     linecontents = []
     entityuri_start, entityuri_end, value_start, value_end= -1, -1, -1, -1
-    with open('D:\\beans-app-context.xml', "r", encoding="utf-8") as f:
+    with open('C:\\Ftd-work\\beans-app-context.xml', "r", encoding="utf-8") as f:
         for cur_line_number, line in enumerate(f):
             linecontents.append(line)
             if 'name=\"entityUriMapString\"' in line:
@@ -72,7 +72,6 @@ elif testType == 8:
     if entityuri_start == entityuri_end or value_start == entityuri_end:
         idxarr = linecontents[entityuri_end].index('\"/>')
         linecontents[entityuri_end] = linecontents[entityuri_end][:idxarr].rstrip(' ') + ';'+value + linecontents[entityuri_end][idxarr:]            
-        print(linecontents[entityuri_end])
     else:
         strtrim = linecontents[entityuri_end].replace('\"/>', '').replace('\t', '').replace('\n', '').strip(' ')
         # --- the end flag in a single line
@@ -103,7 +102,7 @@ elif testType == 8:
                 linecontents[entityuri_end] = linecontents[entityuri_end][:idxarr].rstrip(' ') + ';'+value+ linecontents[entityuri_end][idxarr:]
     
     newfile = ''.join(linecontents)
-    f = open('D:\\beans-app-context.xml', "w", encoding="utf-8")
+    f = open('C:\\beans-app-context.xml', "w", encoding="utf-8")
     f.write(newfile)
     f.close()
     

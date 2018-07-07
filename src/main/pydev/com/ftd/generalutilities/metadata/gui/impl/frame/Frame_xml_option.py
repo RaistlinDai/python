@@ -6,8 +6,8 @@ Created on Jun 26, 2018
 from tkinter import *
 from src.main.pydev.com.ftd.generalutilities.metadata.gui.impl.frame.Frame_bottom import Frame_bottom
 from src.main.pydev.com.ftd.generalutilities.metadata.gui.impl.base.FormatableFrame import FormatableFrame
-from src.main.pydev.com.ftd.generalutilities.metadata.service.File_processor import File_processor
-from src.main.pydev.com.ftd.generalutilities.metadata.service.File_constant import File_constant
+from src.main.pydev.com.ftd.generalutilities.metadata.service.fileproc.Xmlfile_processor import Xmlfile_processor
+from src.main.pydev.com.ftd.generalutilities.metadata.service.base.File_constant import File_constant
 from src.main.pydev.com.ftd.generalutilities.metadata.gui.impl.base.Frame_constant import Frame_constant
 from tkinter.messagebox import showerror, showwarning
 from pip._internal.utils.misc import file_contents
@@ -90,23 +90,25 @@ class Frame_xml_option(FormatableFrame):
         
         #--- read the resource metadata and load the data into ResourceMetadataDTO ---
         resourcepath = curDtos.get_resourcefullpath()
-        File_processor.read_resource_metadata(resourcepath, self.get_dtos())
+        Xmlfile_processor.read_resource_metadata(resourcepath, self.get_dtos())
         
         ''' process file '''
         beanpath = curTrans.get_projectpath() + fileconstant.BEAN_APP_CONTEXT_PATH
-        status, beanDTO, message = File_processor.read_bean_app_context(beanpath)
+        status, beanDTO, message = Xmlfile_processor.read_bean_app_context(beanpath)
         if status:
             #--- verify if the target entity uri is existing in the bean-app-context
             if curDtos.get_resourceDTO().get_primary_secure_uri() in beanDTO.get_entity_uri_mapstring():
                 showwarning('Note', 'The entity uri has been added in the bean-app-context.xml.')
-                return True
             else:
                 #--- backup
-                File_processor.copy_file(beanpath, curTrans.get_workspacepath() + beanDTO.get_filename() + fileconstant.BACKUP_SUFFIX)
+                Xmlfile_processor.copy_file(beanpath, curTrans.get_workspacepath() + beanDTO.get_filename() + fileconstant.BACKUP_SUFFIX)
+                #--- format the new uri
+                value = 'xxx'
                 #--- update
-                
-                
-                print(False)
+                status, message = Xmlfile_processor.write_bean_app_context(beanpath, value)
+                if not status:
+                    showerror('Error', message)
+                    return False
         else:
             showerror('Error', message)
             return False

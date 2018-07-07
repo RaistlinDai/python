@@ -5,7 +5,7 @@ Created on Jun 22, 2018
 '''
 from tkinter import Button
 from src.main.pydev.com.ftd.generalutilities.metadata.gui.impl.view.Popup_filelist import Popup_filelist
-from src.main.pydev.com.ftd.generalutilities.metadata.service.File_processor import File_processor
+from src.main.pydev.com.ftd.generalutilities.metadata.service.fileproc.Xmlfile_processor import Xmlfile_processor
 from tkinter.messagebox import showerror
 
 class Button_load(Button):
@@ -34,7 +34,7 @@ class Button_load(Button):
         
         #call reader service
         if self.__loadfunc:
-            result, metas, err_message = File_processor.read_dir(self.__loadfunc())
+            result, metas, err_message = Xmlfile_processor.read_proj_dir(self.__loadfunc())
             
             if result:
                 popup = Popup_filelist(metas)

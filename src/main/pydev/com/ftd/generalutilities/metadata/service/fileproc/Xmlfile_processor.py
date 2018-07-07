@@ -4,14 +4,13 @@ Created on Jun 21, 2018
 @author: ftd
 '''
 import os
-import shutil
 import xml.dom.minidom
-from src.main.pydev.com.ftd.generalutilities.metadata.service.File_constant import File_constant
+from src.main.pydev.com.ftd.generalutilities.metadata.service.base.File_constant import File_constant
 from src.main.pydev.com.ftd.generalutilities.metadata.dto.xmlFile.resourcemetadata.ResourceMetadataDTO import ResourceMetadataDTO
 from src.main.pydev.com.ftd.generalutilities.metadata.dto.xmlFile.beanappcontext.BeanAppContextDTO import BeanAppContextDTO
-from xml.etree.ElementTree import ElementTree
+from src.main.pydev.com.ftd.generalutilities.metadata.service.base.File_processor import File_processor
 
-class File_processor(object):
+class Xmlfile_processor(File_processor):
     '''
     classdocs
     '''
@@ -19,9 +18,8 @@ class File_processor(object):
 #------------------------ Reader ------------------
 
     @staticmethod
-    def read_dir(dirpath):
+    def read_proj_dir(dirpath):
         try:
-            dir_existing = False
             fileconstant = File_constant()
             #view metadata file list
             viewMetadataNames = {}
@@ -29,7 +27,7 @@ class File_processor(object):
             #change the work path
             os.chdir(dirpath)
             #go through the inner files
-            for fullname in File_processor.iterbrowse(dirpath):
+            for fullname in Xmlfile_processor.iterbrowse(dirpath):
                 #get the view metadata files
                 if (fullname.startswith(dirpath + fileconstant.VIEW_METADATA_PATH)):
                     #trim the file name
@@ -145,7 +143,7 @@ class File_processor(object):
         #get the root of resource metadata
         linecontents = []
         entityuri_start, entityuri_end, value_start = -1, -1, -1
-        with open('D:\\beans-app-context.xml', "r", encoding="utf-8") as f:
+        with open(path, "r", encoding="utf-8") as f:
             for cur_line_number, line in enumerate(f):
                 linecontents.append(line)
                 if 'name=\"entityUriMapString\"' in line:
@@ -194,71 +192,15 @@ class File_processor(object):
                     linecontents[entityuri_end] = linecontents[entityuri_end][:idxarr].rstrip(' ') + ';'+value+ linecontents[entityuri_end][idxarr:]
         
         newfile = ''.join(linecontents)
-        f = open('D:\\beans-app-context.xml', "w", encoding="utf-8")
-        f.write(newfile)
-        f.close()
+        f = open(path, "w", encoding="utf-8")
+        try:
+            f.write(newfile)
+        except PermissionError as e:
+            return False, e
+        finally:
+            f.close()
         
         del linecontents[:] 
         return True, None
-        
-    
-    @staticmethod
-    def read_xml_elementtree(in_path):
-        tree = ElementTree()
-        tree.parse(in_path)
-        return tree
 
-
-    @staticmethod
-    def write_xml_elementtree(tree, out_path):
-        tree.write(out_path, encoding="utf-8",xml_declaration=True)
-    
-    
-    @staticmethod
-    def verify_dir_existing(path):
-        return os.path.exists(path)
-    
-    
-    @staticmethod
-    def verify_dir_format(path):
-        return os.path.isdir(path)
-    
-#------------------------ Generator ------------------
-    
-    @staticmethod
-    def create_folder(directory):
-        os.makedirs(directory)
-    
-    
-    @staticmethod
-    def create_file(filename, directory=None):
-        if directory:
-            os.chdir(directory)
-        
-    
-    @staticmethod
-    def copy_file(srcfile, dstfile):
-        '''
-        copy file
-        @param srcfile: the source file
-        @param dstfile: the new file
-        @return: return status
-        @return: message if validation failed
-        '''
-        if not os.path.isfile(srcfile):
-            return False, "File not exist!"
-        else:
-            fpath,fname=os.path.split(dstfile)
-            if not os.path.exists(fpath):
-                os.makedirs(fpath)
-            shutil.copyfile(srcfile, dstfile)
-        return True, None
-    
-    
-    @staticmethod
-    def update_bean_app_context(filepath):
-        # verify if file is existing
-        if os.path.exists(filepath):
-            #backup file
-            filepath_new = filepath + '.bck'
             

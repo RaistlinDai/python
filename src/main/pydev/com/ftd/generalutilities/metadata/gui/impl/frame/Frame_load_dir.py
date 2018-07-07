@@ -7,10 +7,10 @@ from tkinter import *
 from tkinter.messagebox import showerror
 from src.main.pydev.com.ftd.generalutilities.metadata.gui.impl.button.Button_openfile import Button_openfile
 from src.main.pydev.com.ftd.generalutilities.metadata.gui.impl.frame.Frame_bottom import Frame_bottom
-from src.main.pydev.com.ftd.generalutilities.metadata.service.File_constant import File_constant
+from src.main.pydev.com.ftd.generalutilities.metadata.service.base.File_constant import File_constant
 from src.main.pydev.com.ftd.generalutilities.metadata.gui.impl.base.FormatableFrame import FormatableFrame
 from src.main.pydev.com.ftd.generalutilities.metadata.gui.impl.base.UnFormatableFrame import UnFormatableFrame
-from src.main.pydev.com.ftd.generalutilities.metadata.service.File_processor import File_processor
+from src.main.pydev.com.ftd.generalutilities.metadata.service.fileproc.Xmlfile_processor import Xmlfile_processor
 
 class Frame_load_dir(FormatableFrame):
     '''
@@ -94,7 +94,7 @@ class Frame_load_dir(FormatableFrame):
         resource_exist = False
         if filename:
             resourcefullpath = self.__dicinput.get() + fileconstant.RESOURCE_METADATA_PATH + filename +fileconstant.RESOURCE_METADATA_SUFFIX
-            resource_exist = File_processor.verify_dir_existing(resourcefullpath)
+            resource_exist = Xmlfile_processor.verify_dir_existing(resourcefullpath)
         
         newname = "Selected entity: " + filename
         self.__label02.config(text=newname)
