@@ -4,7 +4,7 @@ Created on Jul 04, 2018
 @author: ftd
 '''
 
-class BeanAppContextDTO(object):
+class BeansAppContextDTO(object):
     '''
     classdocs
     '''
@@ -20,7 +20,7 @@ class BeanAppContextDTO(object):
         '''
         Constructor
         '''
-        self.__filename = 'bean-app-context.xml'
+        self.__filename = 'beans-app-context.xml'
         self.__bean_id = bean_id
         self.__bean_class = bean_class
         self.__entity_uri_mapstring = entity_uri_mapstring
