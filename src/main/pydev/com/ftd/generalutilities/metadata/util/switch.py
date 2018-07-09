@@ -9,25 +9,25 @@ class switch(object):
     classdocs
     '''
     def __init__(self, value):
-        self.value = value
-        self.fall = False
+        self.__value = value
+        self.__fall = False
 
     def __iter__(self):
         '''
         Iterator: return the match method once, then stop
         '''
-        yield self.match
+        yield self.__match
         raise StopIteration
     
     
-    def match(self, *args):
+    def __match(self, *args):
         '''
         Generator: indicate whether or not to enter a case suite
         '''
-        if self.fall or not args:
+        if self.__fall or not args:
             return True
-        elif self.value in args: # changed for v1.5, see below
-            self.fall = True
+        elif self.__value in args: # changed for v1.5, see below
+            self.__fall = True
             return True
         else:
             return False

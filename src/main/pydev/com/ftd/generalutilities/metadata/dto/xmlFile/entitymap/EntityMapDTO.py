@@ -47,9 +47,19 @@ class EntityMaps(object):
         @param entitymap: entityMap dto
         '''
         if isinstance(entitymap, EntityMap):
-            self.__dtos.append(entitymap)
+            if self.__dtos:
+                self.__dtos.append(entitymap)
+            else:
+                self.__dtos = [entitymap]
             
-            
+    
+    def get_entitymap_uris(self):
+        results = []
+        for dto in self.__dtos:
+            results.append(dto.get_urn())
+        return results
+        
+    
     filename = property(get_filename, set_filename, del_filename, "filename's docstring")
     dtos = property(get_dtos, set_dtos, del_dtos, "dtos's docstring")
         

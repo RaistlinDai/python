@@ -113,7 +113,7 @@ class Frame_xml_option(FormatableFrame):
         curDtos = self.get_dtos()
         curTrans = self.get_trans()
         const = Frame_constant()
-        print(self.__varc3.get() + ',' + self.__varc4.get() + ',' + self.__varc5.get())
+        
         #--- update the process options in transaction dto ----
         result, message = curTrans.update_options(
             {'Xml':{'EntityMap':self.__vari1.get(), 'BeanAppContext':self.__vari2.get()}}, const.ACTION_UPDATE)
@@ -122,30 +122,47 @@ class Frame_xml_option(FormatableFrame):
             print(message)
             return False
         
-        #--- read the resource metadata and load the data into ResourceMetadataDTO ---
+        #--- read the resource metadata and load the data into ResourceMetadataDTO
         resourcepath = curDtos.get_resourcefullpath()
         Xmlfile_processor.read_resource_metadata(resourcepath, self.get_dtos())
+        resDTO = curDtos.get_resourceDTO()
         
-        ''' process file '''
-        beanpath = curTrans.get_projectpath() + fileconstant.BEAN_APP_CONTEXT_PATH
-        status, beanDTO, message = Xmlfile_processor.read_bean_app_context(beanpath)
+        ''' process beans-app-context.xml '''
+        bean_path = curTrans.get_projectpath() + fileconstant.BEAN_APP_CONTEXT_PATH
+        status, beanDTO, message = Xmlfile_processor.read_bean_app_context(bean_path)
         if status:
-            resDTO = curDtos.get_resourceDTO()
             #--- verify if the target entity uri is existing in the beans-app-context
             if resDTO.get_primary_secure_uri() in beanDTO.get_entity_uri_mapstring():
                 showwarning('Note', 'The entity uri has been added in the beans-app-context.xml.')
             else:
                 #--- backup beans-app-context
-                Xmlfile_processor.copy_file(beanpath, curTrans.get_workspacepath() + beanDTO.get_filename() + fileconstant.BACKUP_SUFFIX)
+                Xmlfile_processor.copy_file(bean_path, curTrans.get_workspacepath() + beanDTO.get_filename() + fileconstant.BACKUP_SUFFIX)
                 #--- format the new uri
                 value = resDTO.get_primary_secure_uri() + ',' + resDTO.get_meta_uri()
                 #--- update beans-app-context
-                status, message = Xmlfile_processor.write_bean_app_context(beanpath, value)
+                status, message = Xmlfile_processor.write_bean_app_context(bean_path, value)
                 if not status:
                     showerror('Error', message)
                     return False
         else:
             showerror('Error', message)
             return False
+        
+        ''' process entityMap.xml '''
+        entmap_path = curTrans.get_projectpath() + fileconstant.ENTITY_MAP_PATH
+        status, entMapDTO, message = Xmlfile_processor.read_entity_map(entmap_path)
+        if status:
+            #--- verify if the target entity uri is existing in the entityMap
+            if resDTO.get_primary_secure_uri() in entMapDTO.get_entitymap_uris():
+                showwarning('Note', 'The entity uri has been added in the entityMap.xml.')
+            else:
+                #--- backup entityMap
+                Xmlfile_processor.copy_file(entmap_path, curTrans.get_workspacepath() + entMapDTO.get_filename() + fileconstant.BACKUP_SUFFIX)
+                #--- write entityMap
+                Xmlfile_processor.write_entity_map(entmap_path, resDTO.get_primary_secure_uri(), self.__varc3.get(), self.__varc5.get(), self.__varc4.get())
+        else:
+            showerror('Error', message)
+            return False
+        
         
         return True    

@@ -7,6 +7,9 @@ course from: https://www.liaoxuefeng.com/wiki/0014316089557264a6b348958f449949df
 '''
 from selftest import MyDef
 import xml.dom.minidom
+from src.main.pydev.com.ftd.generalutilities.metadata.service.fileproc.Xmlfile_processor import Xmlfile_processor
+from xml.etree.ElementTree import ElementTree
+from src.main.pydev.com.ftd.generalutilities.metadata.dto.xmlFile.entitymap import EntityMapDTO
 
 print('hello,world')
 
@@ -106,5 +109,11 @@ elif testType == 8:
     f.write(newfile)
     f.close()
     
-    del linecontents[:] 
+    del linecontents[:]
+    
+    
+elif testType == 9:
+    value = 'xxxxx'
+    #get the root of entityMap.xml
+    Xmlfile_processor.read_entity_map('C:\Ftd-work.xml')
     
