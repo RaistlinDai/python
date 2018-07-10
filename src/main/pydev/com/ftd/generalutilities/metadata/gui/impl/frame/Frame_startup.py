@@ -42,13 +42,13 @@ class Frame_startup(FormatableFrame):
         #radio box
         self.__vari1 = IntVar()
         self.__rad1 = Radiobutton(canv1, text='Select files from project', variable=self.__vari1, value=1)
-        self.__rad1.place(height=20, width=150, relx= 0.1, rely=0.4)
+        self.__rad1.place(height=20, width=160, relx= 0.2, rely=0.3)
         self.__rad1.select()
         self.__rad2 = Radiobutton(canv1, text='Select files from metadata', variable=self.__vari1, value=2)
-        self.__rad2.place(height=20, width=160, relx= 0.39, rely=0.4)
+        self.__rad2.place(height=20, width=170, relx= 0.2, rely=0.52)
         self.__rad2.deselect()
         self.__rad3 = Radiobutton(canv1, text='Customize process flow', variable=self.__vari1, value=3)
-        self.__rad3.place(height=20, width=150, relx= 0.7, rely=0.4)
+        self.__rad3.place(height=20, width=160, relx= 0.2, rely=0.74)
         self.__rad3.deselect()
         canv1.pack()
         

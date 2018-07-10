@@ -274,7 +274,7 @@ class Xmlfile_processor(File_processor):
                     entityuri_start = cur_line_number
                 if '</EntityMap>' in line and cur_line_number >= entityuri_start:
                     entityuri_end = cur_line_number
-                if '</EntityMaps' in line:
+                if '</EntityMaps>' in line:
                     file_end = cur_line_number
         f.close()
         
@@ -287,12 +287,12 @@ class Xmlfile_processor(File_processor):
             # --- get the prefix from the last EntityMap node
             linepre = linecontents[entityuri_start][:linecontents[entityuri_start].index('<EntityMap>')]
             # --- add new EntityMap node
-            linecontents.insert(len(linecontents)-1, linepre+'<EntityMap>\n')
-            linecontents.insert(len(linecontents)-1, linepre+'\t<urn>'+urn+'</urn>\n')
-            linecontents.insert(len(linecontents)-1, linepre+'\t<type>'+urn_type+'</type>\n')
-            linecontents.insert(len(linecontents)-1, linepre+'\t<objectName>'+object_name+'</objectName>\n')
-            linecontents.insert(len(linecontents)-1, linepre+'\t<panDomain>'+pan_domain+'</panDomain>\n')
-            linecontents.insert(len(linecontents)-1, linepre+'</EntityMap>\n')
+            linecontents.insert(file_end+1, linepre+'<EntityMap>\n')
+            linecontents.insert(file_end+2, linepre+'\t<urn>'+urn+'</urn>\n')
+            linecontents.insert(file_end+3, linepre+'\t<type>'+urn_type+'</type>\n')
+            linecontents.insert(file_end+4, linepre+'\t<objectName>'+object_name+'</objectName>\n')
+            linecontents.insert(file_end+5, linepre+'\t<panDomain>'+pan_domain+'</panDomain>\n')
+            linecontents.insert(file_end+6, linepre+'</EntityMap>\n')
         except ValueError as e:
             return False, e
         

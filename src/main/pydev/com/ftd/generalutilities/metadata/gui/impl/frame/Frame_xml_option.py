@@ -163,6 +163,5 @@ class Frame_xml_option(FormatableFrame):
         else:
             showerror('Error', message)
             return False
-        
-        
+
         return True    
