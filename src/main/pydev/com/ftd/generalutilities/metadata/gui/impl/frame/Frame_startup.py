@@ -44,8 +44,8 @@ class Frame_startup(FormatableFrame):
         self.__rad1 = Radiobutton(canv1, text='Select files from project', variable=self.__vari1, value=1)
         self.__rad1.place(height=20, width=160, relx= 0.2, rely=0.3)
         self.__rad1.select()
-        self.__rad2 = Radiobutton(canv1, text='Select files from metadata', variable=self.__vari1, value=2)
-        self.__rad2.place(height=20, width=170, relx= 0.2, rely=0.52)
+        self.__rad2 = Radiobutton(canv1, text='Select files from metadata file', variable=self.__vari1, value=2)
+        self.__rad2.place(height=20, width=192, relx= 0.2, rely=0.52)
         self.__rad2.deselect()
         self.__rad3 = Radiobutton(canv1, text='Customize process flow', variable=self.__vari1, value=3)
         self.__rad3.place(height=20, width=160, relx= 0.2, rely=0.74)
@@ -58,15 +58,15 @@ class Frame_startup(FormatableFrame):
         label2 = Label(canv2, text='Please select a workspace folder:')
         label2.place(height=20, width=200, relx=0.01, rely=0.05)
         #input
-        feet = StringVar()
-        self.__dicinput = Entry(canv2, textvariable=feet, borderwidth=3, bg='black', foreground='yellow', highlightcolor='red', insertbackground='red')
+        self.__feet = StringVar()
+        self.__dicinput = Entry(canv2, textvariable=self.__feet, borderwidth=3, bg='black', foreground='yellow', highlightcolor='red', insertbackground='red')
         self.__dicinput.place(height=20, width=430, relx=0.1, rely=0.4)
         #button
         self.__dicload = Button_openfile(canv2, self.reset_dicinput, height=1)
         self.__dicload.place(height=20, width=20, relx=0.9, rely=0.4)
         #label
         label3 = Label(canv2, text='(This folder will be used for storing the backup files)', bg='white')
-        label3.place(height=20, width=300, relx=0.1, rely=0.6)
+        label3.place(height=20, width=310, relx=0.1, rely=0.6)
         
         canv2.pack()
         
@@ -105,6 +105,7 @@ class Frame_startup(FormatableFrame):
             else:
                 Xmlfile_processor.create_folder(tempdir)
                 showinfo('Note', 'A temp folder(PyWorkspace) has been created on your desktop.')
+            self.__feet.set(tempdir)
                 
             #--- set the workspace path into transaction dto
             self.get_trans().set_workspacepath(tempdir)

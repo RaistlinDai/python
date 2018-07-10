@@ -10,7 +10,7 @@ from src.main.pydev.com.ftd.generalutilities.metadata.gui.impl.base.FormatableFr
 from src.main.pydev.com.ftd.generalutilities.metadata.service.fileproc.Xmlfile_processor import Xmlfile_processor
 from src.main.pydev.com.ftd.generalutilities.metadata.service.base.File_constant import File_constant
 from src.main.pydev.com.ftd.generalutilities.metadata.gui.impl.base.Frame_constant import Frame_constant
-from tkinter.messagebox import showerror, showwarning
+from tkinter.messagebox import showerror, showwarning, showinfo
 
 class Frame_xml_option(FormatableFrame):
     '''
@@ -129,39 +129,47 @@ class Frame_xml_option(FormatableFrame):
         
         ''' process beans-app-context.xml '''
         bean_path = curTrans.get_projectpath() + fileconstant.BEAN_APP_CONTEXT_PATH
-        status, beanDTO, message = Xmlfile_processor.read_bean_app_context(bean_path)
-        if status:
+        status01, beanDTO, message01 = Xmlfile_processor.read_bean_app_context(bean_path)
+        if status01:
             #--- verify if the target entity uri is existing in the beans-app-context
             if resDTO.get_primary_secure_uri() in beanDTO.get_entity_uri_mapstring():
-                showwarning('Note', 'The entity uri has been added in the beans-app-context.xml.')
+                showwarning('Note', 'The entity uri had been added in the beans-app-context.xml.')
             else:
                 #--- backup beans-app-context
                 Xmlfile_processor.copy_file(bean_path, curTrans.get_workspacepath() + beanDTO.get_filename() + fileconstant.BACKUP_SUFFIX)
                 #--- format the new uri
                 value = resDTO.get_primary_secure_uri() + ',' + resDTO.get_meta_uri()
                 #--- update beans-app-context
-                status, message = Xmlfile_processor.write_bean_app_context(bean_path, value)
-                if not status:
-                    showerror('Error', message)
-                    return False
-        else:
-            showerror('Error', message)
+                status01, message01 = Xmlfile_processor.write_bean_app_context(bean_path, value)
+                #--- clean the backup if needed
+                if self.__vari1.get() == 2:
+                    status01, message01 = Xmlfile_processor.remove_file(curTrans.get_workspacepath() + beanDTO.get_filename() + fileconstant.BACKUP_SUFFIX) 
+                
+        if not status01:
+            showerror('Error', message01)
             return False
         
         ''' process entityMap.xml '''
         entmap_path = curTrans.get_projectpath() + fileconstant.ENTITY_MAP_PATH
-        status, entMapDTO, message = Xmlfile_processor.read_entity_map(entmap_path)
-        if status:
+        status02, entMapDTO, message02 = Xmlfile_processor.read_entity_map(entmap_path)
+        if status02:
             #--- verify if the target entity uri is existing in the entityMap
             if resDTO.get_primary_secure_uri() in entMapDTO.get_entitymap_uris():
-                showwarning('Note', 'The entity uri has been added in the entityMap.xml.')
+                showwarning('Note', 'The entity uri had been added in the entityMap.xml.')
             else:
                 #--- backup entityMap
                 Xmlfile_processor.copy_file(entmap_path, curTrans.get_workspacepath() + entMapDTO.get_filename() + fileconstant.BACKUP_SUFFIX)
                 #--- write entityMap
-                Xmlfile_processor.write_entity_map(entmap_path, resDTO.get_primary_secure_uri(), self.__varc3.get(), self.__varc5.get(), self.__varc4.get())
-        else:
-            showerror('Error', message)
+                status02, message02 = Xmlfile_processor.write_entity_map(entmap_path, resDTO.get_primary_secure_uri(), self.__varc3.get(), self.__varc5.get(), self.__varc4.get())
+                #--- clean the backup if needed
+                if self.__vari2.get() == 2:
+                    status02, message02 = Xmlfile_processor.remove_file(curTrans.get_workspacepath() + entMapDTO.get_filename() + fileconstant.BACKUP_SUFFIX) 
+                
+        if not status02:
+            showerror('Error', message02)
             return False
 
+        # --- Info message
+        showinfo('Note', 'The xml files are processed, please verify them later.')
+        
         return True    

@@ -5,6 +5,7 @@ Created on Jun 21, 2018
 '''
 import os
 import shutil
+from test.test_decimal import file
 
 class File_processor(object):
     '''
@@ -52,9 +53,16 @@ class File_processor(object):
     
     
     @staticmethod
-    def update_bean_app_context(filepath):
-        # verify if file is existing
-        if os.path.exists(filepath):
-            #backup file
-            filepath_new = filepath + '.bck'
-            
+    def remove_file(srcfile):
+        '''
+        remove file
+        @param srcfile: the target file
+        @return: return status
+        @return: message if validation failed
+        '''
+        if not os.path.isfile(srcfile):
+            return False, "File not exist!"
+        else:
+            os.remove(srcfile)
+        return True, None    
+        
