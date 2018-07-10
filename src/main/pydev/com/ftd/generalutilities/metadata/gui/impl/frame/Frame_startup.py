@@ -100,12 +100,12 @@ class Frame_startup(FormatableFrame):
         else:
             tempdir = os.path.join(os.path.expanduser('~'), "Desktop") + '\\PyWorkspace'
             #--- desktop temp folder already existing
+            self.__feet.set(tempdir)
             if Xmlfile_processor.verify_dir_existing(tempdir):
                 showinfo('Note', 'The temp folder(PyWorkspace) on your desktop has been set as the default workspace.')
             else:
                 Xmlfile_processor.create_folder(tempdir)
                 showinfo('Note', 'A temp folder(PyWorkspace) has been created on your desktop.')
-            self.__feet.set(tempdir)
                 
             #--- set the workspace path into transaction dto
             self.get_trans().set_workspacepath(tempdir)

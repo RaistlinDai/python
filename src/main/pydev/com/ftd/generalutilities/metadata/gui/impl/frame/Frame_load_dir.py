@@ -30,7 +30,7 @@ class Frame_load_dir(FormatableFrame):
         self.__frame1 = FormatableFrame(self)
         self.__frame1.pack(side=TOP)
         #title
-        self.__label01 = Label(self.__frame1, text="Select or Input the project src path:", width= 45)
+        self.__label01 = Label(self.__frame1, text="Load the project metadata", width= 45)
         self.__label01.pack(side=TOP, fill=X, ipady=10)
         #input
         feet = StringVar()
