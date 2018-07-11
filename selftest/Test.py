@@ -6,10 +6,8 @@ course from: https://www.liaoxuefeng.com/wiki/0014316089557264a6b348958f449949df
 @author: ftd
 '''
 from selftest import MyDef
-import xml.dom.minidom
 from src.main.pydev.com.ftd.generalutilities.metadata.service.fileproc.Xmlfile_processor import Xmlfile_processor
-from xml.etree.ElementTree import ElementTree
-from src.main.pydev.com.ftd.generalutilities.metadata.dto.xmlFile.entitymap import EntityMapDTO
+from src.main.pydev.com.ftd.generalutilities.metadata.service.javabak.Java_processor import Java_processor
 
 print('hello,world')
 
@@ -113,7 +111,5 @@ elif testType == 8:
     
     
 elif testType == 9:
-    value = 'xxxxx'
-    #get the root of entityMap.xml
-    Xmlfile_processor.read_entity_map('C:\Ftd-work.xml')
+    Java_processor.java_3rd_tester()
     
