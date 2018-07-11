@@ -4,6 +4,9 @@ Created on Jul 11, 2018
 @author: ftd
 '''
 import jpype
+import os
+from src.main.pydev.com.ftd.generalutilities.metadata.service.base.File_constant import File_constant
+from jpype._jexception import JavaException
 
 class Java_processor(object):
     '''
@@ -20,16 +23,32 @@ class Java_processor(object):
     
     @staticmethod
     def java_3rd_tester():
-        #jarpath = '/3rd/lib/jar/FTD.jar'
-        jarpath = 'C:\\Users\\ftd\\Desktop\\PyWorkspace\\FTD.jar'
-        #--- start JVM and point out the jar path
-        jpype.startJVM(jpype.getDefaultJVMPath(), "-Djava.class.path=%s" % jarpath)
-        #--- import the jar class
-        javaclass = jpype.JClass('test.reader.ftdTest')
-        #--- create instance
-        javaInstance = javaclass('test in python')
-        #--- run java method
-        result = javaInstance.getFtdTest('FTD', jpype.java.lang.Integer(45))
-        print('java result: %s' % result)
+        fileconstant = File_constant()
+        #--- get the 3rd lib jar path
+        curr_path = os.path.dirname(os.path.abspath(__file__))
+        proj_path = curr_path[:curr_path.index(fileconstant.MY_PROJECT_PACKAGE)]
+        jarpath = proj_path + fileconstant.MY_PROJECT_3RD_LIB_PATH
         
-        jpype.shutdownJVM()
+        #--- start JVM and point out the jar path
+        if not jpype.isJVMStarted():  
+            jpype.startJVM(jpype.getDefaultJVMPath(), "-Djava.class.path=%s" % jarpath)
+            
+        try:
+            #--- import the jar class
+            javaclass = jpype.JClass('test.reader.ftdTest')
+            #--- create instance
+            javaInstance = javaclass('test in python')
+            #--- run java method
+            result = javaInstance.getFtdTest('FTD', jpype.java.lang.Integer(45))
+            print('java result: %s' % result)
+        except JavaException as ex: 
+            print("Caught exception : ", ex.message())
+        except:
+            print('Unkonw Error')
+        finally:
+            #--- close JVM
+            jpype.shutdownJVM()
+        
+    
+    
+    
