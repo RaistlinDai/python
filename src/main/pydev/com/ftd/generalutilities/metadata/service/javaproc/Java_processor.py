@@ -69,8 +69,8 @@ class Java_processor(object):
             javaInstance = javaclass()
             print(javaInstance)
             #--- run java method
-            result = javaclass.decompile('C:\\Users\\ftd\Desktop\\PyWorkspace\\FTD.jar', 'C:\\Users\\ftd\\Desktop\\PyWorkspace\\JD_cache')
-            print(result)
+            
+            
         except JavaException as ex: 
             print("Caught exception : ", ex.message())
         
