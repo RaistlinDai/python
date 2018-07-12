@@ -7,6 +7,7 @@ import jpype
 import os
 from src.main.pydev.com.ftd.generalutilities.metadata.service.base.File_constant import File_constant
 from jpype._jexception import JavaException
+from jpype._jpackage import JPackage
 
 class Java_processor(object):
     '''
@@ -37,10 +38,9 @@ class Java_processor(object):
             #--- import the jar class
             javaclass = jpype.JClass('test.reader.ftdTest')
             #--- create instance
-            javaInstance = javaclass('test in python')
+            javaInstance = javaclass()
             #--- run java method
-            result = javaInstance.getFtdTest('FTD', jpype.java.lang.Integer(45))
-            print('java result: %s' % result)
+            result = javaInstance.getSelfAAA()
         except JavaException as ex: 
             print("Caught exception : ", ex.message())
         except:
@@ -50,5 +50,33 @@ class Java_processor(object):
             jpype.shutdownJVM()
         
     
-    
-    
+    @staticmethod
+    def java_load_jdcore():
+        fileconstant = File_constant()
+        #--- get the 3rd lib jar path
+        curr_path = os.path.dirname(os.path.abspath(__file__))
+        proj_path = curr_path[:curr_path.index(fileconstant.MY_PROJECT_PACKAGE)]
+        jarpath = proj_path + fileconstant.THIRD_LIB_JDCORE
+        
+        #--- start JVM and point out the jar path
+        if not jpype.isJVMStarted():  
+            jpype.startJVM(jpype.getDefaultJVMPath(), "-Djava.class.path=%s" % jarpath)
+            
+        try:
+           #--- import the jar class
+            javaclass = jpype.JClass('jd.core.process.DecompilerImpl')
+            #--- create instance
+            javaInstance = javaclass()
+            print(javaInstance)
+            #--- run java method
+            result = javaclass.decompile('C:\\Users\\ftd\Desktop\\PyWorkspace\\FTD.jar', 'C:\\Users\\ftd\\Desktop\\PyWorkspace\\JD_cache')
+            print(result)
+        except JavaException as ex: 
+            print("Caught exception : ", ex.message())
+        
+        finally:
+            #--- close JVM
+            jpype.shutdownJVM()
+            
+            
+            
