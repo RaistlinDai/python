@@ -5,12 +5,18 @@ Created on Jun 21, 2018
 '''
 import os
 import shutil
+from pathlib import Path
 from test.test_decimal import file
 
 class File_processor(object):
     '''
     classdocs
     '''    
+    
+    @staticmethod
+    def get_home_dir():
+        return str(Path.home())
+    
     
     @staticmethod
     def verify_dir_existing(path):

@@ -8,6 +8,7 @@ course from: https://www.liaoxuefeng.com/wiki/0014316089557264a6b348958f449949df
 from selftest import MyDef
 from src.main.pydev.com.ftd.generalutilities.metadata.service.fileproc.Xmlfile_processor import Xmlfile_processor
 from src.main.pydev.com.ftd.generalutilities.metadata.service.javaproc.Java_processor import Java_processor
+from src.main.pydev.com.ftd.generalutilities.metadata.service.base.File_processor import File_processor
 
 print('hello,world')
 
@@ -50,7 +51,7 @@ elif testType == 7:
     print(data)
     
 elif testType == 8:
-    Java_processor.java_3rd_tester()
+    print(File_processor.get_home_dir())
     
 elif testType == 9:
     Java_processor.java_load_jdcore()
