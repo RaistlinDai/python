@@ -23,51 +23,23 @@ class Java_processor(object):
         
     
     @staticmethod
-    def java_3rd_tester():
+    def java_load_ftdJD():
         fileconstant = File_constant()
         #--- get the 3rd lib jar path
         curr_path = os.path.dirname(os.path.abspath(__file__))
         proj_path = curr_path[:curr_path.index(fileconstant.MY_PROJECT_PACKAGE)]
         jarpath = proj_path + fileconstant.MY_PROJECT_3RD_LIB_PATH
         
-        #--- start JVM and point out the jar path
-        if not jpype.isJVMStarted():  
-            jpype.startJVM(jpype.getDefaultJVMPath(), "-Djava.class.path=%s" % jarpath)
-            
-        try:
-            #--- import the jar class
-            javaclass = jpype.JClass('test.reader.ftdTest')
-            #--- create instance
-            javaInstance = javaclass()
-            #--- run java method
-            result = javaInstance.getSelfAAA()
-        except JavaException as ex: 
-            print("Caught exception : ", ex.message())
-        except:
-            print('Unkonw Error')
-        finally:
-            #--- close JVM
-            jpype.shutdownJVM()
-        
-    
-    @staticmethod
-    def java_load_jdcore():
-        fileconstant = File_constant()
-        #--- get the 3rd lib jar path
-        curr_path = os.path.dirname(os.path.abspath(__file__))
-        proj_path = curr_path[:curr_path.index(fileconstant.MY_PROJECT_PACKAGE)]
-        jarpath = proj_path + fileconstant.THIRD_LIB_JDCORE
-        
+        print(jarpath)
         #--- start JVM and point out the jar path
         if not jpype.isJVMStarted():  
             jpype.startJVM(jpype.getDefaultJVMPath(), "-Djava.class.path=%s" % jarpath)
             
         try:
            #--- import the jar class
-            javaclass = jpype.JClass('jd.core.process.DecompilerImpl')
-            #--- create instance
-            javaInstance = javaclass()
-            print(javaInstance)
+            javaclass1 = jpype.JClass('test.reader.ftdTest')
+            
+            print(javaclass1)
             #--- run java method
             
             

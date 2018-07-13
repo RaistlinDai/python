@@ -34,7 +34,7 @@ class File_constant(object):
         Constructor
         '''
         self.MY_PROJECT_PACKAGE = '\\src\\main\\pydev'
-        self.MY_PROJECT_3RD_LIB_PATH = '\\3rd\\lib\\jar\\FTD.jar'
+        self.MY_PROJECT_3RD_LIB_PATH = '\\3rd\\lib\\jar\\FtdJD.jar'
         self.THIRD_LIB_JDCORE = '\\3rd\\lib\\jar\\jd-core-0.7.1.jar'
         
         self.VIEW_METADATA_PATH = '\\main\\resources\\com\\qad\\erp\\financials\\view\\'

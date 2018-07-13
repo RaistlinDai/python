@@ -54,5 +54,5 @@ elif testType == 8:
     print(File_processor.get_home_dir())
     
 elif testType == 9:
-    Java_processor.java_load_jdcore()
+    Java_processor.java_load_ftdJD()
     
