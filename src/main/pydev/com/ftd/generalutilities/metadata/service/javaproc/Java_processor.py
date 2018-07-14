@@ -53,7 +53,7 @@ class Java_processor(File_processor):
             #--- import the jar class
             javaclass = jpype.JClass('main.java.com.jd.FtdDecompiler')
             #--- run java method
-            javaclass.decompiler(srcfile, dcpfile)
+            javaclass.jarDecompiler(srcfile, dcpfile)
             
             return True, None
         except JavaException as ex: 
