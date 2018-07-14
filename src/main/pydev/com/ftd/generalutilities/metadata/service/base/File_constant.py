@@ -33,6 +33,10 @@ class File_constant(object):
         '''
         Constructor
         '''
+        
+        '''
+        @todo: the project is incorrect after package, should be correct later
+        '''
         self.MY_PROJECT_PACKAGE = '\\src\\main\\pydev'
         self.FTD_JD_JAR = '\\3rd\\lib\\jar\\FtdJD.jar'
         self.THIRD_JDCORE_JAR = '\\3rd\\lib\\jar\\jd-core-0.7.1.jar'

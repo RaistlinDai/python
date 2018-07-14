@@ -26,8 +26,8 @@ class Java_processor(object):
     def java_load_ftdJD():
         fileconstant = File_constant()
         #--- get the 3rd lib jar path
-        curr_path = os.path.dirname(os.path.abspath(__file__))
-        proj_path = curr_path[:curr_path.index(fileconstant.MY_PROJECT_PACKAGE)]
+        root_path = os.path.dirname(os.path.abspath(__file__))
+        proj_path = root_path[:root_path.index(fileconstant.MY_PROJECT_PACKAGE)]
         jarpath = proj_path + fileconstant.FTD_JD_JAR + ';' + proj_path + fileconstant.THIRD_JDCORE_JAR
         
         #--- start JVM and point out the jar path
