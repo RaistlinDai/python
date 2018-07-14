@@ -36,10 +36,13 @@ class Java_processor(object):
             
         try:
            #--- import the jar class
-            javaclass1 = jpype.JClass('main.java.com.jd.FtdDecompiler')
+            javaclass = jpype.JClass('main.java.com.jd.FtdDecompiler')
             
-            print(javaclass1)
+            print(javaclass)
             #--- run java method
+            class_pth = 'C:\\Users\\Raistlin\\Desktop\\PyWorkspace\\ftdjd\\test\\reader\\ftdTest.class'
+            output_path = 'C:\\Users\\Raistlin\\Desktop\\PyWorkspace\\output\\test.txt'
+            javaclass.decompiler(class_pth, output_path)
             
             
         except JavaException as ex: 
