@@ -28,16 +28,15 @@ class Java_processor(object):
         #--- get the 3rd lib jar path
         curr_path = os.path.dirname(os.path.abspath(__file__))
         proj_path = curr_path[:curr_path.index(fileconstant.MY_PROJECT_PACKAGE)]
-        jarpath = proj_path + fileconstant.MY_PROJECT_3RD_LIB_PATH
+        jarpath = proj_path + fileconstant.FTD_JD_JAR + ';' + proj_path + fileconstant.THIRD_JDCORE_JAR
         
-        print(jarpath)
         #--- start JVM and point out the jar path
         if not jpype.isJVMStarted():  
             jpype.startJVM(jpype.getDefaultJVMPath(), "-Djava.class.path=%s" % jarpath)
             
         try:
            #--- import the jar class
-            javaclass1 = jpype.JClass('test.reader.ftdTest')
+            javaclass1 = jpype.JClass('main.java.com.jd.FtdDecompiler')
             
             print(javaclass1)
             #--- run java method
