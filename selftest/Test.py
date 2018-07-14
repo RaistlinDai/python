@@ -51,8 +51,8 @@ elif testType == 7:
     print(data)
     
 elif testType == 8:
-    print(File_processor.get_home_dir())
+    Java_processor.unzip_jar('C:\\Users\\Raistlin\\Desktop\\PyWorkspace\\FtdJD.jar', 'C:\\Users\\Raistlin\\Desktop\\PyWorkspace\\output', True)
     
 elif testType == 9:
-    Java_processor.java_load_ftdJD()
+    Java_processor.java_load_ftdJD('C:\\Users\\Raistlin\\Desktop\\PyWorkspace\\ftdjd\\test\\reader\\ftdTest.class', 'C:\\Users\\Raistlin\\Desktop\\PyWorkspace\\output\\test.txt')
     

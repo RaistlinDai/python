@@ -49,6 +49,7 @@ class File_constant(object):
         
         self.BACKUP_SUFFIX = '.bck'
         self.XML_SUFFIX = ".xml"
+        self.JAR_SUFFIX = ".jar"
         self.RESOURCE_METADATA_SUFFIX = "-ViewResourceMeta.xml"
         
     

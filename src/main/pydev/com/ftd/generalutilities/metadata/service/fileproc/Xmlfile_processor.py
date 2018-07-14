@@ -21,18 +21,29 @@ class Xmlfile_processor(File_processor):
 #------------------------ Reader ------------------
 
     @staticmethod
-    def read_proj_dir(dirpath):
+    def read_proj_dir(dir_path):
+        '''
+        read the all view metadata xml files from the project directory
+        @param path: the full path of the project
+        @return: return status
+        @return: viewMetadataNames in list
+        @return: message if validation failed
+        '''
+        # verify if file is existing
+        if not File_processor.verify_dir_existing(dir_path):
+            return False, None, "File not exist!"
+        
         try:
             fileconstant = File_constant()
             #view metadata file list
             viewMetadataNames = {}
             
             #change the work path
-            os.chdir(dirpath)
+            os.chdir(dir_path)
             #go through the inner files
-            for fullname in Xmlfile_processor.iterbrowse(dirpath):
+            for fullname in File_processor.dir_iterbrowse(dir_path):
                 #get the view metadata files
-                if (fullname.startswith(dirpath + fileconstant.VIEW_METADATA_PATH)):
+                if (fullname.startswith(dir_path + fileconstant.VIEW_METADATA_PATH)):
                     #trim the file name
                     filename=os.path.basename(fullname)
                     #remove the suffix
@@ -47,32 +58,29 @@ class Xmlfile_processor(File_processor):
             return True, viewMetadataNames, None
         
         except OSError as e:
-            print('expect:', e)
-            return False, None, e
+            print('Caught exception:', e.message())
+            return False, None, e.message()
         except FileNotFoundError as e:
-            print('expect:', e)
-            return False, None, e
+            print('Caught exception:', e.message())
+            return False, None, e.message()
         finally:
             pass
         
     
-    #get the inner files (full path)
     @staticmethod
-    def iterbrowse(path):
-        for home, dirs, files in os.walk(path):
-            for filename in files:
-                #generator
-                yield os.path.join(home, filename)
-                
-    
-    @staticmethod
-    def read_resource_metadata(path, file_dto):
+    def read_resource_metadata(dir_path, file_dto):
+        '''
+        read the target resource metadata xml file by dom, and load the details into ResourceMetadataDTO
+        @param path: the full path of resource metadata
+        @return: return status
+        @return: message if validation failed
+        '''
         # verify if file is existing
-        if not File_processor.verify_dir_existing(path):
-            return False
+        if not File_processor.verify_dir_existing(dir_path):
+            return False, "File not exist!"
         
         #get the root of resource metadata
-        dom = xml.dom.minidom.parse(path)
+        dom = xml.dom.minidom.parse(dir_path)
         root = dom.documentElement
         #elements=root.getElementsByTagName('element')
         
@@ -92,6 +100,8 @@ class Xmlfile_processor(File_processor):
         
         #update the ResourceMetadataDTO in FileDTOSet
         file_dto.set_resourceDTO(resDto)
+        
+        return True, None
     
     
     @staticmethod

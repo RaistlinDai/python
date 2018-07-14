@@ -6,7 +6,6 @@ Created on Jun 21, 2018
 import os
 import shutil
 from pathlib import Path
-from test.test_decimal import file
 
 class File_processor(object):
     '''
@@ -22,6 +21,11 @@ class File_processor(object):
     def verify_dir_existing(path):
         return os.path.exists(path)
     
+    
+    @staticmethod
+    def verify_file(file_path):
+        return os.path.isfile(file_path)
+        
     
     @staticmethod
     def verify_dir_format(path):
@@ -70,5 +74,17 @@ class File_processor(object):
             return False, "File not exist!"
         else:
             os.remove(srcfile)
-        return True, None    
+        return True, None
+        
+        
+    @staticmethod
+    def dir_iterbrowse(dir_path):
+        '''
+        this is a generator, to retrieve all of the inter files (include the files in the sub folder)
+        @param dir_path: the target directory
+        '''
+        for home, dirs, files in os.walk(dir_path):
+            for filename in files:
+                #generator
+                yield os.path.join(home, filename)
         

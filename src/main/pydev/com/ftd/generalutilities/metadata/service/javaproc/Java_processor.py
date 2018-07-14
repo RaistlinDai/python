@@ -5,17 +5,21 @@ Created on Jul 11, 2018
 '''
 import jpype
 import os
-from src.main.pydev.com.ftd.generalutilities.metadata.service.base.File_constant import File_constant
+import zipfile
 from jpype._jexception import JavaException
-from jpype._jpackage import JPackage
+from src.main.pydev.com.ftd.generalutilities.metadata.service.base.File_constant import File_constant
+from src.main.pydev.com.ftd.generalutilities.metadata.service.base.File_processor import File_processor
 
-class Java_processor(object):
+class Java_processor(File_processor):
     '''
     before compiling this class, you have to install jpype and numpy in Python
     '''
 
     @staticmethod
     def java__tester():
+        '''
+        tester function for reading java
+        '''
         jvmPath = jpype.getDefaultJVMPath() 
         jpype.startJVM(jvmPath) 
         jpype.java.lang.System.out.println('hello world!')
@@ -23,11 +27,22 @@ class Java_processor(object):
         
     
     @staticmethod
-    def java_load_ftdJD():
+    def java_load_ftdJD(srcfile, dcpfile):
+        '''
+        decompile the java class file to the target directory
+        @param srcfile: the java class file
+        @param dcpfile: the decompiled file
+        @return: return status
+        @return: message if validation failed
+        '''
+        if not File_processor.verify_dir_existing(srcfile):
+            return False, "File not exist!"
+        
         fileconstant = File_constant()
         #--- get the 3rd lib jar path
         root_path = os.path.dirname(os.path.abspath(__file__))
         proj_path = root_path[:root_path.index(fileconstant.MY_PROJECT_PACKAGE)]
+        #--- java class path
         jarpath = proj_path + fileconstant.FTD_JD_JAR + ';' + proj_path + fileconstant.THIRD_JDCORE_JAR
         
         #--- start JVM and point out the jar path
@@ -35,22 +50,53 @@ class Java_processor(object):
             jpype.startJVM(jpype.getDefaultJVMPath(), "-Djava.class.path=%s" % jarpath)
             
         try:
-           #--- import the jar class
+            #--- import the jar class
             javaclass = jpype.JClass('main.java.com.jd.FtdDecompiler')
-            
-            print(javaclass)
             #--- run java method
-            class_pth = 'C:\\Users\\Raistlin\\Desktop\\PyWorkspace\\ftdjd\\test\\reader\\ftdTest.class'
-            output_path = 'C:\\Users\\Raistlin\\Desktop\\PyWorkspace\\output\\test.txt'
-            javaclass.decompiler(class_pth, output_path)
+            javaclass.decompiler(srcfile, dcpfile)
             
-            
+            return True, None
         except JavaException as ex: 
             print("Caught exception : ", ex.message())
-        
+            return False, ex.message()
         finally:
             #--- close JVM
             jpype.shutdownJVM()
             
-            
-            
+    
+    @staticmethod
+    def unzip_jar(srcfile, outdir, deep_unzip=False):
+        '''
+        unzip the jar to the target directory
+        @param srcfile: the jar file
+        @param outdir: the output directory
+        @param deep_unzip: if unzip the inner jar also
+        @return: return status
+        @return: message if validation failed
+        '''
+        if not File_processor.verify_dir_existing(srcfile):
+            return False, "File not exist!"
+        
+        if not File_processor.verify_dir_existing(outdir):
+            os.makedirs(outdir)
+        
+        fileconstant = File_constant()
+        
+        if fileconstant.JAR_SUFFIX in srcfile:
+            zfile = zipfile.ZipFile(srcfile, 'r')  
+            zfile.extractall(outdir)  
+            zfile.close
+        else:
+            return False, "The source file is not jar!"
+        
+        #--- unzip all inner jars
+        if deep_unzip:
+            for fullname in File_processor.dir_iterbrowse(outdir):
+                #get the inner jar files
+                if (fileconstant.JAR_SUFFIX in fullname):
+                    inner_jar_outdir = fullname[:fullname.index(fileconstant.JAR_SUFFIX)]
+                    result, message = Java_processor.unzip_jar(fullname, inner_jar_outdir, deep_unzip)
+                    if not result:
+                        return False, "Deep unzip failed!"
+
+        return True, None

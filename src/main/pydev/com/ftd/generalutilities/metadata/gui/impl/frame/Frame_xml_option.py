@@ -119,15 +119,18 @@ class Frame_xml_option(FormatableFrame):
             {'Xml':{'EntityMap':self.__vari1.get(), 'BeanAppContext':self.__vari2.get()}}, const.ACTION_UPDATE)
         
         if not result:
-            print(message)
+            showerror('Error', message)
             return False
         
         #--- read the resource metadata and load the data into ResourceMetadataDTO
         resourcepath = curDtos.get_resourcefullpath()
-        Xmlfile_processor.read_resource_metadata(resourcepath, self.get_dtos())
+        result, message = Xmlfile_processor.read_resource_metadata(resourcepath, self.get_dtos())
+        if not result:
+            showerror('Error', message)
+            return False
         resDTO = curDtos.get_resourceDTO()
         
-        ''' process beans-app-context.xml '''
+        #--- process beans-app-context.xml
         bean_path = curTrans.get_projectpath() + fileconstant.BEAN_APP_CONTEXT_PATH
         status01, beanDTO, message01 = Xmlfile_processor.read_bean_app_context(bean_path)
         if status01:
@@ -149,7 +152,7 @@ class Frame_xml_option(FormatableFrame):
             showerror('Error', message01)
             return False
         
-        ''' process entityMap.xml '''
+        #--- process entityMap.xml
         entmap_path = curTrans.get_projectpath() + fileconstant.ENTITY_MAP_PATH
         status02, entMapDTO, message02 = Xmlfile_processor.read_entity_map(entmap_path)
         if status02:
