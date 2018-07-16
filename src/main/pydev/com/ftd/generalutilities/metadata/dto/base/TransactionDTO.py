@@ -253,6 +253,7 @@ class TransactionDTO(object):
         for case in switch(selections):
             if case(1): #select entity from folder
                 self.add_next_process(Mainframe_enum.LOAD_DIR)
+                self.add_next_process(Mainframe_enum.PROJFILE_CHECK)
                 self.add_next_process(Mainframe_enum.GENE_SELECTION)
                 break
             if case(2): #select a entity directly

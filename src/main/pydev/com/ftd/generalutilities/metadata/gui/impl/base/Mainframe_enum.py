@@ -10,6 +10,7 @@ from src.main.pydev.com.ftd.generalutilities.metadata.gui.impl.frame.Frame_xml_o
 from src.main.pydev.com.ftd.generalutilities.metadata.gui.impl.frame.Frame_controller_option import Frame_controller_option
 from src.main.pydev.com.ftd.generalutilities.metadata.gui.impl.frame.Frame_serviceimpl_option import Frame_serviceimpl_option
 from src.main.pydev.com.ftd.generalutilities.metadata.gui.impl.frame.Frame_startup import Frame_startup
+from src.main.pydev.com.ftd.generalutilities.metadata.gui.impl.frame.Frame_projfile_check import Frame_projfile_check
 
 @unique
 class Mainframe_enum(Enum):
@@ -24,3 +25,4 @@ class Mainframe_enum(Enum):
     XML_OPTION = [Frame_xml_option, 'EntityMap & BeanAppContext']
     CONTROLLER_OPTION = [Frame_controller_option, 'DataController']
     SERVICEIMPL_OPTION = [Frame_serviceimpl_option, 'ServiceImpl']
+    PROJFILE_CHECK = [Frame_projfile_check, 'ProjFileCheck']

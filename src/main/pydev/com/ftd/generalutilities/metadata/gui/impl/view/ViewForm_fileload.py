@@ -34,7 +34,7 @@ class ViewForm_fileload(IViewForm):
         
         #mock processing flow
         self.__trans.add_next_process(Mainframe_enum.START_UP)
-        #self.__trans.add_next_process(Mainframe_enum.XML_OPTION)
+        #self.__trans.add_next_process(Mainframe_enum.PROJFILE_CHECK)
         
         #load frame
         self.open_firstframe()
