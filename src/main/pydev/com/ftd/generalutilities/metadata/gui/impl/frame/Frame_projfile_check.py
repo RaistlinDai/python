@@ -9,6 +9,8 @@ from src.main.pydev.com.ftd.generalutilities.metadata.gui.impl.base.FormatableFr
 from src.main.pydev.com.ftd.generalutilities.metadata.service.fileproc.Xmlfile_processor import Xmlfile_processor
 from src.main.pydev.com.ftd.generalutilities.metadata.service.base.File_constant import File_constant
 from src.main.pydev.com.ftd.generalutilities.metadata.service.base.File_processor import File_processor
+from src.main.pydev.com.ftd.generalutilities.metadata.gui.impl.view.Popup_projfile_details import Popup_projfile_details
+from tkinter.messagebox import showerror
 
 class Frame_projfile_check(FormatableFrame):
     '''
@@ -19,8 +21,8 @@ class Frame_projfile_check(FormatableFrame):
         '''
         Constructor
         '''
+        self.__checkstatus = {'ViewMetadata':False, 'ResourceMetadata':False, 'Pom':False, 'JAR':False }
         FormatableFrame.__init__(self, parent.get_mainframe(), dtos, trans, **configs)
-        self.__checkstatus = {}
         
         
     #overwrite create_widges
@@ -47,6 +49,7 @@ class Frame_projfile_check(FormatableFrame):
         self.__label04.place(height=20, width=120, relx=0.5, rely=0.18)
         self.__button01 = Button(canv1, text="Detail")
         self.__button01.place(height=20, width=50, relx=0.8, rely=0.18)
+        self.__button01.bind('<Button-1>', self.detal_button_click, 'test') #bind button click event
         
         self.__checkval02 = IntVar()
         self.__checkbox02 = Checkbutton(canv1, text = "Resource metadata", variable = self.__checkval02, onvalue = 1, offvalue = 0, state=DISABLED)
@@ -182,4 +185,33 @@ class Frame_projfile_check(FormatableFrame):
             self.__button11.config(text=btnlabel)
             self.__checkstatus['JAR'] = False
         self.__checkval11.set(1)
+    
+    
+    def detal_button_click(self, ii):
+        '''
+        detail button click event
+        '''
+        print(ii)
+        popup = Popup_projfile_details(None)
+        popup.grab_set()
+        popup.focus_set()
+        popup.wait_window()
+        
+        if self.__setfunc:
+            self.__setfunc(popup.return_selection())
+            
+    
+    def before_next(self):
+        '''
+        overwrite the function in super class
+        verify the input directory
+        '''
+        for flag in self.__checkstatus.values():
+            if not flag:
+                print('ERROR')
+                showerror('Error', 'There are errors existing, please correct it!')
+                return False
+            
+        return True
+        
             
