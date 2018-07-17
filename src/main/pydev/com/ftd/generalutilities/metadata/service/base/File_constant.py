@@ -41,11 +41,14 @@ class File_constant(object):
         self.FTD_JD_JAR = '\\3rd\\lib\\jar\\FtdJD.jar'
         self.THIRD_JDCORE_JAR = '\\3rd\\lib\\jar\\jd-core-0.7.1.jar'
         
-        self.VIEW_METADATA_PATH = '\\main\\resources\\com\\qad\\erp\\financials\\view\\'
-        self.RESOURCE_METADATA_PATH = '\\main\\resources\\com\\qad\\erp\\financials\\data\\meta\\'
-        self.JAVA_CONTROLLER_PATH = '\\main\\java\\com\\qad\\erp\\financials\\'
-        self.ENTITY_MAP_PATH = '\\main\\resources\\com\\qad\\erp\\financials\\data\\doc\\entityMap.xml'
-        self.BEAN_APP_CONTEXT_PATH = '\\main\\resources\\WEB-INF\\qad\\erp\\financials\\beans-app-context.xml'
+        self.VIEW_METADATA_PATH = '\\src\\main\\resources\\com\\qad\\erp\\financials\\view\\'
+        self.RESOURCE_METADATA_PATH = '\\src\\main\\resources\\com\\qad\\erp\\financials\\data\\meta\\'
+        self.JAVA_CONTROLLER_PATH = '\\src\\main\\java\\com\\qad\\erp\\financials\\'
+        self.ENTITY_MAP_PATH = '\\src\\main\\resources\\com\\qad\\erp\\financials\\data\\doc\\entityMap.xml'
+        self.BEAN_APP_CONTEXT_PATH = '\\src\\main\\resources\\WEB-INF\\qad\\erp\\financials\\beans-app-context.xml'
+        self.POM_PATH = '\\pom.xml'
+        self.JAR_LIB_PATH = '\\.m2\\repository\\com\\qad\\financials-impl\\'
+        self.FIN_IMPL_JAR_PREFIX = 'financials-impl-'
         
         self.BACKUP_SUFFIX = '.bck'
         self.XML_SUFFIX = ".xml"

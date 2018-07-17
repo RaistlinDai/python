@@ -88,3 +88,10 @@ class File_processor(object):
                 #generator
                 yield os.path.join(home, filename)
         
+    @staticmethod
+    def get_user_home():
+        '''
+        get the user home directory
+        @return: user home directory
+        '''
+        return os.path.expanduser('~')

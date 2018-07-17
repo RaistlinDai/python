@@ -12,6 +12,7 @@ from src.main.pydev.com.ftd.generalutilities.metadata.service.base.File_processo
 import xml.etree.ElementTree as ElementTree
 from src.main.pydev.com.ftd.generalutilities.metadata.dto.xmlFile.entitymap.EntityMapDTO import EntityMaps,\
     EntityMap
+from src.main.pydev.com.ftd.generalutilities.metadata.dto.xmlFile.pom.PomDTO import PomDTO
 
 class Xmlfile_processor(File_processor):
     '''
@@ -223,8 +224,8 @@ class Xmlfile_processor(File_processor):
     @staticmethod
     def read_entity_map(path):
         '''
-        read the entityMap.xml file, and load the details into entityMap
-        @param path: the directory of entityMap.xml
+        read the entityMap.xml file, and load the details into entityMapDTO
+        @param path: the directory of entityMap.xml by ElementTree
         @return: return status
         @return: BeansAppContextDTO
         @return: message if validation failed
@@ -261,6 +262,7 @@ class Xmlfile_processor(File_processor):
     @staticmethod
     def write_entity_map(path, urn, urn_type, object_name, pan_domain):   
         '''
+        write the entityMap.xml file
         @param path: the full path of entityMap.xml
         @param urn: the new urn
         @param urn_type: the new urn_type
@@ -318,3 +320,30 @@ class Xmlfile_processor(File_processor):
         
         del linecontents[:] 
         return True, None
+    
+    
+    @staticmethod
+    def read_pom(path):
+        '''
+        read the pom.xml file, and load the details into PomDTO
+        @param path: the directory of pom.xml (web) by dom
+        @return: return status
+        @return: PomDTO
+        @return: message if validation failed
+        '''
+        # verify if file is existing
+        if not File_processor.verify_dir_existing(path):
+            return False, None, 'The pom.xml is not exist, please check.'
+        
+        #get the root of entityMap.xml
+        dom = xml.dom.minidom.parse(path)
+        pomDto = PomDTO()
+        for node in dom.getElementsByTagName('properties'):
+            node_value = node.getElementsByTagName('financials-api-version')[0]
+            pomDto.set_financials_api_version(node_value.childNodes[0].nodeValue)
+            break
+        
+        return True, pomDto, None
+    
+    
+    

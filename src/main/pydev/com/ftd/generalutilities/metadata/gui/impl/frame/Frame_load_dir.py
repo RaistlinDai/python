@@ -7,10 +7,7 @@ from tkinter import *
 from tkinter.messagebox import showerror
 from src.main.pydev.com.ftd.generalutilities.metadata.gui.impl.button.Button_openfile import Button_openfile
 from src.main.pydev.com.ftd.generalutilities.metadata.gui.impl.frame.Frame_bottom import Frame_bottom
-from src.main.pydev.com.ftd.generalutilities.metadata.service.base.File_constant import File_constant
 from src.main.pydev.com.ftd.generalutilities.metadata.gui.impl.base.FormatableFrame import FormatableFrame
-from src.main.pydev.com.ftd.generalutilities.metadata.gui.impl.base.UnFormatableFrame import UnFormatableFrame
-from src.main.pydev.com.ftd.generalutilities.metadata.service.fileproc.Xmlfile_processor import Xmlfile_processor
 
 class Frame_load_dir(FormatableFrame):
     '''
@@ -48,16 +45,6 @@ class Frame_load_dir(FormatableFrame):
         self.__label02 = Label(self.__frame2, text="Selected entity: ")
         self.__label02.pack(side=LEFT, fill=X)
         
-        #selected details
-        self.__frame3 = UnFormatableFrame(self)
-        self.__frame3.pack(fill=X)
-        self.__label03 = Label(self.__frame3, text="View metadata: ")
-        self.__label03.pack(side=LEFT, fill=X)
-        self.__frame4 = UnFormatableFrame(self)
-        self.__frame4.pack(fill=X)
-        self.__label04 = Label(self.__frame4, text="Source metadata: ")
-        self.__label04.pack(side=LEFT, fill=X)
-        
     
     #overwrite create_widges
     def add_bottom(self, parent):
@@ -78,43 +65,21 @@ class Frame_load_dir(FormatableFrame):
         
     
     def get_selection(self, fileinfo):
-        #path constant
-        fileconstant = File_constant()
         #update label
         if isinstance(fileinfo, tuple):
             filename = fileinfo[0]
             viewfullpath = fileinfo[1]
         elif isinstance(fileinfo, str):
             filename = fileinfo
-            viewfullpath = self.__dicinput.get() + fileconstant.viewmetadata_path + filename
         else:
-            return
-        
-        #verify source metadata
-        resource_exist = False
-        if filename:
-            resourcefullpath = self.__dicinput.get() + fileconstant.RESOURCE_METADATA_PATH + filename +fileconstant.RESOURCE_METADATA_SUFFIX
-            resource_exist = Xmlfile_processor.verify_dir_existing(resourcefullpath)
-        
-        newname = "Selected entity: " + filename
-        self.__label02.config(text=newname)
-        
-        newviewpath = "View metadata: Verified"
-        self.__label03.config(text=newviewpath)
-        
-        if resource_exist:
-            newsourcepath = "Source metadata: Verified"
-            self.__label04.config(text=newsourcepath)
-        else:
-            newsourcepath = "Source metadata: Failed"
-            self.__label04.config(text=newsourcepath)
-            showerror('Error', 'There is no matching resource metadata!')
             return
         
         #set the entity name and full path into entity dto
         self.get_dtos().set_entityname(filename)
-        self.get_dtos().set_viewfullpath(viewfullpath)
-        self.get_dtos().set_resourcefullpath(resourcefullpath)
+        newlabel02 = "Selected entity: " + filename
+        self.__label02.config(text=newlabel02, fg='blue')
+        if viewfullpath:
+            self.get_dtos().set_viewfullpath(viewfullpath)
         #set the project path into transaction dto
         self.get_trans().set_projectpath(self.__dicinput.get())
         

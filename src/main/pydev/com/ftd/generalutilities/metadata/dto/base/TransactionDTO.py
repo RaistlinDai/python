@@ -23,7 +23,9 @@ class TransactionDTO(object):
                       'PrevFrameFunc':None,
                       'GenerateOption':{},
                       'WorkspacePath':None,
-                      'ProjectPath':None
+                      'ProjectPath':None,
+                      'PomDTO':None,
+                      'FinImplJarPath':None
                       }
         
         
@@ -118,9 +120,32 @@ class TransactionDTO(object):
         if self.__dto:
             return self.__dto['WorkspacePath']
         else:
-            return None    
+            return None
     
-
+    
+    def set_pomDto(self, pomDto):
+        if self.__dto:
+            self.__dto['PomDTO'] = pomDto
+            
+            
+    def get_pomDto(self):
+        if self.__dto:
+            return self.__dto['PomDTO']
+        else:
+            return None
+        
+        
+    def set_finImplJarPath(self, finImplJarPath):
+        if self.__dto:
+            self.__dto['FinImplJarPath'] = finImplJarPath
+            
+            
+    def get_finImplJarPath(self):
+        if self.__dto:
+            return self.__dto['FinImplJarPath']
+        else:
+            return None
+        
 #----------------- packaged functions ------------------
 
 #----------------- maintain the process ----------------
