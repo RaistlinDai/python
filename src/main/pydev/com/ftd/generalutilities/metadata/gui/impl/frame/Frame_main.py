@@ -21,7 +21,7 @@ class Frame_main(Frame):
         #main window
         #update the title
         self.master.title('File Generator')
-        self.master.geometry('600x300')
+        self.master.geometry('600x400')
         self.master.resizable(width=False, height=False)
         #font
         self.labelfont = ('times', 15, 'bold')

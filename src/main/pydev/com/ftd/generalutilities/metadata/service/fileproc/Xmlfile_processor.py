@@ -13,19 +13,19 @@ import xml.etree.ElementTree as ElementTree
 from src.main.pydev.com.ftd.generalutilities.metadata.dto.xmlFile.entitymap.EntityMapDTO import EntityMaps,\
     EntityMap
 from src.main.pydev.com.ftd.generalutilities.metadata.dto.xmlFile.pom.PomDTO import PomDTO
+from pyexpat import ExpatError
 
 class Xmlfile_processor(File_processor):
     '''
     classdocs
     '''
 
-#------------------------ Reader ------------------
-
+#------------------ Reader project directory ------------------
     @staticmethod
     def read_proj_dir(dir_path):
         '''
         read the all view metadata xml files from the project directory
-        @param path: the full path of the project
+        @param dir_path: the full path of the project
         @return: return status
         @return: viewMetadataNames in list
         @return: message if validation failed
@@ -67,18 +67,68 @@ class Xmlfile_processor(File_processor):
         finally:
             pass
         
-    
+
+#---------------- view metadata.xml --------------------------
     @staticmethod
-    def read_resource_metadata(dir_path, file_dto):
+    def veriy_view_metadata(dir_path):
         '''
-        read the target resource metadata xml file by dom, and load the details into ResourceMetadataDTO
-        @param path: the full path of resource metadata
+        read the target view metadata xml file by dom
+        @param dir_path: the full path of view metadata
         @return: return status
         @return: message if validation failed
         '''
         # verify if file is existing
         if not File_processor.verify_dir_existing(dir_path):
-            return False, "File not exist!"
+            return False, "The view metadata is not exist, please check."
+        
+        #get the root of resource metadata
+        try:
+            dom = xml.dom.minidom.parse(dir_path)
+            root = dom.documentElement
+            if not root.nodeName == 'QADView':
+                return False, 'This is not a valid view metadata, please check.'
+        except ExpatError:
+            return False, 'This is not a valid xml file, please check.'
+            
+        return True, None
+        
+        
+#---------------- resource metadata.xml --------------------------
+    @staticmethod
+    def veriy_resource_metadata(dir_path):
+        '''
+        read the target resource metadata xml file by dom
+        @param dir_path: the full path of resource metadata
+        @return: return status
+        @return: message if validation failed
+        '''
+        # verify if file is existing
+        if not File_processor.verify_dir_existing(dir_path):
+            return False, "The resource metadata is not exist, please check."
+        
+        #get the root of resource metadata
+        try:
+            dom = xml.dom.minidom.parse(dir_path)
+            root = dom.documentElement
+            if not root.nodeName == 'ViewResourceMetadata':
+                return False, 'This is not a valid resource metadata, please check.'
+        except ExpatError:
+            return False, 'This is not a valid xml file, please check.'
+        
+        return True, None
+        
+    
+    @staticmethod
+    def read_resource_metadata(dir_path, file_dto):
+        '''
+        read the target resource metadata xml file by dom, and load the details into ResourceMetadataDTO
+        @param dir_path: the full path of resource metadata
+        @return: return status
+        @return: message if validation failed
+        '''
+        # verify if file is existing
+        if not File_processor.verify_dir_existing(dir_path):
+            return False, "The resource metadata is not exist, please check."
         
         #get the root of resource metadata
         dom = xml.dom.minidom.parse(dir_path)
@@ -96,17 +146,44 @@ class Xmlfile_processor(File_processor):
                                  root.getAttribute('IsEligibleForMenu'), 
                                  root.getAttribute('IsSecure'), 
                                  root.getAttribute('PrimarySecureUri'))
-            
+        else:
+            return False, 'This is not a valid resource metadata, please check.'
+        
         #print(root.childNodes)
         
         #update the ResourceMetadataDTO in FileDTOSet
-        file_dto.set_resourceDTO(resDto)
+        if file_dto:
+            file_dto.set_resourceDTO(resDto)
         
         return True, None
     
-    
+
+#---------------- beans-app-context.xml --------------------------
     @staticmethod
-    def read_bean_app_context(path):
+    def verify_beans_app_context(dir_path):
+        '''
+        verify the beans-app-context.xml file by dom
+        @param dir_path: the full path of beans-app-context.xml
+        @return: return status
+        @return: message if validation failed
+        '''
+        # verify if file is existing
+        if not File_processor.verify_dir_existing(dir_path):
+            return False, 'The beans-app-context is not exist, please check.'
+        
+        #get the root of resource metadata
+        try:
+            dom = xml.dom.minidom.parse(dir_path)
+            if len(dom.getElementsByTagName('bean')) == 0:
+                return False, 'This is not a valid beans-app-context.xml, please check.'
+        except ExpatError:
+            return False, 'This is not a valid xml file, please check.'
+        
+        return True, None
+        
+
+    @staticmethod
+    def read_beans_app_context(path):
         '''
         read the beans-app-context.xml file by dom, and load the details into BeansAppContextDTO
         @param path: the full path of beans-app-context.xml
@@ -138,26 +215,26 @@ class Xmlfile_processor(File_processor):
                 bean_app.set_view_metadata_service(node.getAttribute('value'))
                 
         return True, bean_app, None
-        
+    
     
     @staticmethod
-    def write_bean_app_context(path, value):
+    def write_beans_app_context(dir_path, value):
         '''
         write the beans-app-context.xml file
-        @param path: the full path of beans-app-context.xml
+        @param dir_path: the full path of beans-app-context.xml
         @param value: append value
         @return: return status
         @return: message if validation failed
         '''
         # verify if file is existing
-        if not File_processor.verify_dir_existing(path):
+        if not File_processor.verify_dir_existing(dir_path):
             return False, 'The beans-app-context is not exist, please check.'
         
         #get the root of resource metadata
         linecontents = []
         entityuri_start, entityuri_end, value_start = -1, -1, -1
         
-        with open(path, "r", encoding="utf-8") as f:
+        with open(dir_path, "r", encoding="utf-8") as f:
             for cur_line_number, line in enumerate(f):
                 linecontents.append(line)
                 if 'name=\"entityUriMapString\"' in line:
@@ -208,7 +285,7 @@ class Xmlfile_processor(File_processor):
             return False, e
         
         newfile = ''.join(linecontents)
-        f = open(path, "w", encoding="utf-8")
+        f = open(dir_path, "w", encoding="utf-8")
         try:
             f.write(newfile)
             
@@ -221,21 +298,45 @@ class Xmlfile_processor(File_processor):
         return True, None
 
     
+#---------------- entityMap.xml --------------------------
     @staticmethod
-    def read_entity_map(path):
+    def verify_entity_map(dir_path):
+        '''
+        verify the entityMap.xml file
+        @param dir_path: the directory of entityMap.xml by dom
+        @return: return status
+        @return: message if validation failed
+        '''
+        # verify if file is existing
+        if not File_processor.verify_dir_existing(dir_path):
+            return False, 'The entityMap is not exist, please check.'
+        
+        try:
+            dom = xml.dom.minidom.parse(dir_path)
+            root = dom.documentElement
+            if not root.nodeName == 'EntityMaps':
+                return False, 'This is not a valid entityMap.xml, please check.'
+        except ExpatError:
+            return False, 'This is not a valid xml file, please check.'
+        
+        return True, None
+    
+
+    @staticmethod
+    def read_entity_map(dir_path):
         '''
         read the entityMap.xml file, and load the details into entityMapDTO
-        @param path: the directory of entityMap.xml by ElementTree
+        @param dir_path: the directory of entityMap.xml by ElementTree
         @return: return status
         @return: BeansAppContextDTO
         @return: message if validation failed
         '''
         # verify if file is existing
-        if not File_processor.verify_dir_existing(path):
+        if not File_processor.verify_dir_existing(dir_path):
             return False, None, 'The entityMap.xml is not exist, please check.'
         
         #get the root of entityMap.xml
-        tree = ElementTree.parse(path)
+        tree = ElementTree.parse(dir_path)
         root = tree.getroot()
         ent_maps = EntityMaps()
         
@@ -260,10 +361,10 @@ class Xmlfile_processor(File_processor):
     
     
     @staticmethod
-    def write_entity_map(path, urn, urn_type, object_name, pan_domain):   
+    def write_entity_map(dir_path, urn, urn_type, object_name, pan_domain):   
         '''
         write the entityMap.xml file
-        @param path: the full path of entityMap.xml
+        @param dir_path: the full path of entityMap.xml
         @param urn: the new urn
         @param urn_type: the new urn_type
         @param object_name: the new object_name
@@ -272,14 +373,14 @@ class Xmlfile_processor(File_processor):
         @return: message if validation failed
         '''
         # verify if file is existing
-        if not File_processor.verify_dir_existing(path):
+        if not File_processor.verify_dir_existing(dir_path):
             return False, None, 'The entityMap.xml is not exist, please check.'
         
         #get the root of entityMap
         linecontents = []
         entityuri_start, entityuri_end, file_end = -1, -1, -1
         
-        with open(path, "r", encoding="utf-8") as f:
+        with open(dir_path, "r", encoding="utf-8") as f:
             for cur_line_number, line in enumerate(f):
                 linecontents.append(line)
                 if '<EntityMap>' in line:
@@ -309,7 +410,7 @@ class Xmlfile_processor(File_processor):
             return False, e
         
         newfile = ''.join(linecontents)
-        f = open(path, "w", encoding="utf-8")
+        f = open(dir_path, "w", encoding="utf-8")
         try:
             f.write(newfile)
             
@@ -322,21 +423,46 @@ class Xmlfile_processor(File_processor):
         return True, None
     
     
+#---------------- pom.xml --------------------------
     @staticmethod
-    def read_pom(path):
+    def verify_pom(dir_path):
+        '''
+        verify the pom.xml file
+        @param dir_path: the directory of pom.xml by dom
+        @return: return status
+        @return: message if validation failed
+        '''
+        # verify if file is existing
+        if not File_processor.verify_dir_existing(dir_path):
+            return False, 'The pom.xml is not exist, please check.'
+        
+        try:
+            dom = xml.dom.minidom.parse(dir_path)
+            root = dom.documentElement
+            print(root.nodeName)
+            if not root.nodeName == 'project':
+                return False, 'This is not a valid pom.xml, please check.'
+        except ExpatError:
+            return False, 'This is not a valid xml file, please check.'
+        
+        return True, None
+    
+        
+    @staticmethod
+    def read_pom(dir_path):
         '''
         read the pom.xml file, and load the details into PomDTO
-        @param path: the directory of pom.xml (web) by dom
+        @param dir_path: the directory of pom.xml (web) by dom
         @return: return status
         @return: PomDTO
         @return: message if validation failed
         '''
         # verify if file is existing
-        if not File_processor.verify_dir_existing(path):
+        if not File_processor.verify_dir_existing(dir_path):
             return False, None, 'The pom.xml is not exist, please check.'
         
         #get the root of entityMap.xml
-        dom = xml.dom.minidom.parse(path)
+        dom = xml.dom.minidom.parse(dir_path)
         pomDto = PomDTO()
         for node in dom.getElementsByTagName('properties'):
             node_value = node.getElementsByTagName('financials-api-version')[0]

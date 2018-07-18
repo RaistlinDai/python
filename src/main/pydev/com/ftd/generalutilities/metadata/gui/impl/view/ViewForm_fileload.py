@@ -115,7 +115,7 @@ class ViewForm_fileload(IViewForm):
 
     def __contruct_newframe__(self, procfunc):
         self.__body = procfunc.value[0](self, self.__dtos, self.__trans)
-        self.__body.config(width=540,height=300)
+        self.__body.config(width=540,height=400)
         self.__body.pack_propagate(0)
         self.__body.pack(fill=X)
         

@@ -132,7 +132,7 @@ class Frame_xml_option(FormatableFrame):
         
         #--- process beans-app-context.xml
         bean_path = curTrans.get_projectpath() + fileconstant.BEAN_APP_CONTEXT_PATH
-        status01, beanDTO, message01 = Xmlfile_processor.read_bean_app_context(bean_path)
+        status01, beanDTO, message01 = Xmlfile_processor.read_beans_app_context(bean_path)
         if status01:
             #--- verify if the target entity uri is existing in the beans-app-context
             if resDTO.get_primary_secure_uri() in beanDTO.get_entity_uri_mapstring():
@@ -143,7 +143,7 @@ class Frame_xml_option(FormatableFrame):
                 #--- format the new uri
                 value = resDTO.get_primary_secure_uri() + ',' + resDTO.get_meta_uri()
                 #--- update beans-app-context
-                status01, message01 = Xmlfile_processor.write_bean_app_context(bean_path, value)
+                status01, message01 = Xmlfile_processor.write_beans_app_context(bean_path, value)
                 #--- clean the backup if needed
                 if self.__vari1.get() == 2:
                     status01, message01 = Xmlfile_processor.remove_file(curTrans.get_workspacepath() + beanDTO.get_filename() + fileconstant.BACKUP_SUFFIX) 
