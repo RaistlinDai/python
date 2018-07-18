@@ -35,7 +35,7 @@ class Frame_startup(FormatableFrame):
         self.__label01.pack(side=TOP, fill=X, ipady=10)
         
         #---- panel 01 ----------
-        canv1 = Canvas(self, height=100, width=550)
+        canv1 = Canvas(self, height=150, width=550)
         #label
         label1 = Label(canv1, text='Please select a processing pattern:')
         label1.place(height=20, width=200, relx=0.01, rely=0.05)
