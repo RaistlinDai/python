@@ -189,7 +189,6 @@ class Xmlfile_processor(File_processor):
         @return: return status
         @return: message if validation failed
         '''
-        print(dir_path)
         # verify if file is existing
         if not File_processor.verify_dir_existing(dir_path):
             return False, 'The beans-app-context is not exist, please check.'

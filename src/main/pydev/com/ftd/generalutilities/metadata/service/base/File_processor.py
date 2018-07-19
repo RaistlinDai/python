@@ -117,7 +117,6 @@ class File_processor(object):
         bytefile.close()
         #convert bytes to 16 bit
         bins = File_processor.bytes2hex(bins)
-        print(bins)
         #keys comparing
         for hcode in fileconstant.FILE_TYPE.keys():
             lens = len(hcode) #length of key

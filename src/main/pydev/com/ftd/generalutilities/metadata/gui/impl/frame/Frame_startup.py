@@ -110,8 +110,6 @@ class Frame_startup(FormatableFrame):
             #--- set the workspace path into transaction dto
             self.get_trans().set_workspacepath(tempdir)
         
-        print(self.get_trans().get_workspacepath())
-        
         #--- set the process flow according to the selection
         self.get_trans().update_process_flow_by_start_selection(self.__vari1.get())
         
