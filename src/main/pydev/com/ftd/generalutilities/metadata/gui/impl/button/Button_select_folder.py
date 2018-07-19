@@ -6,7 +6,7 @@ Created on Jun 23, 2018
 from tkinter import Button
 from tkinter.filedialog import askdirectory
 
-class Button_openfile(Button):
+class Button_select_folder(Button):
     '''
     classdocs
     '''

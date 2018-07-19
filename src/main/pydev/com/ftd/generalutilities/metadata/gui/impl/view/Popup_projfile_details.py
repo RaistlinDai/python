@@ -52,6 +52,7 @@ class Popup_projfile_details(Toplevel):
         if not fileinfo['iscorrect']:
             self.__button01 = Button(canv1, text='File select :')
             self.__button01.place(height=20, width=80, relx=0.01, rely=0.6)
+            self.__button01.bind('<Button-1>', self.file_click_event)
         else:
             self.__label03 = Label(canv1, text='File path :')
             self.__label03.place(height=20, width=80, relx=0.01, rely=0.6)
@@ -90,6 +91,14 @@ class Popup_projfile_details(Toplevel):
         self.destroy()
     
     
+    def file_click_event(self):
+        '''
+        file directory button click event
+        '''
+        pass
+        
+        
+    
     def verify_files(self):
         '''
         verify the file according to the file type
@@ -107,6 +116,8 @@ class Popup_projfile_details(Toplevel):
         elif self.__fileinfo['filetype'] == 'entityMap':
             return Xmlfile_processor.verify_entity_map(self.__fileinfo['filepath'])
         elif self.__fileinfo['filetype'] == 'JAR':
-            return Java_processor.verify_file_type(self.__fileinfo['filepath'])
+            return Java_processor.verify_jar_type(self.__fileinfo['filepath'])
         
         return True, None
+    
+    

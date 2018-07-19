@@ -5,7 +5,7 @@ Created on Jun 23, 2018
 '''
 from tkinter import *
 from tkinter.messagebox import showerror
-from src.main.pydev.com.ftd.generalutilities.metadata.gui.impl.button.Button_openfile import Button_openfile
+from src.main.pydev.com.ftd.generalutilities.metadata.gui.impl.button.Button_select_folder import Button_select_folder
 from src.main.pydev.com.ftd.generalutilities.metadata.gui.impl.frame.Frame_bottom import Frame_bottom
 from src.main.pydev.com.ftd.generalutilities.metadata.gui.impl.base.FormatableFrame import FormatableFrame
 
@@ -34,7 +34,7 @@ class Frame_load_dir(FormatableFrame):
         self.__dicinput = Entry(self.__frame1, textvariable=feet)
         self.__dicinput.pack(side=LEFT, fill=BOTH, expand=1)
         #button
-        self.__dicload = Button_openfile(self.__frame1, self.reset_dicinput, height=1)
+        self.__dicload = Button_select_folder(self.__frame1, self.reset_dicinput, height=1)
         self.__dicload.pack(side=LEFT)
         #focus
         self.__dicinput.focus()

@@ -7,7 +7,7 @@ import os
 from tkinter import *
 from src.main.pydev.com.ftd.generalutilities.metadata.gui.impl.frame.Frame_bottom import Frame_bottom
 from src.main.pydev.com.ftd.generalutilities.metadata.gui.impl.base.FormatableFrame import FormatableFrame
-from src.main.pydev.com.ftd.generalutilities.metadata.gui.impl.button.Button_openfile import Button_openfile
+from src.main.pydev.com.ftd.generalutilities.metadata.gui.impl.button.Button_select_folder import Button_select_folder
 from src.main.pydev.com.ftd.generalutilities.metadata.service.fileproc.Xmlfile_processor import Xmlfile_processor
 from tkinter.messagebox import showerror, showinfo
 
@@ -62,7 +62,7 @@ class Frame_startup(FormatableFrame):
         self.__dicinput = Entry(canv2, textvariable=self.__feet, borderwidth=3, bg='black', foreground='yellow', highlightcolor='red', insertbackground='red')
         self.__dicinput.place(height=20, width=430, relx=0.1, rely=0.4)
         #button
-        self.__dicload = Button_openfile(canv2, self.reset_dicinput, height=1)
+        self.__dicload = Button_select_folder(canv2, self.reset_dicinput, height=1)
         self.__dicload.place(height=20, width=20, relx=0.9, rely=0.4)
         #label
         label3 = Label(canv2, text='(This folder will be used for storing the backup files)', bg='white')
