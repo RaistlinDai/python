@@ -14,6 +14,28 @@ class Java_processor(File_processor):
     '''
     before compiling this class, you have to install jpype and numpy in Python
     '''
+    
+    @staticmethod
+    def verify_jar_type(dir_path):
+        '''
+        verify the jar file type
+        @param dir_path: file directory
+        @return: return status
+        @return: message if validation failed
+        '''
+        if not File_processor.verify_dir_existing(dir_path):
+            return False, "File not exist!"
+        
+        ftype = Java_processor.get_file_type(dir_path)
+                
+        if ftype == 'unknown':
+            return False, 'The file type is unknown!'
+        
+        if ftype != 'jar':
+            return False, 'The file type(%s) is not (jar) !' % ftype
+        
+        return True, None
+        
 
     @staticmethod
     def java__tester():

@@ -11,6 +11,7 @@ from src.main.pydev.com.ftd.generalutilities.metadata.service.base.File_constant
 from src.main.pydev.com.ftd.generalutilities.metadata.service.base.File_processor import File_processor
 from src.main.pydev.com.ftd.generalutilities.metadata.gui.impl.view.Popup_projfile_details import Popup_projfile_details
 from tkinter.messagebox import showerror
+from src.main.pydev.com.ftd.generalutilities.metadata.service.javaproc.Java_processor import Java_processor
 
 class Frame_projfile_check(FormatableFrame):
     '''
@@ -187,6 +188,7 @@ class Frame_projfile_check(FormatableFrame):
         #verify pom 
         result, self.__message = Xmlfile_processor.verify_pom(proj_path + fileconstant.POM_PATH)
         if result:
+            #read the pom
             result, pomDto, self.__message = Xmlfile_processor.read_pom(proj_path + fileconstant.POM_PATH)
             newlabel = "< passed >"
             self.__label08.config(text=newlabel, fg='blue')
@@ -247,14 +249,14 @@ class Frame_projfile_check(FormatableFrame):
         
         
         #verify jar metadata
-        jar_exist = False
+        result = False
         jarfullpath = self.get_trans().get_finImplJarPath()
         #verify if jar is existing at the Maven's default repository
         if not jarfullpath:
             userhomepath = File_processor.get_user_home() + fileconstant.JAR_LIB_PATH
             jarfullpath = userhomepath + pomDto.get_financials_api_version() + '\\' + fileconstant.FIN_IMPL_JAR_PREFIX + pomDto.get_financials_api_version() + fileconstant.JAR_SUFFIX
-            jar_exist = Xmlfile_processor.verify_dir_existing(jarfullpath)
-        if jar_exist:
+            result, self.__message  = Java_processor.verify_jar_type(jarfullpath)
+        if result:
             newlabel = "< passed >"
             self.__label52.config(text=newlabel, fg='blue')
             self.get_trans().set_finImplJarPath(jarfullpath)
@@ -273,7 +275,7 @@ class Frame_projfile_check(FormatableFrame):
                                                               filepath=jarfullpath))
         
         #record the message
-        print(self.__message)
+        print('Error message:' + self.__message)
     
     
     def event_adapter(self, fun, **kwds):

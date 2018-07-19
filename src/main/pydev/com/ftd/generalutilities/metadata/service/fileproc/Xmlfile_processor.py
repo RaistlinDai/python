@@ -20,6 +20,28 @@ class Xmlfile_processor(File_processor):
     classdocs
     '''
 
+    @staticmethod
+    def verify_xml_type(dir_path):
+        '''
+        verify the jar file type
+        @param dir_path: file directory
+        @return: return status
+        @return: message if validation failed
+        '''
+        if not File_processor.verify_dir_existing(dir_path):
+            return False, "File not exist!"
+        
+        ftype = Xmlfile_processor.get_file_type(dir_path)
+                
+        if ftype == 'unknown':
+            return False, 'The file type is unknown!'
+        
+        if ftype != 'xml':
+            return False, 'The file type(%s) is not (xml) !' % ftype
+        
+        return True, None
+    
+    
 #------------------ Reader project directory ------------------
     @staticmethod
     def read_proj_dir(dir_path):
@@ -439,7 +461,6 @@ class Xmlfile_processor(File_processor):
         try:
             dom = xml.dom.minidom.parse(dir_path)
             root = dom.documentElement
-            print(root.nodeName)
             if not root.nodeName == 'project':
                 return False, 'This is not a valid pom.xml, please check.'
         except ExpatError:

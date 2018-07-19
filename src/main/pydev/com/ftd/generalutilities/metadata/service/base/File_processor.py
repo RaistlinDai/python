@@ -5,7 +5,9 @@ Created on Jun 21, 2018
 '''
 import os
 import shutil
+import struct
 from pathlib import Path
+from src.main.pydev.com.ftd.generalutilities.metadata.service.base.File_constant import File_constant
 
 class File_processor(object):
     '''
@@ -95,3 +97,44 @@ class File_processor(object):
         @return: user home directory
         '''
         return os.path.expanduser('~')
+    
+    
+    @staticmethod
+    def get_file_type(dir_path):
+        '''
+        get the file type
+        @param dir_path: file directory
+        @return: return file type
+        '''
+        fileconstant = File_constant()
+        
+        file = open(dir_path, 'rb')
+        ftype = 'unknown'
+        
+        for k,v in fileconstant.FILE_TYPE.items():
+            num_bytes = len(k)/2
+            file.seek(0)
+            hbytes = struct.unpack('B'*num_bytes, file.read(num_bytes))
+            code = File_processor.bytes2hex(hbytes)
+            if code == k:
+                ftype = v
+                break
+            
+        file.close()
+        return ftype
+    
+    
+    @staticmethod
+    def bytes2hex(bytes):
+        '''
+        convert the bytes to 16 bit
+        '''
+        num = len(bytes)
+        hexstr = u""
+        for i in range(num):
+            t = u"%x" % bytes[i]
+            if len(t) % 2:
+                hexstr += u"0"
+            hexstr += t
+        return hexstr.upper()
+        

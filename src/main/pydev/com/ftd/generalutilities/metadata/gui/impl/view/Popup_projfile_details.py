@@ -6,6 +6,7 @@ Created on Jul 17, 2018
 from tkinter import *
 from tkinter.messagebox import showerror
 from src.main.pydev.com.ftd.generalutilities.metadata.service.fileproc.Xmlfile_processor import Xmlfile_processor
+from src.main.pydev.com.ftd.generalutilities.metadata.service.javaproc.Java_processor import Java_processor
 
 class Popup_projfile_details(Toplevel):
     '''
@@ -92,10 +93,20 @@ class Popup_projfile_details(Toplevel):
     def verify_files(self):
         '''
         verify the file according to the file type
+        @return: result status
+        @return: error message if validation failed
         '''
         if self.__fileinfo['filetype'] == 'ViewMetadata':
             return Xmlfile_processor.veriy_view_metadata(self.__fileinfo['filepath'])
         elif self.__fileinfo['filetype'] == 'ResourceMetadata':
             return Xmlfile_processor.veriy_resource_metadata(self.__fileinfo['filepath'])
+        elif self.__fileinfo['filetype'] == 'POM':
+            return Xmlfile_processor.verify_pom(self.__fileinfo['filepath'])
+        elif self.__fileinfo['filetype'] == 'beans':
+            return Xmlfile_processor.verify_beans_app_context(self.__fileinfo['filepath'])
+        elif self.__fileinfo['filetype'] == 'entityMap':
+            return Xmlfile_processor.verify_entity_map(self.__fileinfo['filepath'])
+        elif self.__fileinfo['filetype'] == 'JAR':
+            return Java_processor.verify_file_type(self.__fileinfo['filepath'])
         
         return True, None
