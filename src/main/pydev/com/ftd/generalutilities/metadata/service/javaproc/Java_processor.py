@@ -23,8 +23,8 @@ class Java_processor(File_processor):
         @return: return status
         @return: message if validation failed
         '''
-        if not File_processor.verify_dir_existing(dir_path):
-            return False, "File not exist!"
+        if not File_processor.verify_file(dir_path):
+            return False, "The jar file is not exist, please check."
         
         ftype = Java_processor.get_file_type(dir_path)
                 

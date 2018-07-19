@@ -108,19 +108,23 @@ class File_processor(object):
         '''
         fileconstant = File_constant()
         
-        file = open(dir_path, 'rb')
+        #open file as bytes
+        bytefile = open(dir_path, 'rb')
         ftype = 'unknown'
-        
-        for k,v in fileconstant.FILE_TYPE.items():
-            num_bytes = len(k)/2
-            file.seek(0)
-            hbytes = struct.unpack('B'*num_bytes, file.read(num_bytes))
-            code = File_processor.bytes2hex(hbytes)
-            if code == k:
-                ftype = v
+        #read the file header
+        bins = bytefile.read(20)
+        #close file
+        bytefile.close()
+        #convert bytes to 16 bit
+        bins = File_processor.bytes2hex(bins)
+        print(bins)
+        #keys comparing
+        for hcode in fileconstant.FILE_TYPE.keys():
+            lens = len(hcode) #length of key
+            if bins[0:lens] == hcode:
+                ftype = fileconstant.FILE_TYPE[hcode]
                 break
-            
-        file.close()
+        
         return ftype
     
     

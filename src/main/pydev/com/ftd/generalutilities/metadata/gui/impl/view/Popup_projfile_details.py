@@ -7,6 +7,7 @@ from tkinter import *
 from tkinter.messagebox import showerror
 from src.main.pydev.com.ftd.generalutilities.metadata.service.fileproc.Xmlfile_processor import Xmlfile_processor
 from src.main.pydev.com.ftd.generalutilities.metadata.service.javaproc.Java_processor import Java_processor
+from src.main.pydev.com.ftd.generalutilities.metadata.gui.impl.button.Button_select_file import Button_select_file
 
 class Popup_projfile_details(Toplevel):
     '''
@@ -34,7 +35,7 @@ class Popup_projfile_details(Toplevel):
         canv1 = Canvas(self, height=150, width=550)
         #label
         self.__label01 = Label(canv1, text='File name :')
-        self.__label01.place(height=20, width=80, relx=0.01, rely=0.02)
+        self.__label01.place(height=20, width=75, relx=0.01, rely=0.02)
         if fileinfo and fileinfo['filename']:
             self.__text01 = Text(canv1, height=1)
             self.__text01.place(width=450, relx=0.15, rely=0.02)
@@ -42,7 +43,7 @@ class Popup_projfile_details(Toplevel):
             self.__text01.config(state=DISABLED)
         
         self.__label02 = Label(canv1, text='File type :')
-        self.__label02.place(height=20, width=80, relx=0.01, rely=0.3)
+        self.__label02.place(height=20, width=75, relx=0.01, rely=0.3)
         if fileinfo and fileinfo['filetype']:
             self.__text02 = Text(canv1, height=1)
             self.__text02.place(width=200, relx=0.15, rely=0.3)
@@ -50,9 +51,8 @@ class Popup_projfile_details(Toplevel):
             self.__text02.config(state=DISABLED)
             
         if not fileinfo['iscorrect']:
-            self.__button01 = Button(canv1, text='File select :')
-            self.__button01.place(height=20, width=80, relx=0.01, rely=0.6)
-            self.__button01.bind('<Button-1>', self.file_click_event)
+            self.__button01 = Button_select_file(canv1, self.file_button_callback, text='File select :')
+            self.__button01.place(height=20, width=75, relx=0.01, rely=0.6)
         else:
             self.__label03 = Label(canv1, text='File path :')
             self.__label03.place(height=20, width=80, relx=0.01, rely=0.6)
@@ -91,12 +91,14 @@ class Popup_projfile_details(Toplevel):
         self.destroy()
     
     
-    def file_click_event(self):
+    def file_button_callback(self, filename):
         '''
         file directory button click event
         '''
-        pass
-        
+        self.__text03.config(state=NORMAL)
+        self.__text03.delete(1.0, END)
+        self.__text03.insert(END, filename)
+        self.__text03.config(state=DISABLED)
         
     
     def verify_files(self):
@@ -105,18 +107,20 @@ class Popup_projfile_details(Toplevel):
         @return: result status
         @return: error message if validation failed
         '''
+        fullpath = self.__text03.get(1.0, END).replace('\n','')
+        
         if self.__fileinfo['filetype'] == 'ViewMetadata':
-            return Xmlfile_processor.veriy_view_metadata(self.__fileinfo['filepath'])
+            return Xmlfile_processor.veriy_view_metadata(fullpath)
         elif self.__fileinfo['filetype'] == 'ResourceMetadata':
-            return Xmlfile_processor.veriy_resource_metadata(self.__fileinfo['filepath'])
+            return Xmlfile_processor.veriy_resource_metadata(fullpath)
         elif self.__fileinfo['filetype'] == 'POM':
-            return Xmlfile_processor.verify_pom(self.__fileinfo['filepath'])
+            return Xmlfile_processor.verify_pom(fullpath)
         elif self.__fileinfo['filetype'] == 'beans':
-            return Xmlfile_processor.verify_beans_app_context(self.__fileinfo['filepath'])
+            return Xmlfile_processor.verify_beans_app_context(fullpath)
         elif self.__fileinfo['filetype'] == 'entityMap':
-            return Xmlfile_processor.verify_entity_map(self.__fileinfo['filepath'])
+            return Xmlfile_processor.verify_entity_map(fullpath)
         elif self.__fileinfo['filetype'] == 'JAR':
-            return Java_processor.verify_jar_type(self.__fileinfo['filepath'])
+            return Java_processor.verify_jar_type(fullpath)
         
         return True, None
     

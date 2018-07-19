@@ -55,6 +55,13 @@ class File_constant(object):
         self.JAR_SUFFIX = ".jar"
         self.RESOURCE_METADATA_SUFFIX = "-ViewResourceMeta.xml"
         
-        self.FILE_TYPE = {'FFD8FF':'jpg', '89504E47':'png', '47494638':'gif', '424D':'bmp',
-                          '3C3F786D6C':'xml', '68746D6C3E':'html', '504B0304':'zip', '52617221':'rar',
-                          '5F27A889':'jar', '213C617263683E0A':'lib'}
+        self.FILE_TYPE = {'FFD8FF':'jpg', 
+                          '89504E47':'png', 
+                          '47494638':'gif', 
+                          '424D':'bmp',
+                          '3C3F786D6C':'xml', 
+                          '68746D6C3E':'html', 
+                          '52617221':'rar',
+                          '504B0304':'jar', #the same as zip
+                          '7061636b616765207765':'java',
+                          '213C617263683E0A':'lib'}
