@@ -54,44 +54,48 @@ class Frame_projfile_check(FormatableFrame):
         
         self.__checkval02 = IntVar()
         self.__checkbox02 = Checkbutton(canv1, text = "Resource metadata", variable = self.__checkval02, onvalue = 1, offvalue = 0, state=DISABLED)
-        self.__checkbox02.place(height=20, width=130, relx=0.1, rely=0.3)
+        self.__checkbox02.place(height=20, width=130, relx=0.1, rely=0.27)
         self.__label05 = Label(canv1, text='Status :')
-        self.__label05.place(height=20, width=60, relx=0.4, rely=0.3)
+        self.__label05.place(height=20, width=60, relx=0.4, rely=0.27)
         self.__label06 = Label(canv1, text='< no need >')
-        self.__label06.place(height=20, width=120, relx=0.5, rely=0.3)
+        self.__label06.place(height=20, width=120, relx=0.5, rely=0.27)
         self.__button02 = Button(canv1, text="Detail")
-        self.__button02.place(height=20, width=50, relx=0.8, rely=0.3)
+        self.__button02.place(height=20, width=50, relx=0.8, rely=0.27)
         
         self.__checkval03 = IntVar()
         self.__checkbox03 = Checkbutton(canv1, text = "Pom", variable = self.__checkval03, onvalue = 1, offvalue = 0, state=DISABLED)
-        self.__checkbox03.place(height=20, width=50, relx=0.1, rely=0.45)
+        self.__checkbox03.place(height=20, width=50, relx=0.1, rely=0.39)
         self.__label07 = Label(canv1, text='Status :')
-        self.__label07.place(height=20, width=60, relx=0.4, rely=0.45)
+        self.__label07.place(height=20, width=60, relx=0.4, rely=0.39)
         self.__label08 = Label(canv1, text='< no need >')
-        self.__label08.place(height=20, width=120, relx=0.5, rely=0.45)
+        self.__label08.place(height=20, width=120, relx=0.5, rely=0.39)
         self.__button03 = Button(canv1, text="Detail")
-        self.__button03.place(height=20, width=50, relx=0.8, rely=0.45)
+        self.__button03.place(height=20, width=50, relx=0.8, rely=0.39)
         
         self.__checkval04 = IntVar()
         self.__checkbox04 = Checkbutton(canv1, text = "beans-app-context", variable = self.__checkval04, onvalue = 1, offvalue = 0, state=DISABLED)
-        self.__checkbox04.place(height=20, width=125, relx=0.1, rely=0.6)
+        self.__checkbox04.place(height=20, width=125, relx=0.1, rely=0.51)
         self.__label09 = Label(canv1, text='Status :')
-        self.__label09.place(height=20, width=60, relx=0.4, rely=0.6)
+        self.__label09.place(height=20, width=60, relx=0.4, rely=0.51)
         self.__label10 = Label(canv1, text='< no need >')
-        self.__label10.place(height=20, width=120, relx=0.5, rely=0.6)
+        self.__label10.place(height=20, width=120, relx=0.5, rely=0.51)
         self.__button04 = Button(canv1, text="Detail")
-        self.__button04.place(height=20, width=50, relx=0.8, rely=0.6)
+        self.__button04.place(height=20, width=50, relx=0.8, rely=0.51)
         
         self.__checkval05 = IntVar()
         self.__checkbox05 = Checkbutton(canv1, text = "entityMap", variable = self.__checkval05, onvalue = 1, offvalue = 0, state=DISABLED)
-        self.__checkbox05.place(height=20, width=80, relx=0.1, rely=0.75)
+        self.__checkbox05.place(height=20, width=80, relx=0.1, rely=0.63)
         self.__label11 = Label(canv1, text='Status :')
-        self.__label11.place(height=20, width=60, relx=0.4, rely=0.75)
+        self.__label11.place(height=20, width=60, relx=0.4, rely=0.63)
         self.__label12 = Label(canv1, text='< no need >')
-        self.__label12.place(height=20, width=120, relx=0.5, rely=0.75)
+        self.__label12.place(height=20, width=120, relx=0.5, rely=0.63)
         self.__button05 = Button(canv1, text="Detail")
-        self.__button05.place(height=20, width=50, relx=0.8, rely=0.75)
+        self.__button05.place(height=20, width=50, relx=0.8, rely=0.63)
         
+        #warning message in xml panel
+        self.__label99 = Label(canv1, text='Warning : the project xml must be correct.', fg='red')
+        self.__label99.place(height=20, width=400, relx=0.1, rely=0.75)
+                
         canv1.pack()
         
         #---- panel 02 ----------
@@ -245,32 +249,43 @@ class Frame_projfile_check(FormatableFrame):
                                                               iscorrect=self.__checkstatus['entityMap'],
                                                               filename='entityMap.xml',
                                                               filetype='entityMap',
-                                                              filepath=proj_path + fileconstant.ENTITY_MAP_PATH))
-        
+                                                              filepath=proj_path + fileconstant.ENTITY_MAP_PATH))    
         
         #verify jar metadata
         result = False
+        jarname = None
         jarfullpath = self.get_trans().get_finImplJarPath()
         #verify if jar is existing at the Maven's default repository
         if not jarfullpath:
             userhomepath = File_processor.get_user_home() + fileconstant.JAR_LIB_PATH
+            #jar name and full path
             jarfullpath = userhomepath + pomDto.get_financials_api_version() + '\\' + fileconstant.FIN_IMPL_JAR_PREFIX + pomDto.get_financials_api_version() + fileconstant.JAR_SUFFIX
+            jarname = fileconstant.FIN_IMPL_JAR_PREFIX + pomDto.get_financials_api_version() + fileconstant.JAR_SUFFIX
+            
             result, self.__message  = Java_processor.verify_jar_type(jarfullpath)
-        if result:
+            
+            if result:
+                newlabel = "< passed >"
+                self.__label52.config(text=newlabel, fg='blue')
+                self.get_trans().set_finImplJarPath(jarfullpath)
+                self.__checkstatus['JAR'] = True
+            else:
+                newlabel = "< failed >"
+                self.__label52.config(text=newlabel, fg='red')
+                btnlabel = 'Correct'
+                self.__button51.config(text=btnlabel)
+                self.__checkstatus['JAR'] = False
+        else:
             newlabel = "< passed >"
             self.__label52.config(text=newlabel, fg='blue')
-            self.get_trans().set_finImplJarPath(jarfullpath)
             self.__checkstatus['JAR'] = True
-        else:
-            newlabel = "< failed >"
-            self.__label52.config(text=newlabel, fg='red')
-            btnlabel = 'Correct'
-            self.__button51.config(text=btnlabel)
-            self.__checkstatus['JAR'] = False
+            #jar name
+            jarname = File_processor.get_file_name(self.get_trans().get_finImplJarPath())
+                
         self.__checkval51.set(1)
         self.__button51.bind('<Button-1>', self.event_adapter(self.detal_button_click,
                                                               iscorrect=self.__checkstatus['JAR'],
-                                                              filename=fileconstant.FIN_IMPL_JAR_PREFIX + pomDto.get_financials_api_version() + fileconstant.JAR_SUFFIX,
+                                                              filename=jarname,
                                                               filetype='JAR',
                                                               filepath=jarfullpath))
         
@@ -296,10 +311,26 @@ class Frame_projfile_check(FormatableFrame):
         popup.grab_set()
         popup.focus_set()
         popup.wait_window()
-        '''
-        if self.__setfunc:
-            self.__setfunc(popup.return_selection())'''
-            
+        
+        if not iscorrect:
+            result_dto = popup.return_selection()
+            if result_dto['iscorrect']:
+                if result_dto['filetype'] == 'JAR':
+                    #update the global parameters
+                    self.__checkstatus['JAR'] = True
+                    #set new jara path into transaction
+                    self.get_trans().set_finImplJarPath(result_dto['filepath'])
+                    #update labels
+                    newlabel = "< passed >"
+                    self.__label52.config(text=newlabel, fg='blue')
+                    btnlabel = 'Detail'
+                    self.__button51.config(text=btnlabel)
+                    #update event parameters
+                    self.__button51.bind('<Button-1>', self.event_adapter(self.detal_button_click,
+                                                              iscorrect=self.__checkstatus['JAR'],
+                                                              filename=result_dto['filename'],
+                                                              filetype='JAR',
+                                                              filepath=result_dto['filepath']))
     
     def before_next(self):
         '''

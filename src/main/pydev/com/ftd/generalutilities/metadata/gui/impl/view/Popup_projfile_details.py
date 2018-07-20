@@ -8,6 +8,7 @@ from tkinter.messagebox import showerror
 from src.main.pydev.com.ftd.generalutilities.metadata.service.fileproc.Xmlfile_processor import Xmlfile_processor
 from src.main.pydev.com.ftd.generalutilities.metadata.service.javaproc.Java_processor import Java_processor
 from src.main.pydev.com.ftd.generalutilities.metadata.gui.impl.button.Button_select_file import Button_select_file
+from src.main.pydev.com.ftd.generalutilities.metadata.service.base.File_processor import File_processor
 
 class Popup_projfile_details(Toplevel):
     '''
@@ -50,7 +51,7 @@ class Popup_projfile_details(Toplevel):
             self.__text02.insert(INSERT, fileinfo['filetype'])
             self.__text02.config(state=DISABLED)
             
-        if not fileinfo['iscorrect']:
+        if not fileinfo['iscorrect'] and fileinfo['filetype'] == 'JAR':
             self.__button01 = Button_select_file(canv1, self.file_button_callback, text='File select :')
             self.__button01.place(height=20, width=75, relx=0.01, rely=0.6)
         else:
@@ -83,32 +84,44 @@ class Popup_projfile_details(Toplevel):
         '''
         'OK' button click event
         '''
-        #if not self.__fileinfo['iscorrect']:
-        result, message = self.verify_files()
-        if not result:
-            showerror('Error', message)
-            return
+        if not self.__fileinfo['iscorrect']:
+            fullpath = self.__text03.get(1.0, END).replace('\n','')
+            if not fullpath or fullpath == '':
+                showerror('Error', 'You must select a %s file!' % self.__fileinfo['filetype'])
+                return
+            
+            result, message = self.verify_files(fullpath)
+            if not result:
+                showerror('Error', message)
+                return
+            else:
+                self.__fileinfo['filename'] = File_processor.get_file_name(fullpath)
+                self.__fileinfo['filepath'] = fullpath
+                self.__fileinfo['iscorrect'] = True
         self.destroy()
     
     
-    def file_button_callback(self, filename):
+    def file_button_callback(self, fullpath):
         '''
         file directory button click event
+        @param fullpath: the selected file fullpath
         '''
+        if not fullpath or fullpath == '':
+            return
+        
         self.__text03.config(state=NORMAL)
         self.__text03.delete(1.0, END)
-        self.__text03.insert(END, filename)
+        self.__text03.insert(END, fullpath)
         self.__text03.config(state=DISABLED)
         
     
-    def verify_files(self):
+    def verify_files(self, fullpath):
         '''
         verify the file according to the file type
+        @param fullpath: the selected file fullpath in textarea
         @return: result status
         @return: error message if validation failed
         '''
-        fullpath = self.__text03.get(1.0, END).replace('\n','')
-        
         if self.__fileinfo['filetype'] == 'ViewMetadata':
             return Xmlfile_processor.veriy_view_metadata(fullpath)
         elif self.__fileinfo['filetype'] == 'ResourceMetadata':
@@ -125,3 +138,9 @@ class Popup_projfile_details(Toplevel):
         return True, None
     
     
+    def return_selection(self):
+        '''
+        this function is an external function, it will return back the selected file fullpath
+        @return: the selected file name and fullpath
+        '''
+        return self.__fileinfo

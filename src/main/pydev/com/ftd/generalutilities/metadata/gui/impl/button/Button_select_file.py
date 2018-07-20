@@ -21,12 +21,11 @@ class Button_select_file(Button):
             self.config(text='...')
         self.__exfunc = exfunc
         
-    '''
-    Event
     
-    '''
     def click_event(self, event):
-        
+        '''
+        click event
+        '''
         self.__dic = askopenfilename()
         self.__exfunc(self.__dic)
         

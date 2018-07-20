@@ -5,7 +5,6 @@ Created on Jun 21, 2018
 '''
 import os
 import shutil
-import struct
 from pathlib import Path
 from src.main.pydev.com.ftd.generalutilities.metadata.service.base.File_constant import File_constant
 
@@ -116,7 +115,7 @@ class File_processor(object):
         #close file
         bytefile.close()
         #convert bytes to 16 bit
-        bins = File_processor.bytes2hex(bins)
+        bins = File_processor.__bytes2hex(bins)
         #keys comparing
         for hcode in fileconstant.FILE_TYPE.keys():
             lens = len(hcode) #length of key
@@ -128,16 +127,30 @@ class File_processor(object):
     
     
     @staticmethod
-    def bytes2hex(bytes):
+    def __bytes2hex(filebytes):
         '''
         convert the bytes to 16 bit
+        @param filebytes: the bytes list
+        @return: the 16 bit list
         '''
-        num = len(bytes)
+        num = len(filebytes)
         hexstr = u""
         for i in range(num):
-            t = u"%x" % bytes[i]
+            t = u"%x" % filebytes[i]
             if len(t) % 2:
                 hexstr += u"0"
             hexstr += t
         return hexstr.upper()
-        
+    
+    
+    @staticmethod
+    def get_file_name(filepath):
+        '''
+        get the file name according to the file's full path
+        @param filepath: the file full path
+        @return: file name
+        '''
+        if not File_processor.verify_file(filepath):
+            return None
+        else:
+            return os.path.basename(filepath)
