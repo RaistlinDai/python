@@ -93,7 +93,7 @@ class Frame_projfile_check(FormatableFrame):
         self.__button05.place(height=20, width=50, relx=0.8, rely=0.63)
         
         #warning message in xml panel
-        self.__label99 = Label(canv1, text='Warning : the project xml must be correct.', fg='red')
+        self.__label99 = Label(canv1, text='Warning : Please run svn revert/update if something in project is incorrect.', fg='red')
         self.__label99.place(height=20, width=400, relx=0.1, rely=0.75)
                 
         canv1.pack()
@@ -164,6 +164,8 @@ class Frame_projfile_check(FormatableFrame):
                                                               filename=entity_name +fileconstant.XML_SUFFIX,
                                                               filetype='ViewMetadata',
                                                               filepath=viewfullpath))
+        #record the message
+        print('Error message:' + str(self.__message))
         
         #verify source metadata
         resource_exist = False
@@ -188,6 +190,8 @@ class Frame_projfile_check(FormatableFrame):
                                                               filename=entity_name +fileconstant.RESOURCE_METADATA_SUFFIX,
                                                               filetype='ResourceMetadata',
                                                               filepath=resourcefullpath))
+        #record the message
+        print('Error message:' + str(self.__message))
         
         #verify pom 
         result, self.__message = Xmlfile_processor.verify_pom(proj_path + fileconstant.POM_PATH)
@@ -210,6 +214,8 @@ class Frame_projfile_check(FormatableFrame):
                                                               filename='pom.xml',
                                                               filetype='POM',
                                                               filepath=proj_path + fileconstant.POM_PATH))
+        #record the message
+        print('Error message:' + str(self.__message))
         
         #verify beans-app-context 
         result, self.__message = Xmlfile_processor.verify_beans_app_context(proj_path + fileconstant.BEAN_APP_CONTEXT_PATH)
@@ -230,6 +236,8 @@ class Frame_projfile_check(FormatableFrame):
                                                               filename='beans-app-server.xml',
                                                               filetype='beans',
                                                               filepath=proj_path + fileconstant.BEAN_APP_CONTEXT_PATH))
+        #record the message
+        print('Error message:' + str(self.__message))
         
         #verify entityMap 
         result, self.__message = Xmlfile_processor.verify_entity_map(proj_path + fileconstant.ENTITY_MAP_PATH)
@@ -250,6 +258,8 @@ class Frame_projfile_check(FormatableFrame):
                                                               filename='entityMap.xml',
                                                               filetype='entityMap',
                                                               filepath=proj_path + fileconstant.ENTITY_MAP_PATH))    
+        #record the message
+        print('Error message:' + str(self.__message))
         
         #verify jar metadata
         result = False
@@ -288,9 +298,8 @@ class Frame_projfile_check(FormatableFrame):
                                                               filename=jarname,
                                                               filetype='JAR',
                                                               filepath=jarfullpath))
-        
         #record the message
-        print('Error message:' + self.__message)
+        print('Error message:' + str(self.__message))
     
     
     def event_adapter(self, fun, **kwds):
