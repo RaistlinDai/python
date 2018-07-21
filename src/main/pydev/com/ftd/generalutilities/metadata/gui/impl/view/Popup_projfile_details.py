@@ -52,7 +52,7 @@ class Popup_projfile_details(Toplevel):
             self.__text02.config(state=DISABLED)
             
         if not fileinfo['iscorrect'] and fileinfo['filetype'] == 'JAR':
-            self.__button01 = Button_select_file(canv1, self.file_button_callback, text='File select :')
+            self.__button01 = Button_select_file(canv1, self.file_button_callback, text='File select :', cursor='hand2')
             self.__button01.place(height=20, width=75, relx=0.01, rely=0.6)
         else:
             self.__label03 = Label(canv1, text='File path :')

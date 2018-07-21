@@ -65,7 +65,7 @@ class Frame_startup(FormatableFrame):
         self.__dicload = Button_select_folder(canv2, self.reset_dicinput, height=1)
         self.__dicload.place(height=20, width=20, relx=0.9, rely=0.4)
         #label
-        label3 = Label(canv2, text='(This folder will be used for storing the backup files)', bg='white')
+        label3 = Label(canv2, text='(This folder will be used for storing the backup files)', fg='blue')
         label3.place(height=20, width=310, relx=0.1, rely=0.6)
         
         canv2.pack()

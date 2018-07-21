@@ -6,12 +6,12 @@ Created on Jul 16, 2018
 from tkinter import *
 from src.main.pydev.com.ftd.generalutilities.metadata.gui.impl.frame.Frame_bottom import Frame_bottom
 from src.main.pydev.com.ftd.generalutilities.metadata.gui.impl.base.FormatableFrame import FormatableFrame
+from src.main.pydev.com.ftd.generalutilities.metadata.gui.impl.view.Popup_projfile_details import Popup_projfile_details
 from src.main.pydev.com.ftd.generalutilities.metadata.service.fileproc.Xmlfile_processor import Xmlfile_processor
 from src.main.pydev.com.ftd.generalutilities.metadata.service.base.File_constant import File_constant
 from src.main.pydev.com.ftd.generalutilities.metadata.service.base.File_processor import File_processor
-from src.main.pydev.com.ftd.generalutilities.metadata.gui.impl.view.Popup_projfile_details import Popup_projfile_details
-from tkinter.messagebox import showerror
 from src.main.pydev.com.ftd.generalutilities.metadata.service.javaproc.Java_processor import Java_processor
+from tkinter.messagebox import showerror
 
 class Frame_projfile_check(FormatableFrame):
     '''
