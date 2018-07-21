@@ -8,6 +8,9 @@ from tkinter.messagebox import showerror
 from src.main.pydev.com.ftd.generalutilities.metadata.gui.impl.button.Button_select_folder import Button_select_folder
 from src.main.pydev.com.ftd.generalutilities.metadata.gui.impl.frame.Frame_bottom import Frame_bottom
 from src.main.pydev.com.ftd.generalutilities.metadata.gui.impl.base.FormatableFrame import FormatableFrame
+from src.main.pydev.com.ftd.generalutilities.metadata.service.base.File_processor import File_processor
+from src.main.pydev.com.ftd.generalutilities.metadata.service.base.File_constant import File_constant
+from src.main.pydev.com.ftd.generalutilities.metadata.service.fileproc.Xmlfile_processor import Xmlfile_processor
 
 class Frame_load_dir(FormatableFrame):
     '''
@@ -38,10 +41,13 @@ class Frame_load_dir(FormatableFrame):
         #input
         self.__input01 = StringVar()
         self.__dicinput = Entry(canv1, textvariable=self.__input01, borderwidth=3, bg='black', foreground='yellow', highlightcolor='red', insertbackground='red')
-        self.__dicinput.place(height=20, width=430, relx=0.1, rely=0.4)
+        self.__dicinput.place(height=20, width=430, relx=0.05, rely=0.4)
         #button
-        self.__dicload = Button_select_folder(canv1, self.reset_dicinput, height=1)
-        self.__dicload.place(height=20, width=20, relx=0.9, rely=0.4)
+        self.__dirloadbutton = Button_select_folder(canv1, self.__select_folder, height=1)
+        self.__dirloadbutton.place(height=20, width=20, relx=0.85, rely=0.4)
+        self.__appbutton = Button(canv1, height=1, text='Apply')
+        self.__appbutton.bind('<Button-1>', self.__apply_click_event) #bind button click event
+        self.__appbutton.place(height=20, width=40, relx=0.89, rely=0.4)
         #focus
         self.__dicinput.focus()
         #label02
@@ -65,9 +71,11 @@ class Frame_load_dir(FormatableFrame):
         
         #middle buttons
         self.__button01 = Button(canv2, text='>>', relief=RAISED, cursor='hand2')
+        self.__button01.bind('<Button-1>', self.__to_right_click_event) #bind button click event
         self.__button01.place(height=35, width=25, relx=0.465, rely=0.3)
         
         self.__button02 = Button(canv2, text='<<', relief=RAISED, cursor='hand2')
+        self.__button02.bind('<Button-1>', self.__to_left_click_event) #bind button click event
         self.__button02.place(height=35, width=25, relx=0.465, rely=0.6)
         
         #right listbox and scrollbar
@@ -98,39 +106,64 @@ class Frame_load_dir(FormatableFrame):
     #overwrite create_widges
     def add_bottom(self, parent):
         #bottom frame
-        exFuncs = {'Load':{'loadFunc':self.get_dicinput, 'setFunc':self.get_selection},
-                   'Next':{'process':self.get_nextframe(), 'before':self.before_next}}
+        exFuncs = {'Next':{'process':self.get_nextframe(), 'before':self.before_next},
+                   'Prev':{'process':self.get_prevframe(), 'before':self.before_prev}}
         self.__buttom = Frame_bottom(parent, ['Next','Load'], exFuncs)
         self.__buttom.pack(side=BOTTOM, fill=X, ipady=10)
         
     
-    def reset_dicinput(self, dicname):
-        self.__dicinput.delete(0, END)
-        self.__dicinput.insert(END, dicname)
+    def __select_folder(self, proj_dir):
+        if proj_dir and proj_dir != "":
+            self.__dicinput.delete(0, END)
+            self.__dicinput.insert(END, proj_dir)
         
         
     def get_dicinput(self):
         return self.__dicinput.get()
         
     
-    def get_selection(self, fileinfo):
-        #update label
-        if isinstance(fileinfo, tuple):
-            filename = fileinfo[0]
-            viewfullpath = fileinfo[1]
-        elif isinstance(fileinfo, str):
-            filename = fileinfo
-        else:
+    def __apply_click_event(self, event):
+        '''
+        get the entities according to the input project path
+        '''
+        fileconstant = File_constant()
+        proj_dir = self.__input01.get()
+        #verify the input directory
+        if not File_processor.verify_dir_existing(proj_dir):
+            showerror('Error', 'Please select a valid directory.')
+        if not File_processor.verify_dir_format(proj_dir):
+            showerror('Error', 'Please select a valid forlder, not a file.')
+            return
+        if not File_processor.verify_file(proj_dir + fileconstant.POM_PATH):
+            showerror('Error', 'Please select a valid project directory\n(the directory of pom.xml in webui).')
             return
         
-        #set the entity name and full path into entity dto
-        self.get_dtos().set_entityname(filename)
-        newlabel02 = "Selected entity: " + filename
-        self.__label02.config(text=newlabel02, fg='blue')
-        if viewfullpath:
-            self.get_dtos().set_viewfullpath(viewfullpath)
-        #set the project path into transaction dto
-        self.get_trans().set_projectpath(self.__dicinput.get())
+        #read the entity metadatas
+        result, metas, err_message = Xmlfile_processor.read_proj_dir(proj_dir)
+        if result:
+            #clear the list box first
+            self.__listboxleft.delete(0, END)
+            #backup the list
+            self.__filelists = metas
+            #add items into list box
+            for name in metas.keys():
+                self.__listboxleft.insert(END, name)
+        else:
+            showerror('Error', err_message)
+    
+    
+    def __to_right_click_event(self, event):
+        '''
+        move the selection to the right list box
+        '''
+        pass
+        
+    
+    def __to_left_click_event(self, event):
+        '''
+        move the selection to the left list box
+        '''
+        pass
         
     
     def before_next(self):
