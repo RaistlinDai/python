@@ -39,12 +39,6 @@ class File_processor(object):
     
     
     @staticmethod
-    def create_file(filename, directory=None):
-        if directory:
-            os.chdir(directory)
-        
-    
-    @staticmethod
     def copy_file(srcfile, dstfile):
         '''
         copy file

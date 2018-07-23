@@ -10,6 +10,9 @@ from src.main.pydev.com.ftd.generalutilities.metadata.gui.impl.base.FormatableFr
 from src.main.pydev.com.ftd.generalutilities.metadata.gui.impl.button.Button_select_folder import Button_select_folder
 from src.main.pydev.com.ftd.generalutilities.metadata.service.fileproc.Xmlfile_processor import Xmlfile_processor
 from tkinter.messagebox import showerror, showinfo
+from src.main.pydev.com.ftd.generalutilities.metadata.service.base.File_processor import File_processor
+from src.main.pydev.com.ftd.generalutilities.metadata.service.base.File_constant import File_constant
+from src.main.pydev.com.ftd.generalutilities.metadata.service.fileproc.Deffile_processor import Deffile_processor
 
 class Frame_startup(FormatableFrame):
     '''
@@ -22,7 +25,6 @@ class Frame_startup(FormatableFrame):
         Constructor
         '''
         FormatableFrame.__init__(self, parent.get_mainframe(), dtos, trans, **configs)
-        
         
     
     #overwrite create_widges
@@ -70,6 +72,9 @@ class Frame_startup(FormatableFrame):
         
         canv2.pack()
         
+        #load the user default
+        self.load_user_default()
+        
     
     #overwrite before_next
     def add_bottom(self, parent):
@@ -85,6 +90,7 @@ class Frame_startup(FormatableFrame):
         verify the input directory
         generating the next frames according to the selections
         '''
+        tempdir = None
         #--- verify the input value
         if self.__dicinput.get():
             if not Xmlfile_processor.verify_dir_format(self.__dicinput.get()):
@@ -97,6 +103,7 @@ class Frame_startup(FormatableFrame):
                 
             #--- set the workspace path into transaction dto
             self.get_trans().set_workspacepath(self.__dicinput.get())
+            tempdir = self.__dicinput.get()
         else:
             tempdir = os.path.join(os.path.expanduser('~'), "Desktop") + '\\PyWorkspace'
             #--- desktop temp folder already existing
@@ -113,9 +120,46 @@ class Frame_startup(FormatableFrame):
         #--- set the process flow according to the selection
         self.get_trans().update_process_flow_by_start_selection(self.__vari1.get())
         
+        #--- update default file
+        fileconstant = File_constant()
+        userdefault = File_processor.get_home_dir()
+        userdefault = userdefault + fileconstant.USER_DEFAULT
+        Deffile_processor.update_default_file(userdefault, 'workspace', tempdir)
+        
         return True
     
     
     def reset_dicinput(self, dicname):
-        self.__dicinput.delete(0, END)
-        self.__dicinput.insert(END, dicname)
+        '''
+        update the workspace directory
+        @param dicname: the workspace directory
+        '''
+        print(dicname)
+        if dicname and dicname != "":
+            self.__dicinput.delete(0, END)
+            self.__dicinput.insert(END, dicname)
+            
+    
+    def load_user_default(self):
+        '''
+        load the local user default
+        '''
+        fileconstant = File_constant()
+        userdefault = File_processor.get_home_dir()
+        userdefault = userdefault + fileconstant.USER_DEFAULT
+        
+        #create default file if not existing
+        if not File_processor.verify_dir_existing(userdefault):
+            Deffile_processor.create_default_file(userdefault)
+        #read default file
+        default_info = Deffile_processor.read_default_file(userdefault)
+        
+        if default_info['workspace'] and default_info['workspace'] != "":
+            self.get_trans().set_workspacepath(default_info['workspace'])
+            self.__dicinput.delete(0, END)
+            self.__dicinput.insert(END, default_info['workspace'])
+        
+        if default_info['project'] and default_info['project'] != "":
+            self.get_trans().set_projectpath(default_info['project'])
+        
+        

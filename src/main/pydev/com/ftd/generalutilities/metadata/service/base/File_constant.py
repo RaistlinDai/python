@@ -41,6 +41,7 @@ class File_constant(object):
         self.FTD_JD_JAR = '\\3rd\\lib\\jar\\FtdJD.jar'
         self.THIRD_JDCORE_JAR = '\\3rd\\lib\\jar\\jd-core-0.7.1.jar'
         
+        self.USER_DEFAULT = '\\ftdgen_default.txt'
         self.VIEW_METADATA_PATH = '\\src\\main\\resources\\com\\qad\\erp\\financials\\view\\'
         self.RESOURCE_METADATA_PATH = '\\src\\main\\resources\\com\\qad\\erp\\financials\\data\\meta\\'
         self.JAVA_CONTROLLER_PATH = '\\src\\main\\java\\com\\qad\\erp\\financials\\'

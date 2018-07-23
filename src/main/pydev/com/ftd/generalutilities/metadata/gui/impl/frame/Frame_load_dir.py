@@ -11,6 +11,7 @@ from src.main.pydev.com.ftd.generalutilities.metadata.gui.impl.base.FormatableFr
 from src.main.pydev.com.ftd.generalutilities.metadata.service.base.File_processor import File_processor
 from src.main.pydev.com.ftd.generalutilities.metadata.service.base.File_constant import File_constant
 from src.main.pydev.com.ftd.generalutilities.metadata.service.fileproc.Xmlfile_processor import Xmlfile_processor
+from src.main.pydev.com.ftd.generalutilities.metadata.service.fileproc.Deffile_processor import Deffile_processor
 
 class Frame_load_dir(FormatableFrame):
     '''
@@ -89,21 +90,10 @@ class Frame_load_dir(FormatableFrame):
         self.__scrollright.place(height=150, width=20, relx=0.92, rely=0.18)
         self.__scrollright.config(command = self.__listboxright.yview)
         
-        
-        '''self.__filelists = filelists
-        for name in filelists.keys():
-            self.__listbox.insert(0, name)
-        '''
-        
-        
-        '''
-        #selected result
-        self.__frame2 = FormatableFrame(self)
-        self.__frame2.pack(fill=X)
-        self.__label02 = Label(self.__frame2, text="Selected entity: ")
-        self.__label02.pack(side=LEFT, fill=X)'''
-        
         canv2.pack()
+        
+        #load default info
+        self.load_user_default()
         
     
     #overwrite create_widges
@@ -222,9 +212,34 @@ class Frame_load_dir(FormatableFrame):
                         self.get_dtos().set_viewfullpath(tup[1])
             
         if self.get_dtos().get_entityname() and self.get_dtos().get_viewfullpath():
-            #save the project path
+            #--- save the project path
             self.get_trans().set_projectpath(self.__input01.get())
+            #--- update default file
+            fileconstant = File_constant()
+            userdefault = File_processor.get_home_dir()
+            userdefault = userdefault + fileconstant.USER_DEFAULT
+            Deffile_processor.update_default_file(userdefault, 'project', self.__input01.get())
             return True
         else:
             showerror('Error', 'You must select an existing entity!')
             return False
+        
+        
+    def load_user_default(self):
+        '''
+        load the local user default
+        '''
+        fileconstant = File_constant()
+        userdefault = File_processor.get_home_dir()
+        userdefault = userdefault + fileconstant.USER_DEFAULT
+        
+        #create default file if not existing
+        if not File_processor.verify_dir_existing(userdefault):
+            Deffile_processor.create_default_file(userdefault)
+        #read default file
+        default_info = Deffile_processor.read_default_file(userdefault)
+        
+        if default_info['project'] and default_info['project'] != "":
+            self.get_trans().set_projectpath(default_info['project'])
+            self.__dicinput.delete(0, END)
+            self.__dicinput.insert(END, default_info['project'])

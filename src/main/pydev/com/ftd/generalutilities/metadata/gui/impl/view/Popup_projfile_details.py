@@ -6,7 +6,7 @@ Created on Jul 17, 2018
 from tkinter import *
 from tkinter.messagebox import showerror
 from src.main.pydev.com.ftd.generalutilities.metadata.service.fileproc.Xmlfile_processor import Xmlfile_processor
-from src.main.pydev.com.ftd.generalutilities.metadata.service.javaproc.Java_processor import Java_processor
+from src.main.pydev.com.ftd.generalutilities.metadata.service.fileproc.Java_processor import Java_processor
 from src.main.pydev.com.ftd.generalutilities.metadata.gui.impl.button.Button_select_file import Button_select_file
 from src.main.pydev.com.ftd.generalutilities.metadata.service.base.File_processor import File_processor
 

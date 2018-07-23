@@ -6,9 +6,7 @@ course from: https://www.liaoxuefeng.com/wiki/0014316089557264a6b348958f449949df
 @author: ftd
 '''
 from selftest import MyDef
-from src.main.pydev.com.ftd.generalutilities.metadata.service.fileproc.Xmlfile_processor import Xmlfile_processor
-from src.main.pydev.com.ftd.generalutilities.metadata.service.javaproc.Java_processor import Java_processor
-from src.main.pydev.com.ftd.generalutilities.metadata.service.base.File_processor import File_processor
+from src.main.pydev.com.ftd.generalutilities.metadata.service.fileproc.Java_processor import Java_processor
 
 print('hello,world')
 

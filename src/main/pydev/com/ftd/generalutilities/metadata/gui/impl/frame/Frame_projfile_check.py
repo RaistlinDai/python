@@ -10,7 +10,7 @@ from src.main.pydev.com.ftd.generalutilities.metadata.gui.impl.view.Popup_projfi
 from src.main.pydev.com.ftd.generalutilities.metadata.service.fileproc.Xmlfile_processor import Xmlfile_processor
 from src.main.pydev.com.ftd.generalutilities.metadata.service.base.File_constant import File_constant
 from src.main.pydev.com.ftd.generalutilities.metadata.service.base.File_processor import File_processor
-from src.main.pydev.com.ftd.generalutilities.metadata.service.javaproc.Java_processor import Java_processor
+from src.main.pydev.com.ftd.generalutilities.metadata.service.fileproc.Java_processor import Java_processor
 from tkinter.messagebox import showerror
 
 class Frame_projfile_check(FormatableFrame):

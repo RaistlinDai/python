@@ -6,6 +6,7 @@ Created on Jul 5, 2018
 from src.main.pydev.com.ftd.generalutilities.metadata.gui.impl.base.Mainframe_enum import Mainframe_enum
 from src.main.pydev.com.ftd.generalutilities.metadata.gui.impl.base.Frame_constant import Frame_constant
 from src.main.pydev.com.ftd.generalutilities.metadata.util.switch import switch
+from src.main.pydev.com.ftd.generalutilities.metadata.service.fileproc.Deffile_processor import Deffile_processor
 
 class TransactionDTO(object):
     '''
