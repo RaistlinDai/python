@@ -21,6 +21,9 @@ class Frame_load_dir(FormatableFrame):
         '''
         Constructor
         '''
+        #initialize
+        self.__filelists = {}       #file list backup
+        
         FormatableFrame.__init__(self, parent.get_mainframe(), dtos, trans, **configs)
         
     
@@ -108,7 +111,7 @@ class Frame_load_dir(FormatableFrame):
         #bottom frame
         exFuncs = {'Next':{'process':self.get_nextframe(), 'before':self.before_next},
                    'Prev':{'process':self.get_prevframe(), 'before':self.before_prev}}
-        self.__buttom = Frame_bottom(parent, ['Next','Load'], exFuncs)
+        self.__buttom = Frame_bottom(parent, ['Next','Prev'], exFuncs)
         self.__buttom.pack(side=BOTTOM, fill=X, ipady=10)
         
     
@@ -156,22 +159,71 @@ class Frame_load_dir(FormatableFrame):
         '''
         move the selection to the right list box
         '''
-        pass
+        if not self.__listboxleft or self.__listboxleft.size() == 0:
+            return
+        if self.__listboxright and self.__listboxright.size() > 0:
+            showerror('Error', 'Multiple entity is not supported for now!')
+            return
         
+        select_item = None
+        if len(self.__listboxleft.curselection()) > 0:
+            selection = self.__listboxleft.selection_get()
+            #the dict.items() will convert to tuple
+            for tup in self.__filelists.items():
+                if tup[0] == selection:
+                    select_item = tup
+                    break
+        
+        if select_item:
+            #add into right
+            self.__listboxright.insert(END, select_item[0])
+            select_idx = self.__listboxleft.curselection()
+            #remove from left
+            self.__listboxleft.delete(select_idx[0])
+            
     
     def __to_left_click_event(self, event):
         '''
         move the selection to the left list box
         '''
-        pass
+        if not self.__listboxright or self.__listboxright.size() == 0:
+            return
         
+        if len(self.__listboxright.curselection()) > 0:
+            selection = self.__listboxright.selection_get()
+            #the dict.items() will convert to tuple
+            idx = 0
+            for tup in self.__filelists.items():
+                if tup[0] == selection:
+                    select_item = tup
+                    break
+                idx = idx + 1
+        
+        if select_item:
+            #add into left
+            self.__listboxleft.insert(idx, select_item[0])
+            select_idx = self.__listboxright.curselection()
+            #remove from right
+            self.__listboxright.delete(select_idx[0])
+            
     
     def before_next(self):
         '''
         overwrite the function in super class
         verify the input directory
         '''
+        if self.__listboxright.size() > 0:
+            #the dict.items() will convert to tuple
+            for index in range(self.__listboxright.size()):
+                for tup in self.__filelists.items():
+                    if tup[0] == self.__listboxright.get(index):
+                        #save the entity info
+                        self.get_dtos().set_entityname(tup[0])
+                        self.get_dtos().set_viewfullpath(tup[1])
+            
         if self.get_dtos().get_entityname() and self.get_dtos().get_viewfullpath():
+            #save the project path
+            self.get_trans().set_projectpath(self.__input01.get())
             return True
         else:
             showerror('Error', 'You must select an existing entity!')
