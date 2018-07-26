@@ -42,14 +42,16 @@ class Deffile_processor(object):
     @staticmethod
     def update_default_file(filename, prop_name, prop_value):
         '''
-        
+        update the default file
+        @param filename: the default file full path
+        @param prop_name: the property name
+        @param prop_value: the property value
         '''
         with open(filename, 'r') as file:
             lines = file.readlines()
         
         idx = 0
         for line in lines:
-            print(prop_name + '=' + prop_value)
             if (prop_name + '=') in line:
                 #new value
                 line = prop_name + '=' + prop_value + '\n'
