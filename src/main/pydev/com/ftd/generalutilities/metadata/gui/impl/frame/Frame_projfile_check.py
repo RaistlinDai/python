@@ -12,6 +12,7 @@ from src.main.pydev.com.ftd.generalutilities.metadata.service.base.File_constant
 from src.main.pydev.com.ftd.generalutilities.metadata.service.base.File_processor import File_processor
 from src.main.pydev.com.ftd.generalutilities.metadata.service.fileproc.Java_processor import Java_processor
 from tkinter.messagebox import showerror
+from src.main.pydev.com.ftd.generalutilities.metadata.service.multproc.Multiple_processor import Multiple_processor
 
 class Frame_projfile_check(FormatableFrame):
     '''
@@ -104,7 +105,8 @@ class Frame_projfile_check(FormatableFrame):
         label2 = Label(canv2, text='Jar checking:')
         label2.place(height=20, width=100, relx=0.01, rely=0.05)
         
-        self.__checkval51 = IntVar()
+        self.__chkint51 = IntVar()
+        self.__checkval51 = self.__chkint51
         self.__checkbox51 = Checkbutton(canv2, text = "financials-impl", variable = self.__checkval51, onvalue = 1, offvalue = 0, state=DISABLED)
         self.__checkbox51.place(height=20, width=110, relx=0.1, rely=0.35)
         self.__label51 = Label(canv2, text='Status :')
@@ -350,7 +352,11 @@ class Frame_projfile_check(FormatableFrame):
             if not flag:
                 showerror('Error', 'There are errors existing, please correct it!')
                 return False
-            
+        
+        #jar processing
+        if self.__chkint51.get() == 1:
+            Multiple_processor.multiprocessing_service(self.get_trans())
+        
         return True
         
             

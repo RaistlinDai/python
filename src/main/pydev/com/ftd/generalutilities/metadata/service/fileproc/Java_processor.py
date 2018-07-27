@@ -49,11 +49,11 @@ class Java_processor(File_processor):
         
     
     @staticmethod
-    def java_load_ftdJD(srcfile, dcpfile):
+    def java_decomp_ftdJD(srcfile, dcpfile):
         '''
-        decompile the java class file to the target directory
-        @param srcfile: the java class file
-        @param dcpfile: the decompiled file
+        decompile the jar to the target directory
+        @param srcfile: the jar file
+        @param dcpfile: the decompiled directory
         @return: return status
         @return: message if validation failed
         '''

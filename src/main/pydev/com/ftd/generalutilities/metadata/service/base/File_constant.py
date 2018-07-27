@@ -51,6 +51,7 @@ class File_constant(object):
         self.JAR_LIB_PATH = '\\.m2\\repository\\com\\qad\\financials-impl\\'
         self.FIN_IMPL_JAR_PREFIX = 'financials-impl-'
         
+        self.UNZIP_JAR_FOLDER = '\\uz\\'
         self.BACKUP_SUFFIX = '.bck'
         self.XML_SUFFIX = ".xml"
         self.JAR_SUFFIX = ".jar"

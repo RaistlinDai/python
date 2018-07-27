@@ -52,5 +52,5 @@ elif testType == 8:
     Java_processor.unzip_jar('C:\\Users\\Raistlin\\Desktop\\PyWorkspace\\FtdJD.jar', 'C:\\Users\\Raistlin\\Desktop\\PyWorkspace\\uj', True)
     
 elif testType == 9:
-    Java_processor.java_load_ftdJD('C:\\Users\\Raistlin\\Desktop\\PyWorkspace\\FtdJD.jar', 'C:\\Users\\Raistlin\\Desktop\\PyWorkspace\\output\\')
+    Java_processor.java_decomp_ftdJD('C:\\Users\\Raistlin\\Desktop\\PyWorkspace\\FtdJD.jar', 'C:\\Users\\Raistlin\\Desktop\\PyWorkspace\\output\\')
     

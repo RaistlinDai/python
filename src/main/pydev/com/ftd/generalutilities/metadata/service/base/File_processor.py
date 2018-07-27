@@ -71,7 +71,22 @@ class File_processor(object):
             os.remove(srcfile)
         return True, None
         
+    
+    @staticmethod
+    def remove_folder(dir_path):
+        '''
+        remove folder
+        @param srcfile: the target folder
+        @return: return status
+        @return: message if validation failed
+        '''
+        try:
+            shutil.rmtree(dir_path)
+        except Exception as e:
+            return False, e.value
+        return True, None
         
+            
     @staticmethod
     def dir_iterbrowse(dir_path):
         '''
@@ -148,3 +163,5 @@ class File_processor(object):
             return None
         else:
             return os.path.basename(filepath)
+        
+    
