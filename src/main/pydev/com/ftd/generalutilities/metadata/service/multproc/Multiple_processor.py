@@ -36,7 +36,7 @@ class Multiple_processor(object):
         '''
         Jar decompile process
         '''
-        print('Run child process %s (%s)...' % (name, os.getpid()))
+        print('Run child process %s (%s) start.' % (name, os.getpid()))
         fileconstant = File_constant()
         unzip_path = workfullpath + fileconstant.UNZIP_JAR_FOLDER
         
@@ -46,6 +46,6 @@ class Multiple_processor(object):
         
         #jar unzip
         Java_processor.java_decomp_ftdJD(jarfullpath, unzip_path)
-        
+        print('Run child process %s (%s) end.' % (name, os.getpid()))
         
         
