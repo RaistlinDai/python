@@ -6,7 +6,6 @@ Created on Jul 5, 2018
 from src.main.pydev.com.ftd.generalutilities.metadata.gui.impl.base.Mainframe_enum import Mainframe_enum
 from src.main.pydev.com.ftd.generalutilities.metadata.gui.impl.base.Frame_constant import Frame_constant
 from src.main.pydev.com.ftd.generalutilities.metadata.util.switch import switch
-from src.main.pydev.com.ftd.generalutilities.metadata.service.fileproc.Deffile_processor import Deffile_processor
 
 class TransactionDTO(object):
     '''
@@ -18,15 +17,16 @@ class TransactionDTO(object):
         '''
         Constructor
         '''
-        self.__dto = {'CurrentFrame':None,
-                      'ProcessFlow':None,
-                      'NextFrameFunc':None,
-                      'PrevFrameFunc':None,
-                      'GenerateOption':{},
-                      'WorkspacePath':None,
-                      'ProjectPath':None,
-                      'PomDTO':None,
-                      'FinImplJarPath':None
+        self.__dto = {'CurrentFrame':None,      # the current frame name
+                      'ProcessFlow':None,       # the current processing flow 
+                      'NextFrameFunc':None,     # the callback function of 'NextFrame'
+                      'PrevFrameFunc':None,     # the callback function of 'PrevFrame'
+                      'GeneratorStatus': {},    # the generator status (set in Frame_projfile_check)
+                      'GenerateOption':{},      # the generator options (set in Frame_xml_optioon)
+                      'WorkspacePath':None,     # the workspace folder's full path
+                      'ProjectPath':None,       # the financials-webui project's full path
+                      'PomDTO':None,            # the DTO of financials-webui pom.xml
+                      'FinImplJarPath':None     # the fin-app-impl.jar full path
                       }
         
         
@@ -85,6 +85,18 @@ class TransactionDTO(object):
         else:
             return None 
      
+     
+    def set_generatorstatus(self, generatorstatus):
+        if self.__dto and isinstance(generatorstatus, dict):
+            self.__dto['GeneratorStatus'] = generatorstatus
+            
+            
+    def get_generatorstatus(self):
+        if self.__dto:
+            return self.__dto['GeneratorStatus']
+        else:
+            return None    
+        
         
     def set_generateoption(self, generateoption):
         if self.__dto and isinstance(generateoption, dict):
