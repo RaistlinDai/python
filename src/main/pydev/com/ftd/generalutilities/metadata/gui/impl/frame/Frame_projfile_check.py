@@ -23,7 +23,7 @@ class Frame_projfile_check(FormatableFrame):
         '''
         Constructor
         '''
-        self.__checkstatus = {}
+        self.__checkstatus = {}  # the generator status, the same structure as TransactionDTO.GeneratorStatus (e.g. {'Metadata':1})
         self.__message = None
         FormatableFrame.__init__(self, parent.get_mainframe(), dtos, trans, **configs)
         
@@ -298,7 +298,7 @@ class Frame_projfile_check(FormatableFrame):
         else:
             newlabel = "< passed >"
             self.__label92.config(text=newlabel, fg='blue')
-            self.__checkstatus['JAR'] = True
+            self.__checkstatus['JAR'] = [True, self.__checkval91]
             #jar name
             jarname = File_processor.get_file_name(self.get_trans().get_finImplJarPath())
                 
@@ -356,13 +356,18 @@ class Frame_projfile_check(FormatableFrame):
         overwrite the function in super class
         verify the input directory
         '''
-        for flag in self.__checkstatus.values():
-            if not flag[0] and flag[1].get() == 1:
+        warning_flag = False
+        for flag in self.__checkstatus.items():
+            if not flag[1][0] and flag[1][1].get() == 1:
                 showerror('Error', 'There are errors existing, please correct it!')
                 return False
-            elif flag[1].get() == 0:
-                showwarning('Warning', 'Some generators could not work because the related file validations are skipped.')
-                break
+            elif flag[1][1].get() == 0:
+                if not warning_flag:
+                    showwarning('Warning', 'Some generators could not work because the related file validations are skipped.')
+                    warning_flag = True
+                    
+        # save the generator status into TransDto
+        self.get_trans().set_generatorstatus(self.__checkstatus)
         
         #jar processing
         if self.__chkint91.get() == 1:

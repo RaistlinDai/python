@@ -92,7 +92,7 @@ class Frame_xml_option(FormatableFrame):
         self.__dicinput = Entry(canv2, textvariable=self.__varc5, borderwidth=3, bg='black', foreground='yellow', highlightcolor='red', insertbackground='red')
         self.__dicinput.place(height=20, width=120, relx= 0.25, rely=0.65)
         
-        canv2.pack()
+        canv2.pack()       
     
     
     def show_msg(self):

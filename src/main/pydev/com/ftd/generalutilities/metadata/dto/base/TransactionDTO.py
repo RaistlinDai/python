@@ -21,7 +21,7 @@ class TransactionDTO(object):
                       'ProcessFlow':None,       # the current processing flow 
                       'NextFrameFunc':None,     # the callback function of 'NextFrame'
                       'PrevFrameFunc':None,     # the callback function of 'PrevFrame'
-                      'GeneratorStatus': {},    # the generator status (set in Frame_projfile_check)
+                      'GeneratorStatus': {},    # the generator status (set in Frame_projfile_check) - {name:[isValid, isSelected]}
                       'GenerateOption':{},      # the generator options (set in Frame_xml_optioon)
                       'WorkspacePath':None,     # the workspace folder's full path
                       'ProjectPath':None,       # the financials-webui project's full path
