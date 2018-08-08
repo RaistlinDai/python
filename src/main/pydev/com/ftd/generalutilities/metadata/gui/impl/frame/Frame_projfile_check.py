@@ -170,7 +170,7 @@ class Frame_projfile_check(FormatableFrame):
         self.__checkval01.set(1)
         #bind button click event
         self.__button01.bind('<Button-1>', self.event_adapter(self.detal_button_click,
-                                                              iscorrect=self.__checkstatus['ViewMetadata'],
+                                                              iscorrect=self.__checkstatus['ViewMetadata'][0],
                                                               filename=entity_name +fileconstant.XML_SUFFIX,
                                                               filetype='ViewMetadata',
                                                               filepath=viewfullpath))
@@ -196,7 +196,7 @@ class Frame_projfile_check(FormatableFrame):
             self.__checkstatus['ResourceMetadata'] = [False, self.__checkval02]
         self.__checkval02.set(1)
         self.__button02.bind('<Button-1>', self.event_adapter(self.detal_button_click,
-                                                              iscorrect=self.__checkstatus['ResourceMetadata'],
+                                                              iscorrect=self.__checkstatus['ResourceMetadata'][0],
                                                               filename=entity_name +fileconstant.RESOURCE_METADATA_SUFFIX,
                                                               filetype='ResourceMetadata',
                                                               filepath=resourcefullpath))
@@ -220,7 +220,7 @@ class Frame_projfile_check(FormatableFrame):
             self.__checkstatus['Pom'] = [False, self.__checkval03]
         self.__checkval03.set(1)
         self.__button03.bind('<Button-1>', self.event_adapter(self.detal_button_click,
-                                                              iscorrect=self.__checkstatus['Pom'],
+                                                              iscorrect=self.__checkstatus['Pom'][0],
                                                               filename='pom.xml',
                                                               filetype='POM',
                                                               filepath=proj_path + fileconstant.POM_PATH))
@@ -242,7 +242,7 @@ class Frame_projfile_check(FormatableFrame):
             self.__checkstatus['beans-app-context'] = [False, self.__checkval04]
         self.__checkval04.set(1)
         self.__button04.bind('<Button-1>', self.event_adapter(self.detal_button_click,
-                                                              iscorrect=self.__checkstatus['beans-app-context'],
+                                                              iscorrect=self.__checkstatus['beans-app-context'][0],
                                                               filename='beans-app-server.xml',
                                                               filetype='beans',
                                                               filepath=proj_path + fileconstant.BEAN_APP_CONTEXT_PATH))
@@ -264,7 +264,7 @@ class Frame_projfile_check(FormatableFrame):
             self.__checkstatus['entityMap'] = [False, self.__checkval05]
         self.__checkval05.set(1)
         self.__button05.bind('<Button-1>', self.event_adapter(self.detal_button_click,
-                                                              iscorrect=self.__checkstatus['entityMap'],
+                                                              iscorrect=self.__checkstatus['entityMap'][0],
                                                               filename='entityMap.xml',
                                                               filetype='entityMap',
                                                               filepath=proj_path + fileconstant.ENTITY_MAP_PATH))    
@@ -304,7 +304,7 @@ class Frame_projfile_check(FormatableFrame):
                 
         self.__checkval91.set(1)
         self.__button91.bind('<Button-1>', self.event_adapter(self.detal_button_click,
-                                                              iscorrect=self.__checkstatus['JAR'],
+                                                              iscorrect=self.__checkstatus['JAR'][0],
                                                               filename=jarname,
                                                               filetype='JAR',
                                                               filepath=jarfullpath))
@@ -336,7 +336,7 @@ class Frame_projfile_check(FormatableFrame):
             if result_dto['iscorrect']:
                 if result_dto['filetype'] == 'JAR':
                     #update the global parameters
-                    self.__checkstatus['JAR'] = True
+                    self.__checkstatus['JAR'][0] = True
                     #set new jara path into transaction
                     self.get_trans().set_finImplJarPath(result_dto['filepath'])
                     #update labels
@@ -346,7 +346,7 @@ class Frame_projfile_check(FormatableFrame):
                     self.__button91.config(text=btnlabel)
                     #update event parameters
                     self.__button91.bind('<Button-1>', self.event_adapter(self.detal_button_click,
-                                                              iscorrect=self.__checkstatus['JAR'],
+                                                              iscorrect=self.__checkstatus['JAR'][0],
                                                               filename=result_dto['filename'],
                                                               filetype='JAR',
                                                               filepath=result_dto['filepath']))
