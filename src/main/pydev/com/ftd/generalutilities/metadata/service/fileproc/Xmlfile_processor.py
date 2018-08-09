@@ -162,12 +162,21 @@ class Xmlfile_processor(File_processor):
         
         #root node information
         if root.nodeName == 'ViewResourceMetadata':
+            prim_uri = root.getAttribute('PrimarySecureUri')
+            if prim_uri.index(resDto.ENTITY_TYPE_BE) >= 0:
+                entity_type = 'BE'
+            elif prim_uri.index(resDto.ENTITY_TYPE_SERVICE) >= 0:
+                entity_type = 'Service'
+            else:
+                entity_type = None
+            
             resDto.update_header(root.getAttribute('MetaUri'), 
                                  root.getAttribute('ViewUri'), 
                                  root.getAttribute('NameStringCode'), 
                                  root.getAttribute('IsEligibleForMenu'), 
                                  root.getAttribute('IsSecure'), 
-                                 root.getAttribute('PrimarySecureUri'))
+                                 prim_uri,
+                                 entity_type)
         else:
             return False, 'This is not a valid resource metadata, please check.'
         

@@ -174,8 +174,6 @@ class Frame_projfile_check(FormatableFrame):
                                                               filename=entity_name +fileconstant.XML_SUFFIX,
                                                               filetype='ViewMetadata',
                                                               filepath=viewfullpath))
-        #record the message
-        print('Error message:' + str(self.__message))
         
         #verify source metadata
         resource_exist = False
@@ -200,8 +198,6 @@ class Frame_projfile_check(FormatableFrame):
                                                               filename=entity_name +fileconstant.RESOURCE_METADATA_SUFFIX,
                                                               filetype='ResourceMetadata',
                                                               filepath=resourcefullpath))
-        #record the message
-        print('Error message:' + str(self.__message))
         
         #verify pom 
         result, self.__message = Xmlfile_processor.verify_pom(proj_path + fileconstant.POM_PATH)
@@ -224,8 +220,6 @@ class Frame_projfile_check(FormatableFrame):
                                                               filename='pom.xml',
                                                               filetype='POM',
                                                               filepath=proj_path + fileconstant.POM_PATH))
-        #record the message
-        print('Error message:' + str(self.__message))
         
         #verify beans-app-context 
         result, self.__message = Xmlfile_processor.verify_beans_app_context(proj_path + fileconstant.BEAN_APP_CONTEXT_PATH)
@@ -246,8 +240,6 @@ class Frame_projfile_check(FormatableFrame):
                                                               filename='beans-app-server.xml',
                                                               filetype='beans',
                                                               filepath=proj_path + fileconstant.BEAN_APP_CONTEXT_PATH))
-        #record the message
-        print('Error message:' + str(self.__message))
         
         #verify entityMap 
         result, self.__message = Xmlfile_processor.verify_entity_map(proj_path + fileconstant.ENTITY_MAP_PATH)
@@ -267,9 +259,7 @@ class Frame_projfile_check(FormatableFrame):
                                                               iscorrect=self.__checkstatus['entityMap'][0],
                                                               filename='entityMap.xml',
                                                               filetype='entityMap',
-                                                              filepath=proj_path + fileconstant.ENTITY_MAP_PATH))    
-        #record the message
-        print('Error message:' + str(self.__message))
+                                                              filepath=proj_path + fileconstant.ENTITY_MAP_PATH))
         
         #verify jar metadata
         result = False
@@ -308,8 +298,6 @@ class Frame_projfile_check(FormatableFrame):
                                                               filename=jarname,
                                                               filetype='JAR',
                                                               filepath=jarfullpath))
-        #record the message
-        print('Error message:' + str(self.__message))
     
     
     def event_adapter(self, fun, **kwds):
@@ -356,6 +344,15 @@ class Frame_projfile_check(FormatableFrame):
         overwrite the function in super class
         verify the input directory
         '''
+        #--- read the resource metadata and load the data into ResourceMetadataDTO
+        curDtos = self.get_dtos()
+        resourcepath = curDtos.get_resourcefullpath()
+        result, message = Xmlfile_processor.read_resource_metadata(resourcepath, self.get_dtos())
+        if not result:
+            showerror('Error', message)
+            return False
+        
+        #--- verify generator options
         warning_flag = False
         for flag in self.__checkstatus.items():
             if not flag[1][0] and flag[1][1].get() == 1:

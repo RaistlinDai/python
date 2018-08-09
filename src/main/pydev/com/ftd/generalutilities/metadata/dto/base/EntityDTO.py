@@ -15,11 +15,12 @@ class EntityDTO(object):
         #dtos
         viewDTO = ViewMetadataDTO()
         resourceDTO = ResourceMetadataDTO()
-        self.__dto = {'Entity':None,
-                      'ViewFullPath':None,
-                      'ResourceFullPath':None,
-                      'ViewMetaData':viewDTO,
-                      'ResourceMetaData':resourceDTO}
+        self.__dto = {'Entity':None,                      # entity name
+                      'ViewFullPath':None,                # view metadata path
+                      'ResourceFullPath':None,            # resource metadata path
+                      'ViewMetaData':viewDTO,             # view metadata DTO
+                      'ResourceMetaData':resourceDTO      # resource metadata DTO
+                      }
         
     
     def set_dtos(self, dtos):

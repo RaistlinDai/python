@@ -9,8 +9,15 @@ class ResourceMetadataDTO(object):
     classdocs
     '''
 
-    def __init__(self, meta_uri=None, view_uri=None, name_string=None, 
-                is_eligible=None, is_secure=None, primary_secure_Uri=None):
+    def __init__(self, 
+                 meta_uri=None, 
+                 view_uri=None, 
+                 name_string=None, 
+                 is_eligible=None, 
+                 is_secure=None, 
+                 primary_secure_Uri=None,
+                 entity_type=None
+                 ):
         '''
         Constructor
         '''
@@ -20,6 +27,10 @@ class ResourceMetadataDTO(object):
         self.__is_eligible = is_eligible
         self.__is_secure = is_secure
         self.__primary_secure_Uri = primary_secure_Uri
+        self.__entity_type = entity_type
+        
+        self.ENTITY_TYPE_BE = "urn:be:"
+        self.ENTITY_TYPE_SERVICE = "urn:service:"
     
 
     def get_meta_uri(self):
@@ -40,6 +51,10 @@ class ResourceMetadataDTO(object):
 
     def get_is_secure(self):
         return self.__is_secure
+
+
+    def get_entity_type(self):
+        return self.__entity_type
 
 
     def get_primary_secure_uri(self):
@@ -64,6 +79,10 @@ class ResourceMetadataDTO(object):
 
     def set_is_secure(self, value):
         self.__is_secure = value
+
+
+    def set_entity_type(self, value):
+        self.__entity_type = value
 
 
     def set_primary_secure_uri(self, value):
@@ -102,7 +121,8 @@ class ResourceMetadataDTO(object):
 
     
     def update_header(self, meta_uri=None, view_uri=None, name_string=None, 
-                      is_eligible=None, is_secure=None, primary_secure_Uri=None):
+                      is_eligible=None, is_secure=None, primary_secure_Uri=None,
+                      entity_type=None):
         '''
         Constructor
         '''
@@ -112,3 +132,4 @@ class ResourceMetadataDTO(object):
         self.__is_eligible = is_eligible
         self.__is_secure = is_secure
         self.__primary_secure_Uri = primary_secure_Uri
+        self.__entity_type = entity_type

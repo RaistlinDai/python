@@ -122,12 +122,7 @@ class Frame_xml_option(FormatableFrame):
             showerror('Error', message)
             return False
         
-        #--- read the resource metadata and load the data into ResourceMetadataDTO
-        resourcepath = curDtos.get_resourcefullpath()
-        result, message = Xmlfile_processor.read_resource_metadata(resourcepath, self.get_dtos())
-        if not result:
-            showerror('Error', message)
-            return False
+        #--- read the resource metadata
         resDTO = curDtos.get_resourceDTO()
         
         #--- process beans-app-context.xml
