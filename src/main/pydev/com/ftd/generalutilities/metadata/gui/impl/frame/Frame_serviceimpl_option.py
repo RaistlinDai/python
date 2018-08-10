@@ -141,19 +141,26 @@ class Frame_serviceimpl_option(FormatableFrame):
             message = 'The decompile folder not existing, please re-generate!'
             return False, message
         
+        api_unzip_path = unzip_path + fileconstant.API_FOLDER
+        impl_unzip_path = unzip_path + fileconstant.IMPL_FOLDER
         idx = 0
         while idx < len(package_list):
             if idx != len(package_list) -1:
-                unzip_path = unzip_path + package_list[idx] + '\\'
+                api_unzip_path = api_unzip_path + package_list[idx] + '\\'
+                impl_unzip_path = impl_unzip_path + package_list[idx] + '\\'
             else:
-                unzip_path = unzip_path + fileconstant.IMPL_FOLDER + package_list[idx] + fileconstant.DEPOMPILE_JAVA_SUFFIX
+                impl_unzip_path = impl_unzip_path + fileconstant.IMPL_FOLDER + package_list[idx] + fileconstant.DEPOMPILE_JAVA_SUFFIX
             
             idx = idx + 1
         
         print(unzip_path)
         
-        if not File_processor.verify_dir_existing(unzip_path):
-            message = 'There is no java service for entity %s,\n please check your jar!' % entityName
+        if not File_processor.verify_dir_existing(api_unzip_path):
+            message = 'There is no api interface for entity %s,\n please check your api jar!' % entityName
+            return False, message
+        
+        if not File_processor.verify_dir_existing(impl_unzip_path):
+            message = 'There is no java service for entity %s,\n please check your impl jar!' % entityName
             return False, message
             
         return True, None

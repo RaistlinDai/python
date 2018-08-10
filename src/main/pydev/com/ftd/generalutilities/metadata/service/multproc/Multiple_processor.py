@@ -29,7 +29,7 @@ class Multiple_processor(object):
         
         #remove the legacy folder
         if File_processor.verify_dir_existing(unzip_path):
-            if askyesno('Confirm', 'The decompile folder existing, do you want to cover it?'):
+            if not askyesno('Confirm', 'The decompile folder existing, do you want to skip decompile?'):
                 File_processor.remove_folder(unzip_path)
             else:
                 return
