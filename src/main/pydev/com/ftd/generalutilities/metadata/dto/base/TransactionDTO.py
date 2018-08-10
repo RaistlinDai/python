@@ -26,7 +26,8 @@ class TransactionDTO(object):
                       'WorkspacePath':None,     # the workspace folder's full path
                       'ProjectPath':None,       # the financials-webui project's full path
                       'PomDTO':None,            # the DTO of financials-webui pom.xml
-                      'FinImplJarPath':None     # the fin-app-impl.jar full path
+                      'FinImplJarPath':None,    # the fin-app-impl.jar full path
+                      'FinApiJarPath':None,     # the fin-app-api.jar full path
                       }
         
         
@@ -156,6 +157,18 @@ class TransactionDTO(object):
     def get_finImplJarPath(self):
         if self.__dto:
             return self.__dto['FinImplJarPath']
+        else:
+            return None
+    
+        
+    def set_finApiJarPath(self, finApiJarPath):
+        if self.__dto:
+            self.__dto['FinApiJarPath'] = finApiJarPath
+            
+            
+    def get_finApiJarPath(self):
+        if self.__dto:
+            return self.__dto['FinApiJarPath']
         else:
             return None
         

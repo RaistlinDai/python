@@ -108,7 +108,7 @@ class Frame_projfile_check(FormatableFrame):
         canv2.pack()
         
         #---- panel 03 ----------
-        canv3 = Canvas(self, height=60, width=550)
+        canv3 = Canvas(self, height=80, width=550)
         #labe3
         label3 = Label(canv3, text='Jar checking:')
         label3.place(height=20, width=100, relx=0.01, rely=0.05)
@@ -116,13 +116,23 @@ class Frame_projfile_check(FormatableFrame):
         self.__chkint91 = IntVar()
         self.__checkval91 = self.__chkint91
         self.__checkbox91 = Checkbutton(canv3, text = "financials-impl", variable = self.__checkval91, onvalue = 1, offvalue = 0)
-        self.__checkbox91.place(height=20, width=110, relx=0.1, rely=0.5)
+        self.__checkbox91.place(height=20, width=110, relx=0.1, rely=0.3)
         self.__label91 = Label(canv3, text='Status :')
-        self.__label91.place(height=20, width=60, relx=0.4, rely=0.5)
+        self.__label91.place(height=20, width=60, relx=0.4, rely=0.3)
         self.__label92 = Label(canv3, text='< no need >')
-        self.__label92.place(height=20, width=120, relx=0.5, rely=0.5)
+        self.__label92.place(height=20, width=120, relx=0.5, rely=0.3)
         self.__button91 = Button(canv3, text="Detail")
-        self.__button91.place(height=20, width=50, relx=0.8, rely=0.5)
+        self.__button91.place(height=20, width=50, relx=0.8, rely=0.3)
+        
+        self.__checkval92 = self.__chkint91
+        self.__checkbox92 = Checkbutton(canv3, text = "financials-api", variable = self.__checkval92, onvalue = 1, offvalue = 0)
+        self.__checkbox92.place(height=20, width=100, relx=0.1, rely=0.6)
+        self.__label93 = Label(canv3, text='Status :')
+        self.__label93.place(height=20, width=60, relx=0.4, rely=0.6)
+        self.__label94 = Label(canv3, text='< no need >')
+        self.__label94.place(height=20, width=120, relx=0.5, rely=0.6)
+        self.__button92 = Button(canv3, text="Detail")
+        self.__button92.place(height=20, width=50, relx=0.8, rely=0.6)
         
         canv3.pack()
         
@@ -261,43 +271,78 @@ class Frame_projfile_check(FormatableFrame):
                                                               filetype='entityMap',
                                                               filepath=proj_path + fileconstant.ENTITY_MAP_PATH))
         
-        #verify jar metadata
+        #verify jar
         result = False
         jarname = None
-        jarfullpath = self.get_trans().get_finImplJarPath()
+        implJarfullpath = self.get_trans().get_finImplJarPath()
+        apiJarfullpath = self.get_trans().get_finApiJarPath()
         #verify if jar is existing at the Maven's default repository
-        if not jarfullpath:
-            userhomepath = File_processor.get_user_home() + fileconstant.JAR_LIB_PATH
+        #impl jar
+        if not implJarfullpath:
+            userhomepath = File_processor.get_user_home() + fileconstant.IMPL_JAR_LIB_PATH
             #jar name and full path
-            jarfullpath = userhomepath + pomDto.get_financials_api_version() + '\\' + fileconstant.FIN_IMPL_JAR_PREFIX + pomDto.get_financials_api_version() + fileconstant.JAR_SUFFIX
+            implJarfullpath = userhomepath + pomDto.get_financials_api_version() + '\\' + fileconstant.FIN_IMPL_JAR_PREFIX + pomDto.get_financials_api_version() + fileconstant.JAR_SUFFIX
             jarname = fileconstant.FIN_IMPL_JAR_PREFIX + pomDto.get_financials_api_version() + fileconstant.JAR_SUFFIX
             
-            result, self.__message  = Java_processor.verify_jar_type(jarfullpath)
+            result, self.__message  = Java_processor.verify_jar_type(implJarfullpath)
             
             if result:
                 newlabel = "< passed >"
                 self.__label92.config(text=newlabel, fg='blue')
-                self.get_trans().set_finImplJarPath(jarfullpath)
-                self.__checkstatus['JAR'] = [True, self.__checkval91]
+                self.get_trans().set_finImplJarPath(implJarfullpath)
+                self.__checkstatus['ImplJAR'] = [True, self.__checkval91]
             else:
                 newlabel = "< failed >"
                 self.__label92.config(text=newlabel, fg='red')
                 btnlabel = 'Correct'
                 self.__button91.config(text=btnlabel)
-                self.__checkstatus['JAR'] = [False, self.__checkval91]
+                self.__checkstatus['ImplJAR'] = [False, self.__checkval91]
         else:
             newlabel = "< passed >"
             self.__label92.config(text=newlabel, fg='blue')
-            self.__checkstatus['JAR'] = [True, self.__checkval91]
+            self.__checkstatus['ImplJAR'] = [True, self.__checkval91]
             #jar name
             jarname = File_processor.get_file_name(self.get_trans().get_finImplJarPath())
-                
+        
         self.__checkval91.set(1)
         self.__button91.bind('<Button-1>', self.event_adapter(self.detal_button_click,
-                                                              iscorrect=self.__checkstatus['JAR'][0],
+                                                              iscorrect=self.__checkstatus['ImplJAR'][0],
                                                               filename=jarname,
-                                                              filetype='JAR',
-                                                              filepath=jarfullpath))
+                                                              filetype='ImplJAR',
+                                                              filepath=implJarfullpath))
+        # api jar
+        if not apiJarfullpath:
+            userhomepath = File_processor.get_user_home() + fileconstant.API_JAR_LIB_PATH
+            #jar name and full path
+            apiJarfullpath = userhomepath + pomDto.get_financials_api_version() + '\\' + fileconstant.FIN_API_JAR_PREFIX + pomDto.get_financials_api_version() + fileconstant.JAR_SUFFIX
+            jarname = fileconstant.FIN_IMPL_JAR_PREFIX + pomDto.get_financials_api_version() + fileconstant.JAR_SUFFIX
+            
+            result, self.__message  = Java_processor.verify_jar_type(apiJarfullpath)
+            
+            if result:
+                newlabel = "< passed >"
+                self.__label94.config(text=newlabel, fg='blue')
+                self.get_trans().set_finApiJarPath(apiJarfullpath)
+                self.__checkstatus['ApiJAR'] = [True, self.__checkval92]
+            else:
+                newlabel = "< failed >"
+                self.__label94.config(text=newlabel, fg='red')
+                btnlabel = 'Correct'
+                self.__button92.config(text=btnlabel)
+                self.__checkstatus['ApiJAR'] = [False, self.__checkval92]
+        else:
+            newlabel = "< passed >"
+            self.__label94.config(text=newlabel, fg='blue')
+            self.__checkstatus['ApiJAR'] = [True, self.__checkval92]
+            #jar name
+            jarname = File_processor.get_file_name(self.get_trans().get_finImplJarPath())
+        
+        self.__checkval92.set(1)
+        self.__button92.bind('<Button-1>', self.event_adapter(self.detal_button_click,
+                                                              iscorrect=self.__checkstatus['ApiJAR'][0],
+                                                              filename=jarname,
+                                                              filetype='ApiJAR',
+                                                              filepath=apiJarfullpath))
     
     
     def event_adapter(self, fun, **kwds):
@@ -322,9 +367,9 @@ class Frame_projfile_check(FormatableFrame):
         if not iscorrect:
             result_dto = popup.return_selection()
             if result_dto['iscorrect']:
-                if result_dto['filetype'] == 'JAR':
+                if result_dto['filetype'] == 'ImplJAR':
                     #update the global parameters
-                    self.__checkstatus['JAR'][0] = True
+                    self.__checkstatus['ImplJAR'][0] = True
                     #set new jara path into transaction
                     self.get_trans().set_finImplJarPath(result_dto['filepath'])
                     #update labels
@@ -334,11 +379,28 @@ class Frame_projfile_check(FormatableFrame):
                     self.__button91.config(text=btnlabel)
                     #update event parameters
                     self.__button91.bind('<Button-1>', self.event_adapter(self.detal_button_click,
-                                                              iscorrect=self.__checkstatus['JAR'][0],
+                                                              iscorrect=self.__checkstatus['ImplJAR'][0],
                                                               filename=result_dto['filename'],
-                                                              filetype='JAR',
+                                                              filetype='ImplJAR',
                                                               filepath=result_dto['filepath']))
-    
+                elif result_dto['filetype'] == 'ApiJAR':
+                    #update the global parameters
+                    self.__checkstatus['ApiJAR'][0] = True
+                    #set new jara path into transaction
+                    self.get_trans().set_finImplJarPath(result_dto['filepath'])
+                    #update labels
+                    newlabel = "< passed >"
+                    self.__label94.config(text=newlabel, fg='blue')
+                    btnlabel = 'Detail'
+                    self.__button92.config(text=btnlabel)
+                    #update event parameters
+                    self.__button92.bind('<Button-1>', self.event_adapter(self.detal_button_click,
+                                                              iscorrect=self.__checkstatus['ApiJAR'][0],
+                                                              filename=result_dto['filename'],
+                                                              filetype='ApiJAR',
+                                                              filepath=result_dto['filepath']))
+                    
+                    
     def before_next(self):
         '''
         overwrite the function in super class

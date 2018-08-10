@@ -48,13 +48,18 @@ class File_constant(object):
         self.ENTITY_MAP_PATH = '\\src\\main\\resources\\com\\qad\\erp\\financials\\data\\doc\\entityMap.xml'
         self.BEAN_APP_CONTEXT_PATH = '\\src\\main\\resources\\WEB-INF\\qad\\erp\\financials\\beans-app-context.xml'
         self.POM_PATH = '\\pom.xml'
-        self.JAR_LIB_PATH = '\\.m2\\repository\\com\\qad\\financials-impl\\'
+        self.IMPL_JAR_LIB_PATH = '\\.m2\\repository\\com\\qad\\financials-impl\\'
+        self.API_JAR_LIB_PATH = '\\.m2\\repository\\com\\qad\\financials-api\\'
         self.FIN_IMPL_JAR_PREFIX = 'financials-impl-'
+        self.FIN_API_JAR_PREFIX = 'financials-api-'
+        self.IMPL_FOLDER = 'impl\\'
+        self.API_FOLDER = 'api\\'
         
-        self.UNZIP_JAR_FOLDER = '\\uz\\'
+        self.UNZIP_JAR_FOLDER = 'uz\\'
         self.BACKUP_SUFFIX = '.bck'
         self.XML_SUFFIX = ".xml"
         self.JAR_SUFFIX = ".jar"
+        self.DEPOMPILE_JAVA_SUFFIX = "._java"
         self.RESOURCE_METADATA_SUFFIX = "-ViewResourceMeta.xml"
         
         self.FILE_TYPE = {'FFD8FF':'jpg', 

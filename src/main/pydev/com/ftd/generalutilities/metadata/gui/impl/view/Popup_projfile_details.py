@@ -51,7 +51,7 @@ class Popup_projfile_details(Toplevel):
             self.__text02.insert(INSERT, fileinfo['filetype'])
             self.__text02.config(state=DISABLED)
             
-        if not fileinfo['iscorrect'] and fileinfo['filetype'] == 'JAR':
+        if not fileinfo['iscorrect'] and (fileinfo['filetype'] == 'ImplJAR' or fileinfo['filetype'] == 'ApiJAR'):
             self.__button01 = Button_select_file(canv1, self.file_button_callback, text='File select :', cursor='hand2')
             self.__button01.place(height=20, width=75, relx=0.01, rely=0.6)
         else:

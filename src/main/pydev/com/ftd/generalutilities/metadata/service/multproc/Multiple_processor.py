@@ -22,7 +22,8 @@ class Multiple_processor(object):
         '''
         fileconstant = File_constant()
         #jar full path
-        jarfullpath = transDTO.get_finImplJarPath()
+        impljarfullpath = transDTO.get_finImplJarPath()
+        apijarfullpath = transDTO.get_finApiJarPath()
         #workspace full path
         unzip_path = transDTO.get_workspacepath() + fileconstant.UNZIP_JAR_FOLDER
         
@@ -35,8 +36,11 @@ class Multiple_processor(object):
         
         print('Parent process %s.' % os.getpid())
         #process the child processing
-        p = Process(target=Multiple_processor.jar_decompile_proc, args=('JarDecompile',jarfullpath,unzip_path,))
-        p.start()
+        p1 = Process(target=Multiple_processor.jar_decompile_proc, args=('JarDecompile',impljarfullpath, unzip_path+fileconstant.IMPL_FOLDER,))
+        p1.start()
+        
+        p2 = Process(target=Multiple_processor.jar_decompile_proc, args=('JarDecompile',apijarfullpath, unzip_path+fileconstant.API_FOLDER,))
+        p2.start()
         # p.join() join will be waiting for the child process
         print('Child process end.')
         
