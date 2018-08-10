@@ -55,6 +55,11 @@ class File_constant(object):
         self.IMPL_FOLDER = 'impl\\'
         self.API_FOLDER = 'api\\'
         
+        # ----------- The java service and interface -------
+        self.JAVA_SERVICE = 'Service'
+        self.JAVA_FACTORY = 'Factory'
+        self.JAVA_QRA = 'Qra'
+        
         self.UNZIP_JAR_FOLDER = 'uz\\'
         self.BACKUP_SUFFIX = '.bck'
         self.XML_SUFFIX = ".xml"

@@ -148,9 +148,6 @@ class Frame_serviceimpl_option(FormatableFrame):
             if idx != len(package_list) -1:
                 api_unzip_path = api_unzip_path + package_list[idx] + '\\'
                 impl_unzip_path = impl_unzip_path + package_list[idx] + '\\'
-            else:
-                impl_unzip_path = impl_unzip_path + fileconstant.IMPL_FOLDER + package_list[idx] + fileconstant.DEPOMPILE_JAVA_SUFFIX
-            
             idx = idx + 1
         
         print(unzip_path)
@@ -160,9 +157,15 @@ class Frame_serviceimpl_option(FormatableFrame):
             return False, message
         
         if not File_processor.verify_dir_existing(impl_unzip_path):
-            message = 'There is no java service for entity %s,\n please check your impl jar!' % entityName
+            message = 'There is no service impl for entity %s,\n please check your impl jar!' % entityName
             return False, message
-            
+        
+        # the service & factory interface
+        # TODO: this is a hardcode style, should be enhancement later!!!
+        serviceImpl_name = package_list[-1][1:]
+        
+        #service_interface = api_unzip_path + 
+        
         return True, None
     
     
