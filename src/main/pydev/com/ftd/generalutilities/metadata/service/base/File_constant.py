@@ -56,14 +56,16 @@ class File_constant(object):
         self.API_FOLDER = 'api\\'
         
         # ----------- The java service and interface -------
-        self.JAVA_SERVICE = 'Service'
-        self.JAVA_FACTORY = 'Factory'
-        self.JAVA_QRA = 'Qra'
+        self.JAVA_SERVICE_INTERFACE = 'Service'
+        self.JAVA_FACTORY_INTERFACE = 'Factory'
+        self.JAVA_QRA_PREFIX = 'Qra'
+        self.SERVICEIMPL_SUFFIX = 'ServiceImpl'
         
         self.UNZIP_JAR_FOLDER = 'uz\\'
         self.BACKUP_SUFFIX = '.bck'
         self.XML_SUFFIX = ".xml"
         self.JAR_SUFFIX = ".jar"
+        self.JAVA_SUFFIX = ".java"
         self.DEPOMPILE_JAVA_SUFFIX = "._java"
         self.RESOURCE_METADATA_SUFFIX = "-ViewResourceMeta.xml"
         

@@ -9,10 +9,13 @@ import zipfile
 from jpype._jexception import JavaException
 from src.main.pydev.com.ftd.generalutilities.metadata.service.base.File_constant import File_constant
 from src.main.pydev.com.ftd.generalutilities.metadata.service.base.File_processor import File_processor
+from src.main.pydev.com.ftd.generalutilities.metadata.service.base import Java_constant
+from src.main.pydev.com.ftd.generalutilities.metadata.dto.javaFile.JavaDTO import JavaDTO
 
 class Java_processor(File_processor):
     '''
-    before compiling this class, you have to install jpype and numpy in Python
+    This class is used to process the Java and Jar files
+    Note: before compiling this class, you have to install jpype and numpy in Python
     '''
     
     @staticmethod
@@ -122,3 +125,36 @@ class Java_processor(File_processor):
                         return False, "Deep unzip failed!"
 
         return True, None
+    
+    
+    @staticmethod
+    def read_java_file(srcfile):
+        '''
+        read and analysis the java file, output the information in JavaDTO
+        NOTE: this is a light weight reador for java file. Generally we should use java reflection
+        @param srcfile: the java file
+        '''
+        if not File_processor.verify_dir_existing(srcfile):
+            return False, "File not exist!", None
+        
+        javaconstant = Java_constant()
+        javaDTO = JavaDTO()
+        
+        file = open(srcfile, 'r')
+        # read java file line by line
+        for eachline in file.readlines():
+            # split the line by blank
+            cells = eachline.split(' ')
+            
+            if javaconstant.JAVA_KEY_PACKAGE in cells:
+                javaDTO.set_class_package(cells[cells.index(javaconstant.JAVA_KEY_PACKAGE)+1])
+        
+        file.close()
+        return True, None, javaDTO
+        
+        
+    @staticmethod
+    def read_java_keyword(cells):
+        
+        pass
+        
