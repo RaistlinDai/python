@@ -235,15 +235,11 @@ class Frame_serviceimpl_option(FormatableFrame):
         return True
     
     
-    
     def __to_right_click_event(self, event):
         '''
         move the selection to the right list box
         '''
         if not self.__listboxleft or self.__listboxleft.size() == 0:
-            return
-        if self.__listboxright and self.__listboxright.size() > 0:
-            showerror('Error', 'Multiple entity is not supported for now!')
             return
         
         select_item = None
