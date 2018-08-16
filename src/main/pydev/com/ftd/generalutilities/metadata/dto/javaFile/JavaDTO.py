@@ -16,13 +16,26 @@ class JavaDTO(object):
         self.__class_name = None
         self.__class_type = None
         self.__class_range = None
-        self.__class_methods = None
+        self.__class_methods = []
         self.__class_extends = None
         self.__class_implements = None
         self.__class_properties = None
         self.__class_package = None
+        self.__class_imports = []
     
     
+    def get_class_imports(self):
+        return self.__class_imports
+
+
+    def set_class_imports(self, value):
+        self.__class_imports = value
+        
+        
+    def push_class_imports(self, import_value):
+        self.__class_imports.append(import_value)
+        
+
     def get_class_package(self):
         return self.__class_package
 
@@ -46,6 +59,10 @@ class JavaDTO(object):
     def set_class_implements(self, value):
         self.__class_implements = value
 
+
+    def push_class_implements(self, value):
+        self.__class_implements.append(value)
+        
 
     def del_class_extends(self):
         del self.__class_extends
@@ -89,6 +106,11 @@ class JavaDTO(object):
 
     def set_class_methods(self, value):
         self.__class_methods = value
+        
+        
+    def push_class_methods(self, value):
+        if isinstance(value, JavaMethodDTO):
+            self.__class_methods.append(value)
 
 
     def set_class_properties(self, value):
@@ -129,14 +151,14 @@ class JavaMethodDTO(object):
     '''
     
     
-    def __init__(self, methodname, methodrange, methodparams, methodreturn):
+    def __init__(self):
         '''
         Constructor
         '''
-        self.__method_name = methodname
-        self.__method_range = methodrange
-        self.__method_params = methodparams
-        self.__method_return = methodreturn
+        self.__method_name = None
+        self.__method_range = None
+        self.__method_inputs = []
+        self.__method_output = None
 
     def get_method_name(self):
         return self.__method_name
@@ -146,12 +168,12 @@ class JavaMethodDTO(object):
         return self.__method_range
 
 
-    def get_method_params(self):
-        return self.__method_params
+    def get_method_inputs(self):
+        return self.__method_inputs
 
 
-    def get_method_return(self):
-        return self.__method_return
+    def get_method_output(self):
+        return self.__method_output
 
 
     def set_method_name(self, value):
@@ -162,12 +184,16 @@ class JavaMethodDTO(object):
         self.__method_range = value
 
 
-    def set_method_params(self, value):
-        self.__method_params = value
+    def set_method_inputs(self, value):
+        self.__method_inputs = value
 
 
-    def set_method_return(self, value):
-        self.__method_return = value
+    def push_method_inputs(self, value):
+        self.__method_inputs.append(value)
+
+
+    def set_method_output(self, value):
+        self.__method_output = value
 
 
     def del_method_name(self):
@@ -178,16 +204,59 @@ class JavaMethodDTO(object):
         del self.__method_range
 
 
-    def del_method_params(self):
-        del self.__method_params
+    def del_method_inputs(self):
+        del self.__method_inputs
 
 
-    def del_method_return(self):
-        del self.__method_return
+    def del_method_output(self):
+        del self.__method_output
 
     method_name = property(get_method_name, set_method_name, del_method_name, "method_name's docstring")
     method_range = property(get_method_range, set_method_range, del_method_range, "method_range's docstring")
-    method_params = property(get_method_params, set_method_params, del_method_params, "method_params's docstring")
-    method_return = property(get_method_return, set_method_return, del_method_return, "method_return's docstring")
+    method_inputs = property(get_method_inputs, set_method_inputs, del_method_inputs, "method_inputs's docstring")
+    method_output = property(get_method_output, set_method_output, del_method_output, "method_output's docstring")
+        
+
+class JavaParameterDTO(object):
+    '''
+    classdocs
+    '''
+    
+    
+    def __init__(self):
+        '''
+        Constructor
+        '''
+        self.__parameter_name = None
+        self.__parameter_type = None
+
+    def get_parameter_name(self):
+        return self.__parameter_name
+
+
+    def get_parameter_type(self):
+        return self.__parameter_type
+
+
+    def set_parameter_name(self, value):
+        self.__parameter_name = value
+
+
+    def set_parameter_type(self, value):
+        self.__parameter_type = value
+
+
+    def del_parameter_name(self):
+        del self.__parameter_name
+
+
+    def del_parameter_type(self):
+        del self.__parameter_type
+
+    parameter_name = property(get_parameter_name, set_parameter_name, del_parameter_name, "parameter_name's docstring")
+    parameter_type = property(get_parameter_type, set_parameter_type, del_parameter_type, "parameter_type's docstring")
+        
+        
+        
         
         

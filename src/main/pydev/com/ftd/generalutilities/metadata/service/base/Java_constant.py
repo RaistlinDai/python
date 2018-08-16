@@ -4,19 +4,16 @@ Created on Aug 14, 2018
 @author: ftd
 '''
 
-class MyClass(object):
+class Java_constant(object):
     '''
     classdocs
     '''
 
 
-    def __init__(self, params):
+    def __init__(self):
         '''
         Constructor
         '''
-        
-        # java end flag
-        self.JAVA_END_FLAG = ';'
         
         self.JAVA_KEY_PACKAGE = 'package'
         self.JAVA_KEY_IMPORT = 'import'
@@ -26,6 +23,17 @@ class MyClass(object):
         self.JAVA_KEY_EXTENDS = 'extends'
         self.JAVA_KEY_IMPLEMENTS = 'implements'
         
+        self.JAVA_KEY_PUBLIC = 'public'
+        self.JAVA_KEY_PROTECTED = 'protected'
+        self.JAVA_KEY_PRIVATE = 'private'
+        
+        # java end flag
+        self.JAVA_END_MARK = ';'
+        self.JAVA_SEPERATOR = ','
+        self.JAVA_RIGHT_BRACKET = ')'
+        self.JAVA_LEFT_BRACKET = '('
+        self.JAVA_RIGHT_BRACE = '}'
+        self.JAVA_LEFT_BRACE = '{'
         
         # java keywords
         self.JAVA_PRIMITIVE_TYPE_ARRAY = ["boolean", "char", "byte", "short", "int",

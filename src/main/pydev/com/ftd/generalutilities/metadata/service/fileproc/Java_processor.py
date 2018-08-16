@@ -9,8 +9,9 @@ import zipfile
 from jpype._jexception import JavaException
 from src.main.pydev.com.ftd.generalutilities.metadata.service.base.File_constant import File_constant
 from src.main.pydev.com.ftd.generalutilities.metadata.service.base.File_processor import File_processor
-from src.main.pydev.com.ftd.generalutilities.metadata.service.base import Java_constant
-from src.main.pydev.com.ftd.generalutilities.metadata.dto.javaFile.JavaDTO import JavaDTO
+from src.main.pydev.com.ftd.generalutilities.metadata.service.base.Java_constant import Java_constant
+from src.main.pydev.com.ftd.generalutilities.metadata.dto.javaFile.JavaDTO import JavaDTO,\
+    JavaMethodDTO, JavaParameterDTO
 
 class Java_processor(File_processor):
     '''
@@ -140,15 +141,150 @@ class Java_processor(File_processor):
         javaconstant = Java_constant()
         javaDTO = JavaDTO()
         
+        # marks
+        class_type = None
+        class_line_nbr = 0
+        class_start_mark = False
+        class_block_startln = -1
+        class_end_mark = False
+        method_start_mark = False
+        method_end_mark = False
+        method_block_startln = -1
+        method_block_count = 0
+        method_param_startIdx = -1
+        method_param_endIdx = -1
+        
         file = open(srcfile, 'r')
         # read java file line by line
         for eachline in file.readlines():
+            # line count
+            class_line_nbr = class_line_nbr + 1
+            
+            # trim the line
+            eachline = eachline.replace('\n', '')
+            
             # split the line by blank
             cells = eachline.split(' ')
             
+            # package
             if javaconstant.JAVA_KEY_PACKAGE in cells:
                 javaDTO.set_class_package(cells[cells.index(javaconstant.JAVA_KEY_PACKAGE)+1])
-        
+                
+            # imports
+            if javaconstant.JAVA_KEY_IMPORT in cells:
+                value = cells[cells.index(javaconstant.JAVA_KEY_IMPORT)+1].replace(javaconstant.JAVA_END_MARK, '')
+                javaDTO.push_class_imports(value)
+                
+            # class name
+            if javaconstant.JAVA_KEY_CLASS in cells:
+                #marks
+                class_start_mark = True
+                class_type = javaconstant.JAVA_KEY_CLASS
+                
+                value = cells[cells.index(javaconstant.JAVA_KEY_CLASS)+1]
+                if javaconstant.JAVA_LEFT_BRACE in value:
+                    subcells = value.split(javaconstant.JAVA_LEFT_BRACE)
+                    javaDTO.set_class_name(subcells[0])
+                    
+                    # class start line
+                    class_block_startln = class_line_nbr
+                else:
+                    javaDTO.set_class_name(value)
+                
+                javaDTO.set_class_type(javaconstant.JAVA_KEY_CLASS)
+            
+            # interface name
+            if javaconstant.JAVA_KEY_INTERFACE in cells:
+                #marks
+                class_start_mark = True
+                class_type = javaconstant.JAVA_KEY_INTERFACE
+                
+                value = cells[cells.index(javaconstant.JAVA_KEY_INTERFACE)+1]
+                if javaconstant.JAVA_LEFT_BRACE in value:
+                    subcells = value.split(javaconstant.JAVA_LEFT_BRACE)
+                    javaDTO.set_class_name(subcells[0])
+                    
+                    # class start line
+                    class_block_startln = class_line_nbr
+                else:
+                    javaDTO.set_class_name(value)
+                    
+                javaDTO.set_class_type(javaconstant.JAVA_KEY_INTERFACE)
+            
+            # extends
+            if javaconstant.JAVA_KEY_EXTENDS in cells:
+                value = cells[cells.index(javaconstant.JAVA_KEY_EXTENDS)+1]
+                javaDTO.set_class_extends(value)
+                
+            # implements
+            if javaconstant.JAVA_KEY_IMPLEMENTS in cells:
+                value = cells[cells.index(javaconstant.JAVA_KEY_IMPLEMENTS)+1]
+                
+                if (javaconstant.JAVA_SEPERATOR in value):
+                    # TODO: multiple interfaces
+                    if (value.index(javaconstant.JAVA_SEPERATOR) == len(value) - 1):
+                        javaDTO.push_class_implements(value[0:-1])
+                    else:
+                        subvalue = value.split(javaconstant.JAVA_SEPERATOR)
+                        for imps in subvalue:
+                            javaDTO.push_class_implements(imps)
+                else:
+                    javaDTO.push_class_implements(value)
+            
+            # class start line
+            if class_start_mark and class_block_startln == -1 and javaconstant.JAVA_LEFT_BRACE in cells:
+                # class start line
+                class_block_startln = class_line_nbr
+                
+            # --------- methods & properties ------------
+            # class inside
+            if class_start_mark and class_block_startln > 0 and not class_end_mark:
+                # find the method start point
+                if not method_start_mark and not method_end_mark:
+                    if javaconstant.JAVA_KEY_PUBLIC in cells or javaconstant.JAVA_KEY_PROTECTED in cells or javaconstant.JAVA_KEY_PRIVATE in cells:
+                        # distingush method and property
+                        
+                        # constructor
+                        if javaDTO.get_class_name() in cells:
+                            continue;
+                        
+                        # method
+                        if javaconstant.JAVA_LEFT_BRACKET in eachline:
+                            # method mark
+                            method_param_startIdx = eachline.index(javaconstant.JAVA_LEFT_BRACKET)
+                            new_method = JavaMethodDTO()
+                            
+                            # TODO: currently only parameters in one line could be processed
+                            if javaconstant.JAVA_RIGHT_BRACKET in eachline:
+                                # method mark
+                                method_param_endIdx = eachline.index(javaconstant.JAVA_RIGHT_BRACKET)
+                                    
+                            # --- method name & return
+                            if method_param_startIdx > 0:
+                                method_name_header = eachline[0:method_param_startIdx].strip(' ')
+                                subcells = method_name_header.split(' ')
+                                
+                                method_name = subcells[-1]
+                                new_method.set_method_name(method_name)
+                                
+                                return_type = subcells[-1]
+                                new_method.set_method_output(return_type)
+                                
+                            # -- parameters
+                            if method_param_startIdx > 0 and method_param_endIdx > 0:
+                                method_param_block = eachline[method_param_startIdx+1:method_param_endIdx]
+                                subcells = method_param_block.split(javaconstant.JAVA_SEPERATOR)
+                                
+                                for subparam in subcells:
+                                    internalcells = subparam.split(' ')
+                                    params = JavaParameterDTO()
+                                    params.set_parameter_name(internalcells[0])
+                                    params.set_parameter_type(internalcells[1])
+                                    new_method.push_method_inputs(params)
+                            
+                            # add method into DTO
+                            javaDTO.push_class_methods(new_method)
+                            
         file.close()
         return True, None, javaDTO
         

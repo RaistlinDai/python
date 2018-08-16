@@ -9,6 +9,7 @@ from src.main.pydev.com.ftd.generalutilities.metadata.gui.impl.base.FormatableFr
 from src.main.pydev.com.ftd.generalutilities.metadata.service.base.File_constant import File_constant
 from src.main.pydev.com.ftd.generalutilities.metadata.service.base.File_processor import File_processor
 from tkinter.messagebox import askyesno, showerror, showwarning
+from src.main.pydev.com.ftd.generalutilities.metadata.service.fileproc.Java_processor import Java_processor
 
 class Frame_serviceimpl_option(FormatableFrame):
     '''
@@ -89,7 +90,7 @@ class Frame_serviceimpl_option(FormatableFrame):
             canv2.pack()
             
             # analysis the api service class and generate the functions list
-            
+            self.analysis_api_service()
             
         else:
              #---- panel 02 ----------
@@ -218,7 +219,18 @@ class Frame_serviceimpl_option(FormatableFrame):
         '''
         decp_service_interface_name = self.__classlist[0]
         
+        # call the java processor
+        result, message, javaDTO = Java_processor.read_java_file(decp_service_interface_name)
         
+        if not result:
+            showerror('Error', message)
+            return False
+        
+        for javaMtd in javaDTO.get_class_methods():
+            self.__funclists[javaMtd.get_method_name()] = javaMtd
+            
+            #add items into list box
+            self.__listboxleft.insert(END, javaMtd.get_method_name())
         
         return True
     
