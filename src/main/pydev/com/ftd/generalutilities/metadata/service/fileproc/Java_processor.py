@@ -12,6 +12,7 @@ from src.main.pydev.com.ftd.generalutilities.metadata.service.base.File_processo
 from src.main.pydev.com.ftd.generalutilities.metadata.service.base.Java_constant import Java_constant
 from src.main.pydev.com.ftd.generalutilities.metadata.dto.javaFile.JavaDTO import JavaDTO,\
     JavaMethodDTO, JavaParameterDTO
+from pathlib import Path
 
 class Java_processor(File_processor):
     '''
@@ -290,7 +291,39 @@ class Java_processor(File_processor):
         
         
     @staticmethod
-    def read_java_keyword(cells):
+    def create_service_impl(filefullpath, filename, package, interDTO):
+        '''
+        create the serviceImpl file
+        @param filefullpath: the serviceImpl file full path
+        '''
+        javaconstant = Java_constant()
+        fileconstant = File_constant()
         
-        pass
+        # retrieve the imports in api package
+        imports = interDTO.get_class_imports()        
+        
+        Path(filefullpath).touch()
+        file = open(filefullpath, 'w')
+        
+        # write the class title
+        file.write(javaconstant.JAVA_ENTITY_TITLE)
+        file.write('\n')
+        
+        # ----- write the package -----
+        file.write(javaconstant.JAVA_KEY_PACKAGE + ' ' + package + javaconstant.JAVA_END_MARK + '\n')
+        file.write('\n')
+        
+        # ----- write the imports -----
+        for importcell in imports:
+            file.write(javaconstant.JAVA_KEY_IMPORT + ' ' + importcell + javaconstant.JAVA_END_MARK + '\n')
+        file.write('\n')
+        
+        
+        # ----- write the service annotation -----
+        tempStr = package + javaconstant.JAVA_DOT_MARK + filename.replace(fileconstant.JAVA_SUFFIX, '')
+        file.write(javaconstant.JAVA_SERVICE_ANNOTATION % tempStr + '\n')
+        
+        
+        
+        file.close()
         

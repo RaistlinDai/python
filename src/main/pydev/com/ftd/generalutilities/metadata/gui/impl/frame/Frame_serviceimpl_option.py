@@ -10,6 +10,7 @@ from src.main.pydev.com.ftd.generalutilities.metadata.service.base.File_constant
 from src.main.pydev.com.ftd.generalutilities.metadata.service.base.File_processor import File_processor
 from tkinter.messagebox import askyesno, showerror, showwarning
 from src.main.pydev.com.ftd.generalutilities.metadata.service.fileproc.Java_processor import Java_processor
+from src.main.pydev.com.ftd.generalutilities.metadata.service.base.Java_constant import Java_constant
 
 class Frame_serviceimpl_option(FormatableFrame):
     '''
@@ -39,7 +40,7 @@ class Frame_serviceimpl_option(FormatableFrame):
         self.__label01.pack(side=TOP, fill=X, ipady=10)
         
         #---- java validation flag
-        self.__errorflag = False
+        self.__error = False
         
         #---- panel 01 ----------
         canv1 = Canvas(self, height=30, width=550)
@@ -90,7 +91,18 @@ class Frame_serviceimpl_option(FormatableFrame):
             canv2.pack()
             
             # analysis the api service class and generate the functions list
-            self.analysis_api_service()
+            result, interDTO = self.__analysis_api_service()
+            
+            if not result:
+                return
+            else:
+                self.get_dtos().set_serviceInterDTO(interDTO)
+            
+            for javaMtd in interDTO.get_class_methods():
+                self.__funclists[javaMtd.get_method_name()] = javaMtd
+                
+                #add items into list box
+                self.__listboxleft.insert(END, javaMtd.get_method_name())
             
         else:
              #---- panel 02 ----------
@@ -116,10 +128,23 @@ class Frame_serviceimpl_option(FormatableFrame):
         overwrite the function in super class
         verify the input directory
         '''
-        if not self.__error:
+        if self.__error:
             showwarning('Warning', 'There are error existing, the ServiceImpl cannot be generated.')
-        else:
-            pass
+            return
+        
+        interDTO = self.get_dtos().get_serviceInterDTO()
+        # get the package name
+        pack_name = self.__analysis_package_name(interDTO.get_class_package())
+        
+        # verify the package folder and file
+        
+        
+        # TODO: write serviceImpl
+        Java_processor.create_service_impl(self.get_trans().get_workspacepath() + self.__feet.get(), self.__feet.get(), pack_name, interDTO)
+        
+        
+        
+        return True
         
         
     def validate_serviceimp(self):
@@ -213,26 +238,38 @@ class Frame_serviceimpl_option(FormatableFrame):
         return True, None, returnList
     
     
-    def analysis_api_service(self):
+    def __analysis_api_service(self):
         '''
         analysis the entityService._java file and generate the function list
         '''
         decp_service_interface_name = self.__classlist[0]
         
         # call the java processor
-        result, message, javaDTO = Java_processor.read_java_file(decp_service_interface_name)
+        result, message, interDTO = Java_processor.read_java_file(decp_service_interface_name)
         
         if not result:
             showerror('Error', message)
-            return False
+            return False, None
         
-        for javaMtd in javaDTO.get_class_methods():
-            self.__funclists[javaMtd.get_method_name()] = javaMtd
-            
-            #add items into list box
-            self.__listboxleft.insert(END, javaMtd.get_method_name())
+        return True, interDTO
+    
+    
+    def __analysis_package_name(self, package_name):
+        '''
+        analysis the package name
+        @return: serviceImpl_folder
+        '''
+        javaconstant = Java_constant()
+        package_parent_name = None    # package parent name
+        package_sub_name = None       # package self name
+        if javaconstant.JAVA_IMPL_PACKAGE_PREFIX in package_name:
+            temp_str = package_name[len(javaconstant.JAVA_IMPL_PACKAGE_PREFIX):]
+            package_parent_name = temp_str[:temp_str.index('.')]
+            package_sub_name = temp_str[temp_str.index('.')+1:].replace(javaconstant.JAVA_END_MARK,'')
         
-        return True
+        serviceImpl_folder = javaconstant.JAVA_ENTITY_SERVICEIMPL_PACKAGE % package_parent_name
+        
+        return serviceImpl_folder
     
     
     def __to_right_click_event(self, event):

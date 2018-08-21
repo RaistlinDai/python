@@ -5,6 +5,7 @@ Created on Jun 27, 2018
 '''
 from src.main.pydev.com.ftd.generalutilities.metadata.dto.xmlFile.viewmetadata.ViewMetadataDTO import ViewMetadataDTO
 from src.main.pydev.com.ftd.generalutilities.metadata.dto.xmlFile.resourcemetadata.ResourceMetadataDTO import ResourceMetadataDTO
+from src.main.pydev.com.ftd.generalutilities.metadata.dto.javaFile.JavaDTO import JavaDTO
 
 class EntityDTO(object):
     '''
@@ -15,11 +16,13 @@ class EntityDTO(object):
         #dtos
         viewDTO = ViewMetadataDTO()
         resourceDTO = ResourceMetadataDTO()
+        serviceInterDTO = JavaDTO()
         self.__dto = {'Entity':None,                      # entity name
                       'ViewFullPath':None,                # view metadata path
                       'ResourceFullPath':None,            # resource metadata path
                       'ViewMetaData':viewDTO,             # view metadata DTO
-                      'ResourceMetaData':resourceDTO      # resource metadata DTO
+                      'ResourceMetaData':resourceDTO,     # resource metadata DTO
+                      'ServiceInterDTO':serviceInterDTO,  # interface DTO
                       }
         
     
@@ -66,7 +69,18 @@ class EntityDTO(object):
         else:
             return None
         
-    
+        
+    def set_serviceInterDTO(self, value):
+        if self.__dto:
+            self.__dto['ServiceInterDTO'] = value
+        
+        
+    def get_serviceInterDTO(self):
+        if self.__dto:
+            return self.__dto['ServiceInterDTO']
+        else:
+            return None
+        
 #-------------------- resource metadata dto ---------
     def get_resourceDTO(self):
         if self.__dto:

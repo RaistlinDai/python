@@ -30,6 +30,7 @@ class Java_constant(object):
         # java end flag
         self.JAVA_END_MARK = ';'
         self.JAVA_SEPERATOR = ','
+        self.JAVA_DOT_MARK = '.'
         self.JAVA_RIGHT_BRACKET = ')'
         self.JAVA_LEFT_BRACKET = '('
         self.JAVA_RIGHT_BRACE = '}'
@@ -48,3 +49,21 @@ class Java_constant(object):
             "try", "volatile", "while"]
         
         self.JAVA_LITERAL_ARRAY = [ "null", "true", "false" ]
+        
+        self.JAVA_FUNCTION_CREATE = 'create'
+        self.JAVA_FUNCTION_UPDATE = 'update'
+        self.JAVA_FUNCTION_DELETE = 'delete'
+        self.JAVA_FUNCTION_FETCH = 'fetch'
+        self.JAVA_FUNCTION_CLEARINST = 'clearInstance'
+        
+        # --- impl jar service
+        self.JAVA_IMPL_PACKAGE_PREFIX = 'com.qad.financials.'
+        
+        self.JAVA_ENTITY_TITLE = '/*******************************************************************************\n * Copyright 2015 QAD Inc. All rights reserved.\n ******************************************************************************/\n'
+        
+        self.JAVA_ENTITY_SERVICEIMPL_PACKAGE = 'com.qad.erp.financials.%s.service.impl'
+        self.JAVA_ENTITY_DATACONTROLLER_PACKAGE = 'com.qad.erp.financials.%s.mvc.controller.data'
+        
+        self.JAVA_SERVICE_ANNOTATION = '@Service(\"%s\")'
+        
+        
