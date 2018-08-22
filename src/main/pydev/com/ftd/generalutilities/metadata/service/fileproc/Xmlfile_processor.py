@@ -6,7 +6,8 @@ Created on Jun 21, 2018
 import os
 import xml.dom.minidom
 from src.main.pydev.com.ftd.generalutilities.metadata.service.base.File_constant import File_constant
-from src.main.pydev.com.ftd.generalutilities.metadata.dto.xmlFile.resourcemetadata.ResourceMetadataDTO import ResourceMetadataDTO
+from src.main.pydev.com.ftd.generalutilities.metadata.dto.xmlFile.resourcemetadata.ResourceMetadataDTO import ResourceMetadataDTO,\
+    ViewParametersDTO, KeyField
 from src.main.pydev.com.ftd.generalutilities.metadata.dto.xmlFile.beanappcontext.BeansAppContextDTO import BeansAppContextDTO
 from src.main.pydev.com.ftd.generalutilities.metadata.service.base.File_processor import File_processor
 import xml.etree.ElementTree as ElementTree
@@ -177,6 +178,48 @@ class Xmlfile_processor(File_processor):
                                  root.getAttribute('IsSecure'), 
                                  prim_uri,
                                  entity_type)
+            
+            # --- HybridBrowseView ---
+            
+            
+            # --- BrowseView ---
+            
+            
+            # --- MaintView ---
+            
+            
+            # --- ViewParameters ---
+            tempViewDto = ViewParametersDTO()
+            views = dom.getElementsByTagName("ViewParameters")
+            for view in views:
+                if len(view.getElementsByTagName("EntityModule")) > 0 and view.getElementsByTagName("EntityModule")[0].firstChild:
+                    tempViewDto.set_entity_module(view.getElementsByTagName("EntityModule")[0].firstChild.data)
+                if len(view.getElementsByTagName("StoredViewKey")) > 0 and view.getElementsByTagName("StoredViewKey")[0].firstChild:
+                    tempViewDto.set_stored_view_key(view.getElementsByTagName("StoredViewKey")[0].firstChild.data)
+                if len(view.getElementsByTagName("UsesDomain")) > 0 and view.getElementsByTagName("UsesDomain")[0].firstChild:
+                    tempViewDto.set_uses_domain(view.getElementsByTagName("UsesDomain")[0].firstChild.data)
+                if len(view.getElementsByTagName("ResourceUrlPrefix")) > 0 and view.getElementsByTagName("ResourceUrlPrefix")[0].firstChild:
+                    tempViewDto.set_resource_url_prefix(view.getElementsByTagName("ResourceUrlPrefix")[0].firstChild.data)
+                if len(view.getElementsByTagName("DataResource")) > 0 and view.getElementsByTagName("DataResource")[0].firstChild:
+                    tempViewDto.set_data_resource(view.getElementsByTagName("DataResource")[0].firstChild.data)
+                if len(view.getElementsByTagName("Table")) > 0 and view.getElementsByTagName("Table")[0].firstChild:
+                    tempViewDto.set_table(view.getElementsByTagName("Table")[0].firstChild.data)
+                    print(tempViewDto.get_table())
+                if len(view.getElementsByTagName("KeyFields")) > 0:
+                    firstkeys = view.getElementsByTagName("KeyFields")[0]
+                    for subkey in firstkeys.getElementsByTagName("KeyField"):
+                        keyDto = KeyField()
+                        if len(subkey.getElementsByTagName("BrowseKeyField")) > 0 and subkey.getElementsByTagName("BrowseKeyField")[0].firstChild:
+                            keyDto.set_browse_key_field(subkey.getElementsByTagName("BrowseKeyField")[0].firstChild.data)
+                        if len(subkey.getElementsByTagName("EntityKeyField")) > 0 and subkey.getElementsByTagName("EntityKeyField")[0].firstChild:
+                            keyDto.set_entity_key_field(subkey.getElementsByTagName("EntityKeyField")[0].firstChild.data)
+                        if len(subkey.getElementsByTagName("IsParentForeignKey")) > 0 and subkey.getElementsByTagName("IsParentForeignKey")[0].firstChild:
+                            keyDto.set_is_parent_foreign_key(subkey.getElementsByTagName("IsParentForeignKey")[0].firstChild.data)
+                            
+                        tempViewDto.push_key_field(keyDto)
+            
+            resDto.set_view_parameters(tempViewDto)
+                    
         else:
             return False, 'This is not a valid resource metadata, please check.'
         

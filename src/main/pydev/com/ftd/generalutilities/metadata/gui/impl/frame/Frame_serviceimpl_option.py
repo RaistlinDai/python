@@ -55,7 +55,7 @@ class Frame_serviceimpl_option(FormatableFrame):
         canv1.pack()
         
         #analysis the serviceImpl
-        self.__result, self.__error, self.__classlist = self.validate_serviceimp()
+        self.__result, self.__error, self.__classlist = self.__validate_javas()
         
         if self.__result:
             #---- panel 02 ----------
@@ -103,6 +103,11 @@ class Frame_serviceimpl_option(FormatableFrame):
                 
                 #add items into list box
                 self.__listboxleft.insert(END, javaMtd.get_method_name())
+                
+            # analysis the container and factory
+            self.__analysis_container_and_factory()
+            
+            
             
         else:
              #---- panel 02 ----------
@@ -140,16 +145,20 @@ class Frame_serviceimpl_option(FormatableFrame):
         
         
         # TODO: write serviceImpl
-        Java_processor.create_service_impl(self.get_trans().get_workspacepath() + self.__feet.get(), self.__feet.get(), pack_name, interDTO)
+        Java_processor.create_service_impl(self.get_trans().get_workspacepath() + self.__feet.get(), self.__feet.get(), pack_name, interDTO, self.get_dtos())
         
         
         
         return True
         
         
-    def validate_serviceimp(self):
+    def __validate_javas(self):
         '''
         analysis the serviceImpl according to ResourceMetadataDTO in self.__resDto
+        '''
+        
+        '''
+        step 1. retrieve the api/impl file directory
         '''
         #get the entity info
         transDto = self.get_trans()
@@ -162,8 +171,6 @@ class Frame_serviceimpl_option(FormatableFrame):
         prim_uri = resDto.get_primary_secure_uri()
         entity_interface = prim_uri[prim_uri.rindex(':')+1:]
         package_list = entity_interface.split('.')
-        
-        print(package_list)
         
         #verify if the java decompiled files existing
         fileconstant = File_constant()
@@ -183,6 +190,11 @@ class Frame_serviceimpl_option(FormatableFrame):
                 impl_unzip_path = impl_unzip_path + fileconstant.IMPL_FOLDER
             idx = idx + 1
         
+        
+        print(api_unzip_path)
+        print(impl_unzip_path)
+        
+        
         # the service & factory interface
         # TODO: this is a hardcode style, should be enhancement later!!!
         business_entity_name = package_list[-1][1:]
@@ -190,8 +202,8 @@ class Frame_serviceimpl_option(FormatableFrame):
         self.__feet.set(serviceImpl_name)
         
         # Validate the Api package
-        decp_service_interface_name = business_entity_name + fileconstant.JAVA_SERVICE_INTERFACE + fileconstant.DEPOMPILE_JAVA_SUFFIX
-        decp_factory_interface_name = business_entity_name + fileconstant.JAVA_FACTORY_INTERFACE + fileconstant.DEPOMPILE_JAVA_SUFFIX
+        decp_service_interface_name = business_entity_name + fileconstant.JAVA_SERVICE_SUFFIX + fileconstant.DEPOMPILE_JAVA_SUFFIX
+        decp_factory_interface_name = business_entity_name + fileconstant.JAVA_FACTORY_SUFFIX + fileconstant.DEPOMPILE_JAVA_SUFFIX
         
         if not File_processor.verify_dir_existing(api_unzip_path):
             message = 'There is no api package for entity %s,\n please check your api jar!' % business_entity_name
@@ -211,8 +223,8 @@ class Frame_serviceimpl_option(FormatableFrame):
         
         
         # Validate the Impl package                
-        decp_service_impl_name = fileconstant.JAVA_QRA_PREFIX + business_entity_name + fileconstant.JAVA_SERVICE_INTERFACE + fileconstant.DEPOMPILE_JAVA_SUFFIX
-        decp_factory_impl_name = fileconstant.JAVA_QRA_PREFIX + business_entity_name + fileconstant.JAVA_FACTORY_INTERFACE + fileconstant.DEPOMPILE_JAVA_SUFFIX
+        decp_service_impl_name = fileconstant.JAVA_QRA_PREFIX + business_entity_name + fileconstant.JAVA_SERVICE_SUFFIX + fileconstant.DEPOMPILE_JAVA_SUFFIX
+        decp_factory_impl_name = fileconstant.JAVA_QRA_PREFIX + business_entity_name + fileconstant.JAVA_FACTORY_SUFFIX + fileconstant.DEPOMPILE_JAVA_SUFFIX
         
         if not File_processor.verify_dir_existing(impl_unzip_path):
             message = 'There is no serviceImpl package for entity %s,\n please check your impl jar!' % business_entity_name
@@ -238,6 +250,35 @@ class Frame_serviceimpl_option(FormatableFrame):
         return True, None, returnList
     
     
+    def validate_container(self):
+        '''
+        analysis the serviceImpl according to ResourceMetadataDTO in self.__resDto
+        '''
+        fileconstant = File_constant()
+        entityDto = self.get_dtos()
+        transDto = self.get_trans()
+        resDto = entityDto.get_resourceDTO()
+        
+        #get the entity interface
+        entityName = entityDto.get_entityname()
+        prim_uri = resDto.get_primary_secure_uri()
+        entity_interface = prim_uri[prim_uri.rindex(':')+1:]
+        package_list = entity_interface.split('.')
+        
+        #--- the entity name
+        entityDSName = entityDto.get_resourceDTO().get_view_parameters().get_data_resource()
+        
+        #--- the container interface name
+        containerName = entityDSName[:1].upper() + entityDSName[1:-1] + fileconstant.JAVA_CONTAINER_SUFFIX + fileconstant.JAVA_SUFFIX
+        #--- the factory interface name
+        factoryName = entityDSName[:1].upper() + entityDSName[1:-1] + fileconstant.JAVA_FACTORY_SUFFIX + fileconstant.JAVA_SUFFIX
+        
+        
+        print(containerName)
+        print(factoryName)
+        
+        
+    
     def __analysis_api_service(self):
         '''
         analysis the entityService._java file and generate the function list
@@ -252,6 +293,15 @@ class Frame_serviceimpl_option(FormatableFrame):
             return False, None
         
         return True, interDTO
+    
+    
+    def __analysis_container_and_factory(self):
+        '''
+        analysis the entitycontainer._java file
+        '''
+        pass
+        
+        
     
     
     def __analysis_package_name(self, package_name):

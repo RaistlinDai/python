@@ -291,7 +291,7 @@ class Java_processor(File_processor):
         
         
     @staticmethod
-    def create_service_impl(filefullpath, filename, package, interDTO):
+    def create_service_impl(filefullpath, filename, package, interDTO, entityDTO):
         '''
         create the serviceImpl file
         @param filefullpath: the serviceImpl file full path
@@ -299,13 +299,15 @@ class Java_processor(File_processor):
         javaconstant = Java_constant()
         fileconstant = File_constant()
         
+        servicename = filename.replace(fileconstant.JAVA_SUFFIX, '')
+        
         # retrieve the imports in api package
         imports = interDTO.get_class_imports()        
         
         Path(filefullpath).touch()
         file = open(filefullpath, 'w')
         
-        # write the class title
+        # ----- write the class comments title -----
         file.write(javaconstant.JAVA_ENTITY_TITLE)
         file.write('\n')
         
@@ -320,9 +322,12 @@ class Java_processor(File_processor):
         
         
         # ----- write the service annotation -----
-        tempStr = package + javaconstant.JAVA_DOT_MARK + filename.replace(fileconstant.JAVA_SUFFIX, '')
+        tempStr = package + javaconstant.JAVA_DOT_MARK + servicename
         file.write(javaconstant.JAVA_SERVICE_ANNOTATION % tempStr + '\n')
         
+        # ----- write the class header -----
+        tempStr = javaconstant.JAVA_SERVICE_HEADER % (servicename, 'aa', 'bb')
+        file.write(tempStr + '\n')
         
         
         file.close()

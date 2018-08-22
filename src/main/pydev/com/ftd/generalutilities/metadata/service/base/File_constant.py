@@ -58,8 +58,9 @@ class File_constant(object):
         self.API_FOLDER = 'api\\'
         
         # ----------- The java service and interface -------
-        self.JAVA_SERVICE_INTERFACE = 'Service'
-        self.JAVA_FACTORY_INTERFACE = 'Factory'
+        self.JAVA_SERVICE_SUFFIX = 'Service'
+        self.JAVA_FACTORY_SUFFIX = 'Factory'
+        self.JAVA_CONTAINER_SUFFIX ='Container'
         self.JAVA_QRA_PREFIX = 'Qra'
         self.SERVICEIMPL_SUFFIX = 'ServiceImpl'
         

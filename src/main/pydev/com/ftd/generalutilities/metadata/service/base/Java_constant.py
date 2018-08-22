@@ -66,4 +66,4 @@ class Java_constant(object):
         
         self.JAVA_SERVICE_ANNOTATION = '@Service(\"%s\")'
         
-        
+        self.JAVA_SERVICE_HEADER = 'public class %s extends FinQraEntityService<%s, %s> {'
