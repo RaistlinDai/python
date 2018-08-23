@@ -37,6 +37,7 @@ class Java_constant(object):
         self.JAVA_LEFT_BRACE = '{'
         self.JAVA_LEFT_COMMENT = '/*'
         self.JAVA_RIGHT_COMMENT = '*/'
+        self.JAVA_TAB = '\t'
         
         # java keywords
         self.JAVA_PRIMITIVE_TYPE_ARRAY = ["boolean", "char", "byte", "short", "int",
@@ -61,6 +62,13 @@ class Java_constant(object):
         # --- impl jar service
         self.JAVA_IMPL_PACKAGE_PREFIX = 'com.qad.financials.'
         
+        
+        # ---------------------------------------------------------------- #
+        #                  annotation                                      #
+        # ---------------------------------------------------------------- #
+        self.JAVA_ANNOTATION_SERVICE = '@Service(\"%s\")'
+        self.JAVA_ANNOTATION_OVERRIDE = '@Override'
+        
         # ---------------------------------------------------------------- #
         #                  serviceImpl.java                                #
         # ---------------------------------------------------------------- #
@@ -68,8 +76,6 @@ class Java_constant(object):
         
         self.JAVA_ENTITY_SERVICEIMPL_PACKAGE = 'com.qad.erp.financials.%s.service.impl'
         self.JAVA_ENTITY_DATACONTROLLER_PACKAGE = 'com.qad.erp.financials.%s.mvc.controller.data'
-        
-        self.JAVA_SERVICE_ANNOTATION = '@Service(\"%s\")'
         
         self.JAVA_SERVICE_HEADER = 'public class %s extends FinQraEntityService<%s, %s> {'
         
@@ -84,6 +90,26 @@ class Java_constant(object):
         self.JAVA_SERVICE_IMPORT_QRA_WORKSPACE_UTIL = 'import com.qad.qracore.util.QraWorkspaceUtil;'
         self.JAVA_SERVICE_IMPORT_SUBMIT_RESULTANDDATA = 'import com.qad.qraview.dto.SubmitResultAndData;'
         self.JAVA_SERVICE_IMPORT_API_DATAGRAPH = 'import commonj.sdo.DataGraph;'
+        
+        
+        
+        # ----------------- Code format ----------------#
+        # initialize()
+        self.JAVA_SERVICE_OVERRIDE_INITIALIZE = [self.JAVA_ANNOTATION_OVERRIDE,
+                                                 'public %s initialize() {',
+                                                 self.JAVA_TAB + 'String str1 = QraWorkspaceUtil.getFinancialEntityCode(sessionDataHolder.getCurrentWorkspace());',
+                                                 '\n',
+                                                 self.JAVA_TAB + '%s container = (%s) factory.%s();',
+                                                 '\n',
+                                                 self.JAVA_TAB + 'Holder<DataGraph> holder = new Holder<DataGraph>((DataGraph) container.getProDataGraph());',
+                                                 '\n',
+                                                 self.JAVA_TAB + 'Holder<String> %sHolder = new com.qad.qra.Holder<String>();',
+                                                 '\n',
+                                                 self.JAVA_TAB + 'factory.get%s().%s(str1, holder, %sHolder);',
+                                                 self.JAVA_TAB + 'container.setProDataGraph((ProDataGraph) holder.getValue());',
+                                                 self.JAVA_TAB + 'return container;',
+                                                 self.JAVA_RIGHT_BRACE]
+        
         
         
         
