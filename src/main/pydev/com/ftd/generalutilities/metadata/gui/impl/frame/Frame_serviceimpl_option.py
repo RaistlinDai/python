@@ -57,76 +57,77 @@ class Frame_serviceimpl_option(FormatableFrame):
         
         #analysis the serviceImpl
         self.__result, self.__error, self.__classlist = self.__validate_javas()
-        
-        if self.__result:
+        if not self.__result:
             #---- panel 02 ----------
-            canv2 = Canvas(self, height=150, width=550)
-            #label01
-            self.__label01 = Label(canv2, text='Select the functions :')
-            self.__label01.place(height=20, width=150, relx=0.01, rely=0.05)
-            #left listbox and scrollbar
-            self.__listboxleft = Listbox(canv2, width=30)
-            self.__scrollleft = Scrollbar(canv2)
-            self.__listboxleft.config(yscrollcommand = self.__scrollleft.set)
-            self.__listboxleft.place(height=120, width=220, relx=0.02, rely=0.18)
-            self.__scrollleft.place(height=120, width=20, relx=0.42, rely=0.18)
-            self.__scrollleft.config(command = self.__listboxleft.yview)
-            
-            #middle buttons
-            self.__button01 = Button(canv2, text='>>', relief=RAISED, cursor='hand2')
-            self.__button01.bind('<Button-1>', self.__to_right_click_event) #bind button click event
-            self.__button01.place(height=35, width=25, relx=0.465, rely=0.3)
-            
-            self.__button02 = Button(canv2, text='<<', relief=RAISED, cursor='hand2')
-            self.__button02.bind('<Button-1>', self.__to_left_click_event) #bind button click event
-            self.__button02.place(height=35, width=25, relx=0.465, rely=0.6)
-            
-            #right listbox and scrollbar
-            self.__listboxright = Listbox(canv2, width=30)
-            self.__scrollright = Scrollbar(canv2)
-            self.__listboxright.config(yscrollcommand = self.__scrollright.set)
-            self.__listboxright.place(height=120, width=220, relx=0.52, rely=0.18)
-            self.__scrollright.place(height=120, width=20, relx=0.92, rely=0.18)
-            self.__scrollright.config(command = self.__listboxright.yview)
+            self.__pack_errorpanel()
+            return
         
-            canv2.pack()
-            
-            # --------- analysis the api service class and generate the functions list
-            result, serviceInterDTO = self.__analysis_service_interface()
-            if not result:
-                return
-            else:
-                self.get_dtos().set_serviceInterDTO(serviceInterDTO)
-            
-            for javaMtd in serviceInterDTO.get_class_methods():
-                self.__funclists[javaMtd.get_method_name()] = javaMtd
-                
-                #add items into list box
-                self.__listboxleft.insert(END, javaMtd.get_method_name())
-            
-            # --------- analysis the factory
-            result, factoryInterDTO = self.__analysis_factory_interface()
-            if not result:
-                return
-            else:
-                self.get_dtos().set_factoryInterDTO(factoryInterDTO)
-                
-            # --------- analysis the container
-            result, containerInterDTO = self.__analysis_container_interface()
-            if not result:
-                return
-            else:
-                self.get_dtos().set_entContInterDTO(containerInterDTO)
-                
-            
+        # --------- analysis the api service
+        self.__result, self.__error, serviceInterDTO = self.__analysis_service_interface()
+        if not self.__result:
+            #---- panel 02 ----------
+            self.__pack_errorpanel()
+            return
         else:
-             #---- panel 02 ----------
-            canv2 = Canvas(self, height=50, width=550)
-            #label01
-            self.__label01 = Label(canv2, text=self.__error, fg='red')
-            self.__label01.place(height=40, width=500, relx=0.01, rely=0.05)     
+            self.get_dtos().set_serviceInterDTO(serviceInterDTO)
         
-            canv2.pack()
+        # --------- analysis the factory
+        self.__result, self.__error, factoryInterDTO = self.__analysis_factory_interface()
+        if not self.__result:
+            #---- panel 02 ----------
+            self.__pack_errorpanel()
+            return
+        else:
+            self.get_dtos().set_factoryInterDTO(factoryInterDTO)
+            
+        # --------- analysis the container
+        self.__result, containerInterDTO = self.__analysis_container_interface()
+        if not self.__result:
+            #---- panel 02 ----------
+            self.__pack_errorpanel()
+            return
+        else:
+            self.get_dtos().set_entContInterDTO(containerInterDTO)
+
+        
+        #---- panel 02 ----------
+        canv2 = Canvas(self, height=150, width=550)
+        #label01
+        self.__label01 = Label(canv2, text='Select the functions :')
+        self.__label01.place(height=20, width=150, relx=0.01, rely=0.05)
+        #left listbox and scrollbar
+        self.__listboxleft = Listbox(canv2, width=30)
+        self.__scrollleft = Scrollbar(canv2)
+        self.__listboxleft.config(yscrollcommand = self.__scrollleft.set)
+        self.__listboxleft.place(height=120, width=220, relx=0.02, rely=0.18)
+        self.__scrollleft.place(height=120, width=20, relx=0.42, rely=0.18)
+        self.__scrollleft.config(command = self.__listboxleft.yview)
+        
+        #middle buttons
+        self.__button01 = Button(canv2, text='>>', relief=RAISED, cursor='hand2')
+        self.__button01.bind('<Button-1>', self.__to_right_click_event) #bind button click event
+        self.__button01.place(height=35, width=25, relx=0.465, rely=0.3)
+        
+        self.__button02 = Button(canv2, text='<<', relief=RAISED, cursor='hand2')
+        self.__button02.bind('<Button-1>', self.__to_left_click_event) #bind button click event
+        self.__button02.place(height=35, width=25, relx=0.465, rely=0.6)
+        
+        #right listbox and scrollbar
+        self.__listboxright = Listbox(canv2, width=30)
+        self.__scrollright = Scrollbar(canv2)
+        self.__listboxright.config(yscrollcommand = self.__scrollright.set)
+        self.__listboxright.place(height=120, width=220, relx=0.52, rely=0.18)
+        self.__scrollright.place(height=120, width=20, relx=0.92, rely=0.18)
+        self.__scrollright.config(command = self.__listboxright.yview)
+    
+        canv2.pack()
+        
+        #set the function list to the left box
+        for javaMtd in serviceInterDTO.get_class_methods():
+            self.__funclists[javaMtd.get_method_name()] = javaMtd
+            
+            #add items into list box
+            self.__listboxleft.insert(END, javaMtd.get_method_name())
         
     
     #overwrite create_widges
@@ -153,8 +154,18 @@ class Frame_serviceimpl_option(FormatableFrame):
         # TODO: write serviceImpl
         Java_processor.create_service_impl(self.get_trans().get_workspacepath() + self.__feet.get(), self.__feet.get(), self.get_dtos())
         
-        
         return True
+        
+        
+    def __pack_errorpanel(self):
+        '''
+        pack the error panel
+        '''
+        canv2 = Canvas(self, height=50, width=550)
+        #label01
+        self.__label01 = Label(canv2, text=self.__error, fg='red')
+        self.__label01.place(height=40, width=500, relx=0.01, rely=0.05)     
+        canv2.pack()
         
         
     def __validate_javas(self):
@@ -285,12 +296,11 @@ class Frame_serviceimpl_option(FormatableFrame):
         # service interface
         decp_service_interface_name = self.__classlist[0]
         # call the java processor
-        result, message, serviceInterDTO = Java_processor.read_java_file(decp_service_interface_name)
+        result, message, serviceInterDTO = Java_processor.read_java_interface(decp_service_interface_name)
         if not result:
-            showerror('Error', message)
-            return False, None
+            return False, message, None
         
-        return True, serviceInterDTO
+        return True, None, serviceInterDTO
     
     
     def __analysis_factory_interface(self):
@@ -300,12 +310,11 @@ class Frame_serviceimpl_option(FormatableFrame):
         # entity factory interface
         entity_factory_interface_name = self.__classlist[1]
         # call the java processor
-        result, message, factoryInterDTO = Java_processor.read_java_file(entity_factory_interface_name)
+        result, message, factoryInterDTO = Java_processor.read_java_interface(entity_factory_interface_name)
         if not result:
-            showerror('Error', message)
-            return False, None
+            return False, message, None
         
-        return True, factoryInterDTO
+        return True, None, factoryInterDTO
     
     
     def __analysis_container_interface(self):
@@ -315,12 +324,11 @@ class Frame_serviceimpl_option(FormatableFrame):
         # entity container interface
         entity_container_interface_name = self.__classlist[4]
         # call the java processor
-        result, message, containerInterDTO = Java_processor.read_java_file(entity_container_interface_name)
+        result, message, containerInterDTO = Java_processor.read_java_interface(entity_container_interface_name)
         if not result:
-            showerror('Error', message)
-            return False, None
+            return False, message, None
         
-        return True, containerInterDTO
+        return True, None, containerInterDTO
     
     
     def __to_right_click_event(self, event):

@@ -130,10 +130,10 @@ class Java_processor(File_processor):
     
     
     @staticmethod
-    def read_java_file(srcfile):
+    def read_java_interface(srcfile):
         '''
-        read and analysis the java file, output the information in JavaDTO
-        NOTE: this is a light weight reador for java file. Generally we should use java reflection
+        read and analysis the java interface, output the information in JavaDTO
+        NOTE: this is a light weight reader for java file. Generally we should use java reflection
         @param srcfile: the java file
         '''
         if not File_processor.verify_dir_existing(srcfile):
@@ -165,7 +165,7 @@ class Java_processor(File_processor):
             eachline = eachline.replace('\n', '')
             
             # split the line by blank
-            cells = eachline.split(' ')
+            cells = eachline.lstrip().split(' ')
             
             # package
             if javaconstant.JAVA_KEY_PACKAGE in cells:
@@ -179,20 +179,7 @@ class Java_processor(File_processor):
             # class name
             if javaconstant.JAVA_KEY_CLASS in cells:
                 #marks
-                class_start_mark = True
-                class_type = javaconstant.JAVA_KEY_CLASS
-                
-                value = cells[cells.index(javaconstant.JAVA_KEY_CLASS)+1]
-                if javaconstant.JAVA_LEFT_BRACE in value:
-                    subcells = value.split(javaconstant.JAVA_LEFT_BRACE)
-                    javaDTO.set_class_name(subcells[0])
-                    
-                    # class start line
-                    class_block_startln = class_line_nbr
-                else:
-                    javaDTO.set_class_name(value)
-                
-                javaDTO.set_class_type(javaconstant.JAVA_KEY_CLASS)
+                pass
             
             # interface name
             if javaconstant.JAVA_KEY_INTERFACE in cells:
@@ -290,6 +277,36 @@ class Java_processor(File_processor):
                             
         file.close()
         return True, None, javaDTO
+     
+     
+    @staticmethod
+    def read_java_class(srcfile, javaDTO): 
+        '''
+        read and analysis the java class, get the functions' parameters and set them in JavaDTO
+        NOTE: this is a light weight reader for java file. Generally we should use java reflection
+              it only process the functions' parameters
+        @param srcfile: the java file
+        @param javaDTO: the java DTO generated from interface reader
+        '''
+        if not File_processor.verify_dir_existing(srcfile):
+            return False, "File not exist!", None
+        
+        javaconstant = Java_constant()
+        class_line_nbr = 0
+        
+        file = open(srcfile, 'r')
+        # read java file line by line
+        for eachline in file.readlines():
+            # line count
+            class_line_nbr = class_line_nbr + 1
+            
+            # trim the line
+            eachline = eachline.replace('\n', '')
+            
+            
+            
+            
+            
         
         
     @staticmethod
@@ -373,9 +390,7 @@ class Java_processor(File_processor):
         if factory_inter_package not in import_list:
             file.write(factory_inter_package + '\n')   # import factory interface
             import_list.append(factory_inter_package)
-        
         file.write('\n')
-        
         
         # ----- write the service annotation -----
         tempStr = pack_name + javaconstant.JAVA_DOT_MARK + service_name
@@ -388,7 +403,7 @@ class Java_processor(File_processor):
         
         
         # ----- write the class ender -----
-        file.write(javaconstant.JAVA_RIGHT_BRACE)
+        file.write('\n' + javaconstant.JAVA_RIGHT_BRACE)
         file.close()
         
     

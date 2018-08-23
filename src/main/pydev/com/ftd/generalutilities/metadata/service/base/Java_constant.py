@@ -35,6 +35,8 @@ class Java_constant(object):
         self.JAVA_LEFT_BRACKET = '('
         self.JAVA_RIGHT_BRACE = '}'
         self.JAVA_LEFT_BRACE = '{'
+        self.JAVA_LEFT_COMMENT = '/*'
+        self.JAVA_RIGHT_COMMENT = '*/'
         
         # java keywords
         self.JAVA_PRIMITIVE_TYPE_ARRAY = ["boolean", "char", "byte", "short", "int",
