@@ -277,10 +277,12 @@ class Java_processor(File_processor):
                                 subcells = method_param_block.split(javaconstant.JAVA_SEPERATOR)
                                 
                                 for subparam in subcells:
-                                    internalcells = subparam.split(' ')
+                                    internalcells = subparam.lstrip().split(' ')
+                                    if len(internalcells) > 0:
+                                        continue
                                     params = JavaParameterDTO()
-                                    params.set_parameter_name(internalcells[0])
-                                    params.set_parameter_type(internalcells[1])
+                                    params.set_parameter_name(internalcells[1])
+                                    params.set_parameter_type(internalcells[0])
                                     new_method.push_method_inputs(params)
                             
                             # add method into DTO
@@ -291,7 +293,7 @@ class Java_processor(File_processor):
         
         
     @staticmethod
-    def create_service_impl(filefullpath, filename, package, interDTO, entityDTO):
+    def create_service_impl(filefullpath, filename, entityDTO):
         '''
         create the serviceImpl file
         @param filefullpath: the serviceImpl file full path
@@ -299,10 +301,17 @@ class Java_processor(File_processor):
         javaconstant = Java_constant()
         fileconstant = File_constant()
         
-        servicename = filename.replace(fileconstant.JAVA_SUFFIX, '')
+        # get the package name
+        pack_name = Java_processor.analysis_package_name(entityDTO.get_serviceInterDTO().get_class_package())
+        # get the serviceImpl name
+        service_name = filename.replace(fileconstant.JAVA_SUFFIX, '')
+        # get the container interface name
+        container_inter_name = entityDTO.get_entContInterDTO().get_class_name()
+        # get the factory interface name
+        factory_inter_name = entityDTO.get_factoryInterDTO().get_class_name()
         
         # retrieve the imports in api package
-        imports = interDTO.get_class_imports()        
+        imports = entityDTO.get_serviceInterDTO().get_class_imports()        
         
         Path(filefullpath).touch()
         file = open(filefullpath, 'w')
@@ -312,23 +321,91 @@ class Java_processor(File_processor):
         file.write('\n')
         
         # ----- write the package -----
-        file.write(javaconstant.JAVA_KEY_PACKAGE + ' ' + package + javaconstant.JAVA_END_MARK + '\n')
+        file.write(javaconstant.JAVA_KEY_PACKAGE + ' ' + pack_name + javaconstant.JAVA_END_MARK + '\n')
         file.write('\n')
         
         # ----- write the imports -----
+        import_list = []
         for importcell in imports:
             file.write(javaconstant.JAVA_KEY_IMPORT + ' ' + importcell + javaconstant.JAVA_END_MARK + '\n')
+            import_list.append(javaconstant.JAVA_KEY_IMPORT + ' ' + importcell + javaconstant.JAVA_END_MARK)
+        
+        if javaconstant.JAVA_SERVICE_IMPORT_SPRING_FRAME not in import_list:
+            file.write(javaconstant.JAVA_SERVICE_IMPORT_SPRING_FRAME + '\n')
+            import_list.append(javaconstant.JAVA_SERVICE_IMPORT_SPRING_FRAME)
+        if javaconstant.JAVA_SERVICE_IMPORT_PRO_DATAGRAPH not in import_list:
+            file.write(javaconstant.JAVA_SERVICE_IMPORT_PRO_DATAGRAPH + '\n')
+            import_list.append(javaconstant.JAVA_SERVICE_IMPORT_PRO_DATAGRAPH)
+        if javaconstant.JAVA_SERVICE_IMPORT_FIN_QRA_ENTITYSERVICE not in import_list:
+            file.write(javaconstant.JAVA_SERVICE_IMPORT_FIN_QRA_ENTITYSERVICE + '\n')
+            import_list.append(javaconstant.JAVA_SERVICE_IMPORT_FIN_QRA_ENTITYSERVICE)
+        if javaconstant.JAVA_SERVICE_IMPORT_API_EXCEPTION not in import_list:
+            file.write(javaconstant.JAVA_SERVICE_IMPORT_API_EXCEPTION + '\n')
+            import_list.append(javaconstant.JAVA_SERVICE_IMPORT_API_EXCEPTION)
+        if javaconstant.JAVA_SERVICE_IMPORT_CONNECTION_MANAGER not in import_list:
+            file.write(javaconstant.JAVA_SERVICE_IMPORT_CONNECTION_MANAGER + '\n')
+            import_list.append(javaconstant.JAVA_SERVICE_IMPORT_CONNECTION_MANAGER)
+        if javaconstant.JAVA_SERVICE_IMPORT_CONTEXT not in import_list:
+            file.write(javaconstant.JAVA_SERVICE_IMPORT_CONTEXT + '\n')
+            import_list.append(javaconstant.JAVA_SERVICE_IMPORT_CONTEXT)
+        if javaconstant.JAVA_SERVICE_IMPORT_HOLDER not in import_list:
+            file.write(javaconstant.JAVA_SERVICE_IMPORT_HOLDER + '\n')
+            import_list.append(javaconstant.JAVA_SERVICE_IMPORT_HOLDER)
+        if javaconstant.JAVA_SERVICE_IMPORT_EXCEPTION_UTIL not in import_list:
+            file.write(javaconstant.JAVA_SERVICE_IMPORT_EXCEPTION_UTIL + '\n')
+            import_list.append(javaconstant.JAVA_SERVICE_IMPORT_EXCEPTION_UTIL)
+        if javaconstant.JAVA_SERVICE_IMPORT_QRA_WORKSPACE_UTIL not in import_list:
+            file.write(javaconstant.JAVA_SERVICE_IMPORT_QRA_WORKSPACE_UTIL + '\n')
+            import_list.append(javaconstant.JAVA_SERVICE_IMPORT_QRA_WORKSPACE_UTIL)
+        if javaconstant.JAVA_SERVICE_IMPORT_SUBMIT_RESULTANDDATA not in import_list:
+            file.write(javaconstant.JAVA_SERVICE_IMPORT_SUBMIT_RESULTANDDATA + '\n')
+            import_list.append(javaconstant.JAVA_SERVICE_IMPORT_SUBMIT_RESULTANDDATA)
+        if javaconstant.JAVA_SERVICE_IMPORT_API_DATAGRAPH not in import_list:
+            file.write(javaconstant.JAVA_SERVICE_IMPORT_API_DATAGRAPH + '\n')
+            import_list.append(javaconstant.JAVA_SERVICE_IMPORT_API_DATAGRAPH)
+        
+        container_inter_package = javaconstant.JAVA_KEY_IMPORT + ' ' + entityDTO.get_entContInterDTO().get_class_package()[:-1] + javaconstant.JAVA_DOT_MARK + container_inter_name + javaconstant.JAVA_END_MARK
+        if container_inter_package not in import_list:
+            file.write(container_inter_package + '\n')   # import container interface
+            import_list.append(container_inter_package)
+        
+        factory_inter_package = javaconstant.JAVA_KEY_IMPORT + ' ' + entityDTO.get_factoryInterDTO().get_class_package()[:-1] + javaconstant.JAVA_DOT_MARK + factory_inter_name + javaconstant.JAVA_END_MARK
+        if factory_inter_package not in import_list:
+            file.write(factory_inter_package + '\n')   # import factory interface
+            import_list.append(factory_inter_package)
+        
         file.write('\n')
         
         
         # ----- write the service annotation -----
-        tempStr = package + javaconstant.JAVA_DOT_MARK + servicename
+        tempStr = pack_name + javaconstant.JAVA_DOT_MARK + service_name
         file.write(javaconstant.JAVA_SERVICE_ANNOTATION % tempStr + '\n')
         
         # ----- write the class header -----
-        tempStr = javaconstant.JAVA_SERVICE_HEADER % (servicename, 'aa', 'bb')
+        tempStr = javaconstant.JAVA_SERVICE_HEADER % (service_name, container_inter_name, factory_inter_name)
         file.write(tempStr + '\n')
         
         
+        
+        # ----- write the class ender -----
+        file.write(javaconstant.JAVA_RIGHT_BRACE)
         file.close()
         
+    
+    @staticmethod
+    def analysis_package_name(package_name):
+        '''
+        analysis the package name
+        @return: serviceImpl_folder
+        '''
+        javaconstant = Java_constant()
+        package_parent_name = None    # package parent name
+        package_sub_name = None       # package self name
+        if javaconstant.JAVA_IMPL_PACKAGE_PREFIX in package_name:
+            temp_str = package_name[len(javaconstant.JAVA_IMPL_PACKAGE_PREFIX):]
+            package_parent_name = temp_str[:temp_str.index('.')]
+            package_sub_name = temp_str[temp_str.index('.')+1:].replace(javaconstant.JAVA_END_MARK,'')
+        
+        serviceImpl_folder = javaconstant.JAVA_ENTITY_SERVICEIMPL_PACKAGE % package_parent_name
+        
+        return serviceImpl_folder

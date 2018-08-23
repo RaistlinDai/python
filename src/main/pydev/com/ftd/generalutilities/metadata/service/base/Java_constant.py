@@ -59,6 +59,9 @@ class Java_constant(object):
         # --- impl jar service
         self.JAVA_IMPL_PACKAGE_PREFIX = 'com.qad.financials.'
         
+        # ---------------------------------------------------------------- #
+        #                  serviceImpl.java                                #
+        # ---------------------------------------------------------------- #
         self.JAVA_ENTITY_TITLE = '/*******************************************************************************\n * Copyright 2015 QAD Inc. All rights reserved.\n ******************************************************************************/\n'
         
         self.JAVA_ENTITY_SERVICEIMPL_PACKAGE = 'com.qad.erp.financials.%s.service.impl'
@@ -67,3 +70,18 @@ class Java_constant(object):
         self.JAVA_SERVICE_ANNOTATION = '@Service(\"%s\")'
         
         self.JAVA_SERVICE_HEADER = 'public class %s extends FinQraEntityService<%s, %s> {'
+        
+        self.JAVA_SERVICE_IMPORT_SPRING_FRAME = 'import org.springframework.stereotype.Service;'
+        self.JAVA_SERVICE_IMPORT_PRO_DATAGRAPH = 'import com.progress.open4gl.ProDataGraph;'
+        self.JAVA_SERVICE_IMPORT_FIN_QRA_ENTITYSERVICE = 'import com.qad.erp.financials.mvc.service.impl.FinQraEntityService;'
+        self.JAVA_SERVICE_IMPORT_API_EXCEPTION = 'import com.qad.qra.ApiException;'
+        self.JAVA_SERVICE_IMPORT_CONNECTION_MANAGER = 'import com.qad.qra.ConnectionManager;'
+        self.JAVA_SERVICE_IMPORT_CONTEXT = 'import com.qad.qra.Context;'
+        self.JAVA_SERVICE_IMPORT_HOLDER = 'import com.qad.qra.Holder;'
+        self.JAVA_SERVICE_IMPORT_EXCEPTION_UTIL = 'import com.qad.qracore.util.ExceptionUtil;'
+        self.JAVA_SERVICE_IMPORT_QRA_WORKSPACE_UTIL = 'import com.qad.qracore.util.QraWorkspaceUtil;'
+        self.JAVA_SERVICE_IMPORT_SUBMIT_RESULTANDDATA = 'import com.qad.qraview.dto.SubmitResultAndData;'
+        self.JAVA_SERVICE_IMPORT_API_DATAGRAPH = 'import commonj.sdo.DataGraph;'
+        
+        
+        

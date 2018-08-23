@@ -17,12 +17,17 @@ class EntityDTO(object):
         viewDTO = ViewMetadataDTO()
         resourceDTO = ResourceMetadataDTO()
         serviceInterDTO = JavaDTO()
+        entContInterDTO = JavaDTO()
+        factoryInterDTO = JavaDTO()
+        
         self.__dto = {'Entity':None,                      # entity name
                       'ViewFullPath':None,                # view metadata path
                       'ResourceFullPath':None,            # resource metadata path
                       'ViewMetaData':viewDTO,             # view metadata DTO
                       'ResourceMetaData':resourceDTO,     # resource metadata DTO
-                      'ServiceInterDTO':serviceInterDTO,  # interface DTO
+                      'ServiceInterDTO':serviceInterDTO,  # service interface DTO
+                      'FactoryInterDTO':factoryInterDTO,  # factory interface DTO
+                      'EntContInterDTO':entContInterDTO,  # entity container interface DTO
                       }
         
     
@@ -78,6 +83,30 @@ class EntityDTO(object):
     def get_serviceInterDTO(self):
         if self.__dto:
             return self.__dto['ServiceInterDTO']
+        else:
+            return None
+        
+        
+    def set_entContInterDTO(self, value):
+        if self.__dto:
+            self.__dto['EntContInterDTO'] = value
+        
+        
+    def get_entContInterDTO(self):
+        if self.__dto:
+            return self.__dto['EntContInterDTO']
+        else:
+            return None
+        
+        
+    def set_factoryInterDTO(self, value):
+        if self.__dto:
+            self.__dto['FactoryInterDTO'] = value
+        
+        
+    def get_factoryInterDTO(self):
+        if self.__dto:
+            return self.__dto['FactoryInterDTO']
         else:
             return None
         

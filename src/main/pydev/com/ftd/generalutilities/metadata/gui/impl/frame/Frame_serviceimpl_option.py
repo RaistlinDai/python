@@ -26,7 +26,8 @@ class Frame_serviceimpl_option(FormatableFrame):
         self.__funclists = {}       #functins list backup
         self.__result = None
         self.__error = None
-        self.__classlist = []       #0:service interface, 1:factory interface, 2:qra service class, 3:qra factory class
+        self.__classlist = []       # 0:service interface, 1:factory interface, 2:qra service class, 3:qra factory class
+                                    # 4:entity container interface, 5:entity container impl
         FormatableFrame.__init__(self, parent.get_mainframe(), dtos, trans, **configs)
         
         
@@ -90,24 +91,33 @@ class Frame_serviceimpl_option(FormatableFrame):
         
             canv2.pack()
             
-            # analysis the api service class and generate the functions list
-            result, interDTO = self.__analysis_api_service()
-            
+            # --------- analysis the api service class and generate the functions list
+            result, serviceInterDTO = self.__analysis_service_interface()
             if not result:
                 return
             else:
-                self.get_dtos().set_serviceInterDTO(interDTO)
+                self.get_dtos().set_serviceInterDTO(serviceInterDTO)
             
-            for javaMtd in interDTO.get_class_methods():
+            for javaMtd in serviceInterDTO.get_class_methods():
                 self.__funclists[javaMtd.get_method_name()] = javaMtd
                 
                 #add items into list box
                 self.__listboxleft.insert(END, javaMtd.get_method_name())
+            
+            # --------- analysis the factory
+            result, factoryInterDTO = self.__analysis_factory_interface()
+            if not result:
+                return
+            else:
+                self.get_dtos().set_factoryInterDTO(factoryInterDTO)
                 
-            # analysis the container and factory
-            self.__analysis_container_and_factory()
-            
-            
+            # --------- analysis the container
+            result, containerInterDTO = self.__analysis_container_interface()
+            if not result:
+                return
+            else:
+                self.get_dtos().set_entContInterDTO(containerInterDTO)
+                
             
         else:
              #---- panel 02 ----------
@@ -137,16 +147,11 @@ class Frame_serviceimpl_option(FormatableFrame):
             showwarning('Warning', 'There are error existing, the ServiceImpl cannot be generated.')
             return
         
-        interDTO = self.get_dtos().get_serviceInterDTO()
-        # get the package name
-        pack_name = self.__analysis_package_name(interDTO.get_class_package())
-        
         # verify the package folder and file
         
         
         # TODO: write serviceImpl
-        Java_processor.create_service_impl(self.get_trans().get_workspacepath() + self.__feet.get(), self.__feet.get(), pack_name, interDTO, self.get_dtos())
-        
+        Java_processor.create_service_impl(self.get_trans().get_workspacepath() + self.__feet.get(), self.__feet.get(), self.get_dtos())
         
         
         return True
@@ -155,10 +160,6 @@ class Frame_serviceimpl_option(FormatableFrame):
     def __validate_javas(self):
         '''
         analysis the serviceImpl according to ResourceMetadataDTO in self.__resDto
-        '''
-        
-        '''
-        step 1. retrieve the api/impl file directory
         '''
         #get the entity info
         transDto = self.get_trans()
@@ -195,12 +196,14 @@ class Frame_serviceimpl_option(FormatableFrame):
         print(impl_unzip_path)
         
         
-        # the service & factory interface
         # TODO: this is a hardcode style, should be enhancement later!!!
         business_entity_name = package_list[-1][1:]
         serviceImpl_name = business_entity_name + fileconstant.SERVICEIMPL_SUFFIX + fileconstant.JAVA_SUFFIX
         self.__feet.set(serviceImpl_name)
         
+        # --------------------------------------------------------------------- #
+        #                   The interface of service,factory                    #
+        # --------------------------------------------------------------------- #
         # Validate the Api package
         decp_service_interface_name = business_entity_name + fileconstant.JAVA_SERVICE_SUFFIX + fileconstant.DEPOMPILE_JAVA_SUFFIX
         decp_factory_interface_name = business_entity_name + fileconstant.JAVA_FACTORY_SUFFIX + fileconstant.DEPOMPILE_JAVA_SUFFIX
@@ -217,12 +220,15 @@ class Frame_serviceimpl_option(FormatableFrame):
             message = 'There is no factory-interface for entity %s,\n please check your api jar!' % decp_factory_interface_name
             return False, message, None
         
-        # set the return list
+        # set the return list (idx = 0,1)
         returnList.append(api_unzip_path + decp_service_interface_name)
         returnList.append(api_unzip_path + decp_factory_interface_name)
         
         
-        # Validate the Impl package                
+        # --------------------------------------------------------------------- #
+        #                   The impl of service,factory                         #
+        # --------------------------------------------------------------------- #
+        # Validate the Impl package
         decp_service_impl_name = fileconstant.JAVA_QRA_PREFIX + business_entity_name + fileconstant.JAVA_SERVICE_SUFFIX + fileconstant.DEPOMPILE_JAVA_SUFFIX
         decp_factory_impl_name = fileconstant.JAVA_QRA_PREFIX + business_entity_name + fileconstant.JAVA_FACTORY_SUFFIX + fileconstant.DEPOMPILE_JAVA_SUFFIX
         
@@ -238,7 +244,7 @@ class Frame_serviceimpl_option(FormatableFrame):
             message = 'There is no factory-class for entity %s,\n please check your impl jar!' % decp_factory_impl_name
             return False, message, None
         
-        # set the return list
+        # set the return list (idx = 2,3)
         returnList.append(impl_unzip_path + decp_service_impl_name)
         returnList.append(impl_unzip_path + decp_factory_impl_name)
         
@@ -246,80 +252,75 @@ class Frame_serviceimpl_option(FormatableFrame):
         # Validate the additional functionality
         
         
-        
-        return True, None, returnList
-    
-    
-    def validate_container(self):
-        '''
-        analysis the serviceImpl according to ResourceMetadataDTO in self.__resDto
-        '''
-        fileconstant = File_constant()
-        entityDto = self.get_dtos()
-        transDto = self.get_trans()
-        resDto = entityDto.get_resourceDTO()
-        
-        #get the entity interface
-        entityName = entityDto.get_entityname()
-        prim_uri = resDto.get_primary_secure_uri()
-        entity_interface = prim_uri[prim_uri.rindex(':')+1:]
-        package_list = entity_interface.split('.')
-        
         #--- the entity name
         entityDSName = entityDto.get_resourceDTO().get_view_parameters().get_data_resource()
+        # --------------------------------------------------------------------- #
+        #                The interface & Impl of container                      #
+        # --------------------------------------------------------------------- #
+        # Validate the container interface
+        entity_container_interface_name = entityDSName[:1].upper() + entityDSName[1:-1] + fileconstant.JAVA_CONTAINER_SUFFIX + fileconstant.DEPOMPILE_JAVA_SUFFIX
+        entity_container_impl_name = fileconstant.JAVA_QRA_PREFIX + entityDSName[:1].upper() + entityDSName[1:-1] + fileconstant.JAVA_CONTAINER_SUFFIX + fileconstant.DEPOMPILE_JAVA_SUFFIX
         
-        #--- the container interface name
-        containerName = entityDSName[:1].upper() + entityDSName[1:-1] + fileconstant.JAVA_CONTAINER_SUFFIX + fileconstant.JAVA_SUFFIX
-        #--- the factory interface name
-        factoryName = entityDSName[:1].upper() + entityDSName[1:-1] + fileconstant.JAVA_FACTORY_SUFFIX + fileconstant.JAVA_SUFFIX
+        if not File_processor.verify_dir_existing(api_unzip_path + entity_container_interface_name):
+            message = 'There is no interface for container %s,\n please check your api jar!' % entity_container_interface_name
+            return False, message, None
+        
+        if not File_processor.verify_dir_existing(impl_unzip_path + entity_container_impl_name):
+            message = 'There is no impl for container %s,\n please check your impl jar!' % entity_container_impl_name
+            return False, message, None
+        
+        # set the return list (idx = 4,5)
+        returnList.append(api_unzip_path + entity_container_interface_name)
+        returnList.append(impl_unzip_path + entity_container_impl_name)
         
         
-        print(containerName)
-        print(factoryName)
+        return True, None, returnList
         
         
     
-    def __analysis_api_service(self):
+    def __analysis_service_interface(self):
         '''
         analysis the entityService._java file and generate the function list
         '''
+        # service interface
         decp_service_interface_name = self.__classlist[0]
-        
         # call the java processor
-        result, message, interDTO = Java_processor.read_java_file(decp_service_interface_name)
-        
+        result, message, serviceInterDTO = Java_processor.read_java_file(decp_service_interface_name)
         if not result:
             showerror('Error', message)
             return False, None
         
-        return True, interDTO
+        return True, serviceInterDTO
     
     
-    def __analysis_container_and_factory(self):
+    def __analysis_factory_interface(self):
+        '''
+        analysis the entityfactory._java file
+        '''
+        # entity factory interface
+        entity_factory_interface_name = self.__classlist[1]
+        # call the java processor
+        result, message, factoryInterDTO = Java_processor.read_java_file(entity_factory_interface_name)
+        if not result:
+            showerror('Error', message)
+            return False, None
+        
+        return True, factoryInterDTO
+    
+    
+    def __analysis_container_interface(self):
         '''
         analysis the entitycontainer._java file
         '''
-        pass
+        # entity container interface
+        entity_container_interface_name = self.__classlist[4]
+        # call the java processor
+        result, message, containerInterDTO = Java_processor.read_java_file(entity_container_interface_name)
+        if not result:
+            showerror('Error', message)
+            return False, None
         
-        
-    
-    
-    def __analysis_package_name(self, package_name):
-        '''
-        analysis the package name
-        @return: serviceImpl_folder
-        '''
-        javaconstant = Java_constant()
-        package_parent_name = None    # package parent name
-        package_sub_name = None       # package self name
-        if javaconstant.JAVA_IMPL_PACKAGE_PREFIX in package_name:
-            temp_str = package_name[len(javaconstant.JAVA_IMPL_PACKAGE_PREFIX):]
-            package_parent_name = temp_str[:temp_str.index('.')]
-            package_sub_name = temp_str[temp_str.index('.')+1:].replace(javaconstant.JAVA_END_MARK,'')
-        
-        serviceImpl_folder = javaconstant.JAVA_ENTITY_SERVICEIMPL_PACKAGE % package_parent_name
-        
-        return serviceImpl_folder
+        return True, containerInterDTO
     
     
     def __to_right_click_event(self, event):
