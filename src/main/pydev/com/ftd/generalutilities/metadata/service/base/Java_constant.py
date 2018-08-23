@@ -110,6 +110,9 @@ class Java_constant(object):
                                                  self.JAVA_TAB + 'return container;',
                                                  self.JAVA_RIGHT_BRACE]
         
-        
+        self.JAVA_SERVICE_OVERRIDE_getEntityFactory = [self.JAVA_ANNOTATION_OVERRIDE,
+                                                       'protected %s getEntityFactory(ConnectionManager connectionManager, Context context) {',
+                                                       self.JAVA_TAB + 'return new %s(connectionManager, context);',
+                                                       self.JAVA_RIGHT_BRACE]
         
         
