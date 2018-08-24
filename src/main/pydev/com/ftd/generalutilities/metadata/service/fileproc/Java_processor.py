@@ -292,8 +292,6 @@ class Java_processor(File_processor):
         javaconstant = Java_constant()
         javaDTO = JavaDTO()
         
-        method_list = interDTO.get_class_methods()
-        
         class_line_nbr = 0
         
         file = open(srcfile, 'r')
@@ -335,6 +333,45 @@ class Java_processor(File_processor):
                     
                 javaDTO.set_class_type(javaconstant.JAVA_KEY_CLASS)
             
+            # method info
+            if javaconstant.JAVA_KEY_CLASS not in cells:
+                # public method
+                methodDTO = JavaMethodDTO()
+                if javaconstant.JAVA_KEY_PUBLIC in cells:
+                    # all parameters are in a single line
+                    if javaconstant.JAVA_LEFT_BRACKET in eachline and javaconstant.JAVA_RIGHT_BRACKET in eachline:
+                        mtd_headers_and_param = eachline.split(javaconstant.JAVA_LEFT_BRACKET)
+                        mtd_headers = mtd_headers_and_param[0].split(' ')
+                        # method name
+                        methodDTO.set_method_name(mtd_headers[-1])
+                        # method return
+                        methodDTO.set_method_output(mtd_headers[-2])
+                        # method range
+                        methodDTO.set_method_output(javaconstant.JAVA_KEY_PUBLIC)
+                        
+                        # method inputs
+                        method_param = mtd_headers_and_param[1]
+                        method_param = method_param[:method_param.index(javaconstant.JAVA_RIGHT_BRACKET)]
+                        if method_param == '':
+                            methodDTO.set_method_inputs(None)
+                        else:
+                            params = method_param.split(javaconstant.JAVA_SEPERATOR)
+                            paramDTO = JavaParameterDTO()
+                            for param in params:
+                                paramcells = param.lstrip().split(' ')
+                                paramDTO.set_parameter_name(paramcells[-1])
+                                paramDTO.set_parameter_type(paramcells[-2])
+                            
+                                # verify the imports for parameter
+                                for imp in javaDTO.get_class_imports():
+                                    impcells = imp.split(javaconstant.JAVA_DOT_MARK)
+                                    if impcells[-1] == paramDTO.get_parameter_type():
+                                        methodDTO.push_method_related_imports(imp)
+                                    
+                                # add input parameter
+                                methodDTO.push_method_inputs(paramDTO)
+                    
+                javaDTO.push_class_methods(methodDTO)   
             
         return True, None, javaDTO     
         
@@ -351,6 +388,7 @@ class Java_processor(File_processor):
         factory_mtd_list = entityDTO.get_factoryInterDTO().get_class_methods()
         service_mtd_list = entityDTO.get_serviceInterDTO().get_class_methods()
         container_mtd_list = entityDTO.get_entContInterDTO().get_class_methods()
+        maintable_mtd_list = entityDTO.get_maintableInterDTO().get_class_methods()
         # ------------------------------------------------------- #
         #                       Preparation                       #
         # ------------------------------------------------------- #
@@ -416,6 +454,34 @@ class Java_processor(File_processor):
         if not valid_flag:
             return False
         
+        # fetch parameters
+        mtd_fetch_param_values = ''
+        mtd_fetch_param_inputs = ''
+        mtd_fetch_param_calls = ''
+        for mtd in service_mtd_list:
+            print(mtd.get_method_name())
+            if javaconstant.JAVA_FUNCTION_FETCH == mtd.get_method_name():
+                param_nbr = 0
+                for param in mtd.get_method_inputs():
+                    param_nbr = param_nbr + 1
+                    
+                    for tabMtd in maintable_mtd_list:
+                        if tabMtd == javaconstant.JAVA_FUNCTION_GET + param.get_parameter_name()[0:1].upper() + param.get_parameter_name()[1:]:
+                            print(tabMtd)
+                            
+                    
+                    if param_nbr == len(mtd.get_method_inputs()):
+                        mtd_fetch_param_inputs = mtd_fetch_param_inputs + param.get_parameter_type() + ' ' + param.get_parameter_name()
+                        mtd_fetch_param_calls = mtd_fetch_param_calls + param.get_parameter_name()
+                    else:
+                        mtd_fetch_param_inputs = mtd_fetch_param_inputs + param.get_parameter_type() + ' ' + param.get_parameter_name() + javaconstant.JAVA_SEPERATOR + ' '
+                        mtd_fetch_param_calls = mtd_fetch_param_calls + param.get_parameter_name() + javaconstant.JAVA_SEPERATOR + ' '
+                        if param_nbr % 5 == 0:
+                            mtd_fetch_param_inputs = mtd_fetch_param_inputs + '\n'
+                            mtd_fetch_param_calls = mtd_fetch_param_calls + '\n'
+                            
+                break
+            
         # create file
         Path(filefullpath).touch()
         file = open(filefullpath, 'w')
@@ -544,6 +610,9 @@ class Java_processor(File_processor):
                 # replace get main table list method
                 if javaconstant.JAVA_ENTITYCONST_GET_ENTITY_DATASET_LIST in lines:
                     lines = lines.replace(javaconstant.JAVA_ENTITYCONST_GET_ENTITY_DATASET_LIST, mtd_get_maintables)
+                # replace fetch input parameters
+                if javaconstant.JAVA_ENTITYCONST_FETCH_METHOD_PARAMS in lines:
+                    lines = lines.replace(javaconstant.JAVA_ENTITYCONST_FETCH_METHOD_PARAMS, '%%%%%')
                 
                 
                 

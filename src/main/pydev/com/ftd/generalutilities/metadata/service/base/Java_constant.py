@@ -106,6 +106,7 @@ class Java_constant(object):
         self.JAVA_ENTITYCONST_GET_SERVICE_INTER = '%MTD_GET_SERVICE_INTERFACE%'
         self.JAVA_ENTITYCONST_INITIAL_ENTITY_DATASET = '%MTD_INITIAL_ENTITY_DATASET%'
         self.JAVA_ENTITYCONST_GET_ENTITY_DATASET_LIST = '%MTD_GET_ENTITY_DATASET_LIST%'
+        self.JAVA_ENTITYCONST_FETCH_METHOD_PARAMS = '%FETCH_MTD_PARAMETERS%'
         
             
         # initialize()
@@ -141,7 +142,41 @@ class Java_constant(object):
                                                     self.JAVA_TAB + 'return entityList;',
                                                     self.JAVA_RIGHT_BRACE]
         
+        # createEntity()
+        self.JAVA_SERVICE_OVERRIDE_CREATEENTITY = [self.JAVA_ANNOTATION_OVERRIDE,
+                                                   'protected ' + self.JAVA_ENTITYCONST_CONTAINER_INTER + ' createEntity(' + self.JAVA_ENTITYCONST_CONTAINER_INTER + ' container) {',
+                                                   self.JAVA_TAB + self.JAVA_ENTITYCONST_FACTORY_INTER + ' factory = getEntityFactory();',
+                                                   self.JAVA_TAB + 'factory.' + self.JAVA_ENTITYCONST_GET_SERVICE_INTER + '().create(((' + self.JAVA_ENTITYCONST_CONTAINER_QRA + ') container).getProDataGraph());',
+                                                   self.JAVA_TAB + 'return container;',
+                                                   self.JAVA_RIGHT_BRACE]
+        
+        # updateEntity()
+        self.JAVA_SERVICE_OVERRIDE_UPDATEENTITY = [self.JAVA_ANNOTATION_OVERRIDE,
+                                                   'protected ' + self.JAVA_ENTITYCONST_CONTAINER_INTER + ' updateEntity(' + self.JAVA_ENTITYCONST_CONTAINER_INTER + ' container) {',
+                                                   self.JAVA_TAB + self.JAVA_ENTITYCONST_FACTORY_INTER + ' factory = getEntityFactory();',
+                                                   self.JAVA_TAB + 'factory.' + self.JAVA_ENTITYCONST_GET_SERVICE_INTER + '().update(((' + self.JAVA_ENTITYCONST_CONTAINER_QRA + ') container).getProDataGraph());',
+                                                   self.JAVA_TAB + 'return container;',
+                                                   self.JAVA_RIGHT_BRACE]
+        
+        # readEntity()
+        self.JAVA_SERVICE_OVERRIDE_READENTITY = [self.JAVA_ANNOTATION_OVERRIDE,
+                                                 'protected ' + self.JAVA_ENTITYCONST_CONTAINER_INTER + ' readEntity(' + self.JAVA_ENTITYCONST_CONTAINER_INTER + ' container) {',
+                                                 self.JAVA_TAB + self.JAVA_ENTITYCONST_ENTITY_DATASET + ' entity = getEntityListFromContainer(container).get(0);',
+                                                 self.JAVA_TAB + 'return read(' + self.JAVA_ENTITYCONST_FETCH_METHOD_PARAMS + ');',
+                                                 self.JAVA_RIGHT_BRACE]
+        
+        # getJsonFromEntity()
+        self.JAVA_SERVICE_OVERRIDE_GETJSONFROMENTITY = [self.JAVA_ANNOTATION_OVERRIDE,
+                                                        'protected String getJsonFromEntity(' + self.JAVA_ENTITYCONST_CONTAINER_INTER + ' entity) {',
+                                                        self.JAVA_TAB + self.JAVA_ENTITYCONST_FACTORY_INTER + ' factory = getEntityFactory();',
+                                                        self.JAVA_TAB + 'return factory.containerToJson(entity);',
+                                                        self.JAVA_RIGHT_BRACE]
+        
         # override methods list    
         self.JAVA_SERVICEIMPL_OVERRIDE_METHODS = [self.JAVA_SERVICE_OVERRIDE_INITIALIZE,
                                                   self.JAVA_SERVICE_OVERRIDE_GETENTITYFACTORY,
-                                                  self.JAVA_SERVICE_OVERRIDE_GETENTITYLIST]
+                                                  self.JAVA_SERVICE_OVERRIDE_GETENTITYLIST,
+                                                  self.JAVA_SERVICE_OVERRIDE_CREATEENTITY,
+                                                  self.JAVA_SERVICE_OVERRIDE_UPDATEENTITY,
+                                                  self.JAVA_SERVICE_OVERRIDE_READENTITY,
+                                                  self.JAVA_SERVICE_OVERRIDE_GETJSONFROMENTITY]

@@ -159,6 +159,23 @@ class JavaMethodDTO(object):
         self.__method_inputs = []
         self.__method_output = None
         self.__method_related_imports = []
+        self.__method_annotations = []
+
+
+    def get_method_annotations(self):
+        return self.__method_annotations
+
+
+    def set_method_annotations(self, value):
+        self.__method_annotations = value
+
+
+    def push_method_annotations(self, value):
+        self.__method_annotations.append(value)
+        
+
+    def del_method_annotations(self):
+        del self.__method_annotations
 
 
     def get_method_related_imports(self):
@@ -233,6 +250,7 @@ class JavaMethodDTO(object):
     method_inputs = property(get_method_inputs, set_method_inputs, del_method_inputs, "method_inputs's docstring")
     method_output = property(get_method_output, set_method_output, del_method_output, "method_output's docstring")
     method_related_imports = property(get_method_related_imports, set_method_related_imports, del_method_related_imports, "method_related_imports's docstring")
+    method_annotations = property(get_method_annotations, set_method_annotations, del_method_annotations, "method_annotations's docstring")
         
 
 class JavaParameterDTO(object):
