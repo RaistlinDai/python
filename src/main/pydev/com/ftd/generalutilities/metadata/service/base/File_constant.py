@@ -61,6 +61,7 @@ class File_constant(object):
         self.JAVA_SERVICE_SUFFIX = 'Service'
         self.JAVA_FACTORY_SUFFIX = 'Factory'
         self.JAVA_CONTAINER_SUFFIX ='Container'
+        self.JAVA_HOLDER_SUFFIX ='Holder'
         self.JAVA_QRA_PREFIX = 'Qra'
         self.SERVICEIMPL_SUFFIX = 'ServiceImpl'
         

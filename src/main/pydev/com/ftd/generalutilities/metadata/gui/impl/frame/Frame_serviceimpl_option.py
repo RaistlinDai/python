@@ -27,7 +27,7 @@ class Frame_serviceimpl_option(FormatableFrame):
         self.__result = None
         self.__error = None
         self.__classlist = []       # 0:service interface, 1:factory interface, 2:qra service class, 3:qra factory class
-                                    # 4:entity container interface, 5:entity container impl
+                                    # 4:entity container interface, 5:entity container impl, 6:main table interface,
         FormatableFrame.__init__(self, parent.get_mainframe(), dtos, trans, **configs)
         
         
@@ -41,7 +41,8 @@ class Frame_serviceimpl_option(FormatableFrame):
         self.__label01.pack(side=TOP, fill=X, ipady=10)
         
         #---- java validation flag
-        self.__error = False
+        self.__error = None
+        self.__result = True
         
         #---- panel 01 ----------
         canv1 = Canvas(self, height=30, width=550)
@@ -71,6 +72,15 @@ class Frame_serviceimpl_option(FormatableFrame):
         else:
             self.get_dtos().set_serviceInterDTO(serviceInterDTO)
         
+        self.__result, self.__error, serviceQraDTO = self.__analysis_service_qra()
+        if not self.__result:
+            #---- panel 02 ----------
+            self.__pack_errorpanel()
+            return
+        else:
+            self.get_dtos().set_serviceQraDTO(serviceQraDTO)
+        
+        
         # --------- analysis the factory
         self.__result, self.__error, factoryInterDTO = self.__analysis_factory_interface()
         if not self.__result:
@@ -79,15 +89,42 @@ class Frame_serviceimpl_option(FormatableFrame):
             return
         else:
             self.get_dtos().set_factoryInterDTO(factoryInterDTO)
+        
+        self.__result, self.__error, factoryQraDTO = self.__analysis_factory_qra()
+        if not self.__result:
+            #---- panel 02 ----------
+            self.__pack_errorpanel()
+            return
+        else:
+            self.get_dtos().set_factoryQraDTO(factoryQraDTO)
+
             
         # --------- analysis the container
-        self.__result, containerInterDTO = self.__analysis_container_interface()
+        self.__result, self.__error, containerInterDTO = self.__analysis_container_interface()
         if not self.__result:
             #---- panel 02 ----------
             self.__pack_errorpanel()
             return
         else:
             self.get_dtos().set_entContInterDTO(containerInterDTO)
+            
+        self.__result, self.__error, containerQraDTO = self.__analysis_container_qra()
+        if not self.__result:
+            #---- panel 02 ----------
+            self.__pack_errorpanel()
+            return
+        else:
+            self.get_dtos().set_entContQraDTO(containerQraDTO)
+            
+        
+        # --------- analysis the maintable interface
+        self.__result, self.__error, maintableInterDTO = self.__analysis_maintable_interface()
+        if not self.__result:
+            #---- panel 02 ----------
+            self.__pack_errorpanel()
+            return
+        else:
+            self.get_dtos().set_maintableInterDTO(maintableInterDTO)
 
         
         #---- panel 02 ----------
@@ -144,7 +181,7 @@ class Frame_serviceimpl_option(FormatableFrame):
         overwrite the function in super class
         verify the input directory
         '''
-        if self.__error:
+        if not self.__result:
             showwarning('Warning', 'There are error existing, the ServiceImpl cannot be generated.')
             return
         
@@ -203,9 +240,6 @@ class Frame_serviceimpl_option(FormatableFrame):
             idx = idx + 1
         
         
-        print(api_unzip_path)
-        print(impl_unzip_path)
-        
         
         # TODO: this is a hardcode style, should be enhancement later!!!
         business_entity_name = package_list[-1][1:]
@@ -234,7 +268,6 @@ class Frame_serviceimpl_option(FormatableFrame):
         # set the return list (idx = 0,1)
         returnList.append(api_unzip_path + decp_service_interface_name)
         returnList.append(api_unzip_path + decp_factory_interface_name)
-        
         
         # --------------------------------------------------------------------- #
         #                   The impl of service,factory                         #
@@ -265,6 +298,7 @@ class Frame_serviceimpl_option(FormatableFrame):
         
         #--- the entity name
         entityDSName = entityDto.get_resourceDTO().get_view_parameters().get_data_resource()
+        mainTableName = entityDto.get_resourceDTO().get_view_parameters().get_table()
         # --------------------------------------------------------------------- #
         #                The interface & Impl of container                      #
         # --------------------------------------------------------------------- #
@@ -283,6 +317,18 @@ class Frame_serviceimpl_option(FormatableFrame):
         # set the return list (idx = 4,5)
         returnList.append(api_unzip_path + entity_container_interface_name)
         returnList.append(impl_unzip_path + entity_container_impl_name)
+        
+        # --------------------------------------------------------------------- #
+        #                The interface of main table                            #
+        # --------------------------------------------------------------------- #
+        main_table_interface_name = mainTableName[:1].upper() + mainTableName[1:] + fileconstant.DEPOMPILE_JAVA_SUFFIX
+        
+        if not File_processor.verify_dir_existing(api_unzip_path + main_table_interface_name):
+            message = 'There is no interface for main table %s,\n please check your api jar!' % main_table_interface_name
+            return False, message, None
+        
+        # set the return list (idx = 6)
+        returnList.append(api_unzip_path + main_table_interface_name)
         
         
         return True, None, returnList
@@ -303,6 +349,20 @@ class Frame_serviceimpl_option(FormatableFrame):
         return True, None, serviceInterDTO
     
     
+    def __analysis_service_qra(self):
+        '''
+        analysis the QraEntityService._java file
+        '''
+        # entity container interface
+        entity_service_qra_name = self.__classlist[2]
+        # call the java processor
+        result, message, serviceQraDTO = Java_processor.read_java_class(entity_service_qra_name, self.get_dtos().get_serviceInterDTO())
+        if not result:
+            return False, message, None
+        
+        return True, None, serviceQraDTO
+    
+    
     def __analysis_factory_interface(self):
         '''
         analysis the entityfactory._java file
@@ -317,6 +377,20 @@ class Frame_serviceimpl_option(FormatableFrame):
         return True, None, factoryInterDTO
     
     
+    def __analysis_factory_qra(self):
+        '''
+        analysis the QraEntityfactory._java file
+        '''
+        # entity container interface
+        entity_factory_qra_name = self.__classlist[3]
+        # call the java processor
+        result, message, factoryQraDTO = Java_processor.read_java_class(entity_factory_qra_name, self.get_dtos().get_factoryInterDTO())
+        if not result:
+            return False, message, None
+        
+        return True, None, factoryQraDTO
+    
+    
     def __analysis_container_interface(self):
         '''
         analysis the entitycontainer._java file
@@ -329,6 +403,34 @@ class Frame_serviceimpl_option(FormatableFrame):
             return False, message, None
         
         return True, None, containerInterDTO
+    
+    
+    def __analysis_container_qra(self):
+        '''
+        analysis the QraEntitycontainer._java file
+        '''
+        # entity container interface
+        entity_container_qra_name = self.__classlist[5]
+        # call the java processor
+        result, message, containerQraDTO = Java_processor.read_java_class(entity_container_qra_name, self.get_dtos().get_entContInterDTO())
+        if not result:
+            return False, message, None
+        
+        return True, None, containerQraDTO
+    
+    
+    def __analysis_maintable_interface(self):
+        '''
+        analysis the maintable._java file and generate the function list
+        '''
+        # service interface
+        maintable_interface_name = self.__classlist[6]
+        # call the java processor
+        result, message, maintableInterDTO = Java_processor.read_java_interface(maintable_interface_name)
+        if not result:
+            return False, message, None
+        
+        return True, None, maintableInterDTO
     
     
     def __to_right_click_event(self, event):

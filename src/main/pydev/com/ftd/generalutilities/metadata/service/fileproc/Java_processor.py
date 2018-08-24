@@ -143,7 +143,6 @@ class Java_processor(File_processor):
         javaDTO = JavaDTO()
         
         # marks
-        class_type = None
         class_line_nbr = 0
         class_start_mark = False
         class_block_startln = -1
@@ -185,7 +184,6 @@ class Java_processor(File_processor):
             if javaconstant.JAVA_KEY_INTERFACE in cells:
                 #marks
                 class_start_mark = True
-                class_type = javaconstant.JAVA_KEY_INTERFACE
                 
                 value = cells[cells.index(javaconstant.JAVA_KEY_INTERFACE)+1]
                 if javaconstant.JAVA_LEFT_BRACE in value:
@@ -255,7 +253,7 @@ class Java_processor(File_processor):
                                 method_name = subcells[-1]
                                 new_method.set_method_name(method_name)
                                 
-                                return_type = subcells[-1]
+                                return_type = subcells[-2]
                                 new_method.set_method_output(return_type)
                                 
                             # -- parameters
@@ -280,7 +278,7 @@ class Java_processor(File_processor):
      
      
     @staticmethod
-    def read_java_class(srcfile, javaDTO): 
+    def read_java_class(srcfile, interDTO): 
         '''
         read and analysis the java class, get the functions' parameters and set them in JavaDTO
         NOTE: this is a light weight reader for java file. Generally we should use java reflection
@@ -292,6 +290,10 @@ class Java_processor(File_processor):
             return False, "File not exist!", None
         
         javaconstant = Java_constant()
+        javaDTO = JavaDTO()
+        
+        method_list = interDTO.get_class_methods()
+        
         class_line_nbr = 0
         
         file = open(srcfile, 'r')
@@ -303,10 +305,38 @@ class Java_processor(File_processor):
             # trim the line
             eachline = eachline.replace('\n', '')
             
+            # trim the line
+            if javaconstant.JAVA_LEFT_COMMENT in eachline and javaconstant.JAVA_RIGHT_COMMENT in eachline:
+                right_idx = eachline.index(javaconstant.JAVA_RIGHT_COMMENT) + 2
+                eachline = eachline[right_idx:].lstrip()
+            eachline = eachline.replace('\n', '')
+            
+            # split the line by blank
+            cells = eachline.lstrip().split(' ')
+            
+            # package
+            if javaconstant.JAVA_KEY_PACKAGE in cells:
+                javaDTO.set_class_package(cells[cells.index(javaconstant.JAVA_KEY_PACKAGE)+1])
+                
+            # imports
+            if javaconstant.JAVA_KEY_IMPORT in cells:
+                value = cells[cells.index(javaconstant.JAVA_KEY_IMPORT)+1].replace(javaconstant.JAVA_END_MARK, '')
+                javaDTO.push_class_imports(value)
+                
+            # class name
+            if javaconstant.JAVA_KEY_CLASS in cells:
+                #marks
+                value = cells[cells.index(javaconstant.JAVA_KEY_CLASS)+1]
+                if javaconstant.JAVA_LEFT_BRACE in value:
+                    subcells = value.split(javaconstant.JAVA_LEFT_BRACE)
+                    javaDTO.set_class_name(subcells[0])
+                else:
+                    javaDTO.set_class_name(value)
+                    
+                javaDTO.set_class_type(javaconstant.JAVA_KEY_CLASS)
             
             
-            
-            
+        return True, None, javaDTO     
         
         
     @staticmethod
@@ -318,30 +348,93 @@ class Java_processor(File_processor):
         javaconstant = Java_constant()
         fileconstant = File_constant()
         
+        factory_mtd_list = entityDTO.get_factoryInterDTO().get_class_methods()
+        service_mtd_list = entityDTO.get_serviceInterDTO().get_class_methods()
+        container_mtd_list = entityDTO.get_entContInterDTO().get_class_methods()
+        # ------------------------------------------------------- #
+        #                       Preparation                       #
+        # ------------------------------------------------------- #
         # get the package name
         pack_name = Java_processor.analysis_package_name(entityDTO.get_serviceInterDTO().get_class_package())
         # get the serviceImpl name
-        service_name = filename.replace(fileconstant.JAVA_SUFFIX, '')
+        serviceimpl_name = filename.replace(fileconstant.JAVA_SUFFIX, '')
         # get the container interface name
         container_inter_name = entityDTO.get_entContInterDTO().get_class_name()
+        # get the service interface name
+        service_inter_name = entityDTO.get_serviceInterDTO().get_class_name()
         # get the factory interface name
         factory_inter_name = entityDTO.get_factoryInterDTO().get_class_name()
-        
+        # get the container qra name
+        container_qra_name = entityDTO.get_entContQraDTO().get_class_name()
+        # get the service qra name
+        service_qra_name = entityDTO.get_serviceQraDTO().get_class_name()
+        # get the factory interface name
+        factory_qra_name = entityDTO.get_factoryQraDTO().get_class_name()
+        # get the main table interface name
+        main_table_inter_name = entityDTO.get_maintableInterDTO().get_class_name()
+        # entity holder
+        entity_holder = container_inter_name.replace(fileconstant.JAVA_CONTAINER_SUFFIX, '') + fileconstant.JAVA_HOLDER_SUFFIX
         # retrieve the imports in api package
-        imports = entityDTO.get_serviceInterDTO().get_class_imports()        
+        imports = entityDTO.get_serviceInterDTO().get_class_imports()
+        # additional imports for method parameters/result
+        additional_imports = []
         
+        # createEntityContainer()
+        mtd_create_entity_container = javaconstant.JAVA_FUNCTION_CREATE + container_inter_name
+        valid_flag = False
+        for mtd in factory_mtd_list:
+            if mtd_create_entity_container == mtd.get_method_name() and container_inter_name == mtd.get_method_output():
+                valid_flag = True
+        if not valid_flag:
+            return False
+        
+        # getEntityService()
+        mtd_get_entity_service = javaconstant.JAVA_FUNCTION_GET + service_inter_name
+        valid_flag = False
+        for mtd in factory_mtd_list:
+            if mtd_get_entity_service == mtd.get_method_name() and service_inter_name == mtd.get_method_output():
+                valid_flag = True
+        if not valid_flag:
+            return False
+        
+        # initializeEntityDataset()
+        entity_dataset_name = entityDTO.get_resourceDTO().get_view_parameters().get_table()
+        mtd_initialize_entityDS = javaconstant.JAVA_FUNCTION_INITIALIZE + entity_dataset_name
+        valid_flag = False
+        for mtd in service_mtd_list:
+            if mtd_initialize_entityDS == mtd.get_method_name():
+                valid_flag = True
+        if not valid_flag:
+            return False
+        
+        # getMainTables()
+        mtd_get_maintables = javaconstant.JAVA_FUNCTION_GET + main_table_inter_name + 's'
+        valid_flag = False
+        for mtd in container_mtd_list:
+            if mtd_get_maintables == mtd.get_method_name() and main_table_inter_name in mtd.get_method_output():
+                valid_flag = True
+        if not valid_flag:
+            return False
+        
+        # create file
         Path(filefullpath).touch()
         file = open(filefullpath, 'w')
         
+        # ------------------------------------------------------- #
         # ----- write the class comments title -----
+        # ------------------------------------------------------- #
         file.write(javaconstant.JAVA_ENTITY_TITLE)
         file.write('\n')
         
+        # ------------------------------------------------------- #
         # ----- write the package -----
+        # ------------------------------------------------------- #
         file.write(javaconstant.JAVA_KEY_PACKAGE + ' ' + pack_name + javaconstant.JAVA_END_MARK + '\n')
         file.write('\n')
         
+        # ------------------------------------------------------- #
         # ----- write the imports -----
+        # ------------------------------------------------------- #
         import_list = []
         for importcell in imports:
             file.write(javaconstant.JAVA_KEY_IMPORT + ' ' + importcell + javaconstant.JAVA_END_MARK + '\n')
@@ -390,22 +483,87 @@ class Java_processor(File_processor):
         if factory_inter_package not in import_list:
             file.write(factory_inter_package + '\n')   # import factory interface
             import_list.append(factory_inter_package)
+            
+        container_qra_package = javaconstant.JAVA_KEY_IMPORT + ' ' + entityDTO.get_entContQraDTO().get_class_package()[:-1] + javaconstant.JAVA_DOT_MARK + container_qra_name + javaconstant.JAVA_END_MARK
+        if container_qra_package not in import_list:
+            file.write(container_qra_package + '\n')   # import container qra
+            import_list.append(container_qra_package)
+            
+        factory_qra_package = javaconstant.JAVA_KEY_IMPORT + ' ' + entityDTO.get_factoryQraDTO().get_class_package()[:-1] + javaconstant.JAVA_DOT_MARK + factory_qra_name + javaconstant.JAVA_END_MARK
+        if factory_qra_package not in import_list:
+            file.write(factory_qra_package + '\n')   # import factory qra
+            import_list.append(factory_qra_package)
         file.write('\n')
         
+        # ------------------------------------------------------- #
         # ----- write the service annotation -----
-        tempStr = pack_name + javaconstant.JAVA_DOT_MARK + service_name
-        file.write(javaconstant.JAVA_SERVICE_ANNOTATION % tempStr + '\n')
+        # ------------------------------------------------------- #
+        tempStr = pack_name + javaconstant.JAVA_DOT_MARK + serviceimpl_name
+        file.write(javaconstant.JAVA_ANNOTATION_SERVICE % tempStr + '\n')
         
+        # ------------------------------------------------------- #
         # ----- write the class header -----
-        tempStr = javaconstant.JAVA_SERVICE_HEADER % (service_name, container_inter_name, factory_inter_name)
+        # ------------------------------------------------------- #
+        tempStr = javaconstant.JAVA_SERVICE_HEADER % (serviceimpl_name, container_inter_name, factory_inter_name)
         file.write(tempStr + '\n')
+        file.write('\n')
+        
+        # ------------------------------------------------------- #
+        # ----- write the override methods -----
+        # ------------------------------------------------------- #
+        for mtds in javaconstant.JAVA_SERVICEIMPL_OVERRIDE_METHODS:
+            for lines in mtds:
+                lines = javaconstant.JAVA_TAB + lines
+                # replace container interface
+                if javaconstant.JAVA_ENTITYCONST_CONTAINER_INTER in lines:
+                    lines = lines.replace(javaconstant.JAVA_ENTITYCONST_CONTAINER_INTER, container_inter_name)
+                # replace factory interface
+                if javaconstant.JAVA_ENTITYCONST_FACTORY_INTER in lines:
+                    lines = lines.replace(javaconstant.JAVA_ENTITYCONST_FACTORY_INTER, factory_inter_name)
+                # replace container qra
+                if javaconstant.JAVA_ENTITYCONST_CONTAINER_QRA in lines:
+                    lines = lines.replace(javaconstant.JAVA_ENTITYCONST_CONTAINER_QRA, container_qra_name)
+                # replace factory qra
+                if javaconstant.JAVA_ENTITYCONST_FACTORY_QRA in lines:
+                    lines = lines.replace(javaconstant.JAVA_ENTITYCONST_FACTORY_QRA, factory_qra_name)
+                # replace entity holder
+                if javaconstant.JAVA_ENTITYCONST_HOLDER in lines:
+                    lines = lines.replace(javaconstant.JAVA_ENTITYCONST_HOLDER, entity_holder)
+                # replace create container method
+                if javaconstant.JAVA_ENTITYCONST_CRAET_CONTAINER_INTER in lines:
+                    lines = lines.replace(javaconstant.JAVA_ENTITYCONST_CRAET_CONTAINER_INTER, mtd_create_entity_container)
+                # replace get service method
+                if javaconstant.JAVA_ENTITYCONST_GET_SERVICE_INTER in lines:
+                    lines = lines.replace(javaconstant.JAVA_ENTITYCONST_GET_SERVICE_INTER, mtd_get_entity_service)
+                # replace initialize entityDataset method
+                if javaconstant.JAVA_ENTITYCONST_INITIAL_ENTITY_DATASET in lines:
+                    lines = lines.replace(javaconstant.JAVA_ENTITYCONST_INITIAL_ENTITY_DATASET, mtd_initialize_entityDS)
+                # replace main table interface
+                if javaconstant.JAVA_ENTITYCONST_ENTITY_DATASET in lines:
+                    lines = lines.replace(javaconstant.JAVA_ENTITYCONST_ENTITY_DATASET, main_table_inter_name)
+                # replace get main table list method
+                if javaconstant.JAVA_ENTITYCONST_GET_ENTITY_DATASET_LIST in lines:
+                    lines = lines.replace(javaconstant.JAVA_ENTITYCONST_GET_ENTITY_DATASET_LIST, mtd_get_maintables)
+                
+                
+                
+                if '\n' not in lines:
+                    file.write(lines + '\n')
+                else:
+                    file.write(lines)
+            
+            file.write('\n')
         
         
         
+        # ------------------------------------------------------- #
         # ----- write the class ender -----
+        # ------------------------------------------------------- #
         file.write('\n' + javaconstant.JAVA_RIGHT_BRACE)
         file.close()
         
+        return True
+    
     
     @staticmethod
     def analysis_package_name(package_name):

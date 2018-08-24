@@ -19,6 +19,10 @@ class EntityDTO(object):
         serviceInterDTO = JavaDTO()
         entContInterDTO = JavaDTO()
         factoryInterDTO = JavaDTO()
+        serviceQraDTO = JavaDTO()
+        factoryQraDTO = JavaDTO()
+        entContQraDTO = JavaDTO()
+        maintableInterDTO = JavaDTO()
         
         self.__dto = {'Entity':None,                      # entity name
                       'ViewFullPath':None,                # view metadata path
@@ -28,6 +32,10 @@ class EntityDTO(object):
                       'ServiceInterDTO':serviceInterDTO,  # service interface DTO
                       'FactoryInterDTO':factoryInterDTO,  # factory interface DTO
                       'EntContInterDTO':entContInterDTO,  # entity container interface DTO
+                      'ServiceQraDTO':serviceQraDTO,      # service Qra DTO
+                      'FactoryQraDTO':factoryQraDTO,      # factory Qra DTO
+                      'EntContQraDTO':entContQraDTO,      # entity container Qra DTO
+                      'MaintableInterDTO':maintableInterDTO,   # main table interface DTO
                       }
         
     
@@ -110,6 +118,53 @@ class EntityDTO(object):
         else:
             return None
         
+        
+    def set_serviceQraDTO(self, value):
+        if self.__dto:
+            self.__dto['ServiceQraDTO'] = value
+        
+        
+    def get_serviceQraDTO(self):
+        if self.__dto:
+            return self.__dto['ServiceQraDTO']
+        else:
+            return None
+        
+        
+    def set_entContQraDTO(self, value):
+        if self.__dto:
+            self.__dto['EntContQraDTO'] = value
+        
+        
+    def get_entContQraDTO(self):
+        if self.__dto:
+            return self.__dto['EntContQraDTO']
+        else:
+            return None
+        
+        
+    def set_factoryQraDTO(self, value):
+        if self.__dto:
+            self.__dto['FactoryQraDTO'] = value
+        
+        
+    def get_factoryQraDTO(self):
+        if self.__dto:
+            return self.__dto['FactoryQraDTO']
+        else:
+            return None
+        
+        
+    def set_maintableInterDTO(self, value):
+        if self.__dto:
+            self.__dto['MaintableInterDTO'] = value
+        
+        
+    def get_maintableInterDTO(self):
+        if self.__dto:
+            return self.__dto['MaintableInterDTO']
+        else:
+            return None
 #-------------------- resource metadata dto ---------
     def get_resourceDTO(self):
         if self.__dto:

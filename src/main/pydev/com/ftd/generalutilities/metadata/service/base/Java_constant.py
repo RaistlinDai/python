@@ -58,6 +58,8 @@ class Java_constant(object):
         self.JAVA_FUNCTION_DELETE = 'delete'
         self.JAVA_FUNCTION_FETCH = 'fetch'
         self.JAVA_FUNCTION_CLEARINST = 'clearInstance'
+        self.JAVA_FUNCTION_GET = 'get'
+        self.JAVA_FUNCTION_INITIALIZE = 'initialize'
         
         # --- impl jar service
         self.JAVA_IMPL_PACKAGE_PREFIX = 'com.qad.financials.'
@@ -94,25 +96,52 @@ class Java_constant(object):
         
         
         # ----------------- Code format ----------------#
+        self.JAVA_ENTITYCONST_CONTAINER_INTER = '%CONTAINER_INTERFACE%'
+        self.JAVA_ENTITYCONST_FACTORY_INTER = '%FACTORY_INTERFACE%'
+        self.JAVA_ENTITYCONST_CONTAINER_QRA = '%CONTAINER_QRA%'
+        self.JAVA_ENTITYCONST_FACTORY_QRA = '%FACTORY_QRA%'
+        self.JAVA_ENTITYCONST_HOLDER = '%HOLDER%'
+        self.JAVA_ENTITYCONST_ENTITY_DATASET = '%ENTITY_DATASET%'
+        self.JAVA_ENTITYCONST_CRAET_CONTAINER_INTER = '%MTD_CREATE_CONTAINER_INTERFACE%'
+        self.JAVA_ENTITYCONST_GET_SERVICE_INTER = '%MTD_GET_SERVICE_INTERFACE%'
+        self.JAVA_ENTITYCONST_INITIAL_ENTITY_DATASET = '%MTD_INITIAL_ENTITY_DATASET%'
+        self.JAVA_ENTITYCONST_GET_ENTITY_DATASET_LIST = '%MTD_GET_ENTITY_DATASET_LIST%'
+        
+            
         # initialize()
         self.JAVA_SERVICE_OVERRIDE_INITIALIZE = [self.JAVA_ANNOTATION_OVERRIDE,
-                                                 'public %s initialize() {',
+                                                 'public ' + self.JAVA_ENTITYCONST_CONTAINER_INTER + ' initialize() {',
+                                                 self.JAVA_TAB + self.JAVA_ENTITYCONST_FACTORY_INTER +' factory = this.getEntityFactory();',
                                                  self.JAVA_TAB + 'String str1 = QraWorkspaceUtil.getFinancialEntityCode(sessionDataHolder.getCurrentWorkspace());',
                                                  '\n',
-                                                 self.JAVA_TAB + '%s container = (%s) factory.%s();',
+                                                 self.JAVA_TAB + self.JAVA_ENTITYCONST_CONTAINER_QRA + ' container = (' + self.JAVA_ENTITYCONST_CONTAINER_QRA + ') factory.' + self.JAVA_ENTITYCONST_CRAET_CONTAINER_INTER + '();',
                                                  '\n',
                                                  self.JAVA_TAB + 'Holder<DataGraph> holder = new Holder<DataGraph>((DataGraph) container.getProDataGraph());',
+                                                 self.JAVA_TAB + 'Holder<String> ' + self.JAVA_ENTITYCONST_HOLDER + ' = new com.qad.qra.Holder<String>();',
                                                  '\n',
-                                                 self.JAVA_TAB + 'Holder<String> %sHolder = new com.qad.qra.Holder<String>();',
-                                                 '\n',
-                                                 self.JAVA_TAB + 'factory.get%s().%s(str1, holder, %sHolder);',
+                                                 self.JAVA_TAB + 'factory.' + self.JAVA_ENTITYCONST_GET_SERVICE_INTER + '().' + self.JAVA_ENTITYCONST_INITIAL_ENTITY_DATASET + '(str1, holder, ' + self.JAVA_ENTITYCONST_HOLDER + ');',
                                                  self.JAVA_TAB + 'container.setProDataGraph((ProDataGraph) holder.getValue());',
                                                  self.JAVA_TAB + 'return container;',
                                                  self.JAVA_RIGHT_BRACE]
         
-        self.JAVA_SERVICE_OVERRIDE_getEntityFactory = [self.JAVA_ANNOTATION_OVERRIDE,
-                                                       'protected %s getEntityFactory(ConnectionManager connectionManager, Context context) {',
-                                                       self.JAVA_TAB + 'return new %s(connectionManager, context);',
+        # getEntityFactory()
+        self.JAVA_SERVICE_OVERRIDE_GETENTITYFACTORY = [self.JAVA_ANNOTATION_OVERRIDE,
+                                                       'protected ' + self.JAVA_ENTITYCONST_FACTORY_INTER + ' getEntityFactory(ConnectionManager connectionManager, Context context) {',
+                                                       self.JAVA_TAB + 'return new ' + self.JAVA_ENTITYCONST_FACTORY_QRA + '(connectionManager, context);',
                                                        self.JAVA_RIGHT_BRACE]
         
+        # getEntityListFromContainer()
+        self.JAVA_SERVICE_OVERRIDE_GETENTITYLIST = [self.JAVA_ANNOTATION_OVERRIDE,
+                                                    'public List<' + self.JAVA_ENTITYCONST_ENTITY_DATASET + '> getEntityListFromContainer(' + self.JAVA_ENTITYCONST_CONTAINER_INTER + ' container) {',
+                                                    self.JAVA_TAB + 'List<' + self.JAVA_ENTITYCONST_ENTITY_DATASET + '> entityList = new ArrayList<' + self.JAVA_ENTITYCONST_ENTITY_DATASET + '>();',
+                                                    self.JAVA_TAB + 'for (' + self.JAVA_ENTITYCONST_ENTITY_DATASET + ' entity : container.' + self.JAVA_ENTITYCONST_GET_ENTITY_DATASET_LIST + '()) {',
+                                                    self.JAVA_TAB + self.JAVA_TAB + 'entityList.add(entity);',
+                                                    self.JAVA_TAB + self.JAVA_RIGHT_BRACE,
+                                                    '\n',
+                                                    self.JAVA_TAB + 'return entityList;',
+                                                    self.JAVA_RIGHT_BRACE]
         
+        # override methods list    
+        self.JAVA_SERVICEIMPL_OVERRIDE_METHODS = [self.JAVA_SERVICE_OVERRIDE_INITIALIZE,
+                                                  self.JAVA_SERVICE_OVERRIDE_GETENTITYFACTORY,
+                                                  self.JAVA_SERVICE_OVERRIDE_GETENTITYLIST]
