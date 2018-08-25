@@ -425,6 +425,7 @@ class Frame_serviceimpl_option(FormatableFrame):
         '''
         # service interface
         maintable_interface_name = self.__classlist[6]
+        print(maintable_interface_name)
         # call the java processor
         result, message, maintableInterDTO = Java_processor.read_java_interface(maintable_interface_name)
         if not result:

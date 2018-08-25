@@ -147,10 +147,6 @@ class Java_processor(File_processor):
         class_start_mark = False
         class_block_startln = -1
         class_end_mark = False
-        method_start_mark = False
-        method_end_mark = False
-        method_block_startln = -1
-        method_block_count = 0
         method_param_startIdx = -1
         method_param_endIdx = -1
         
@@ -226,52 +222,53 @@ class Java_processor(File_processor):
             # class inside
             if class_start_mark and class_block_startln > 0 and not class_end_mark:
                 # find the method start point
-                if not method_start_mark and not method_end_mark:
-                    if javaconstant.JAVA_KEY_PUBLIC in cells or javaconstant.JAVA_KEY_PROTECTED in cells or javaconstant.JAVA_KEY_PRIVATE in cells:
-                        # distingush method and property
+                if javaconstant.JAVA_KEY_PUBLIC in cells or javaconstant.JAVA_KEY_PROTECTED in cells or javaconstant.JAVA_KEY_PRIVATE in cells:
+                    # distingush method and property
+                    
+                    # constructor
+                    if javaDTO.get_class_name() in cells:
+                        continue;
+                    
+                    # method
+                    if javaconstant.JAVA_LEFT_BRACKET in eachline:
                         
-                        # constructor
-                        if javaDTO.get_class_name() in cells:
-                            continue;
+                        # method mark
+                        method_param_startIdx = eachline.index(javaconstant.JAVA_LEFT_BRACKET)
+                        new_method = JavaMethodDTO()
                         
-                        # method
-                        if javaconstant.JAVA_LEFT_BRACKET in eachline:
+                        # TODO: currently only parameters in one line could be processed
+                        if javaconstant.JAVA_RIGHT_BRACKET in eachline:
                             # method mark
-                            method_param_startIdx = eachline.index(javaconstant.JAVA_LEFT_BRACKET)
-                            new_method = JavaMethodDTO()
+                            method_param_endIdx = eachline.index(javaconstant.JAVA_RIGHT_BRACKET)
+                        
+                        # --- method name & return
+                        if method_param_startIdx > 0:
+                            method_name_header = eachline[0:method_param_startIdx].strip(' ')
+                            subcells = method_name_header.split(' ')
                             
-                            # TODO: currently only parameters in one line could be processed
-                            if javaconstant.JAVA_RIGHT_BRACKET in eachline:
-                                # method mark
-                                method_param_endIdx = eachline.index(javaconstant.JAVA_RIGHT_BRACKET)
-                                    
-                            # --- method name & return
-                            if method_param_startIdx > 0:
-                                method_name_header = eachline[0:method_param_startIdx].strip(' ')
-                                subcells = method_name_header.split(' ')
-                                
-                                method_name = subcells[-1]
-                                new_method.set_method_name(method_name)
-                                
-                                return_type = subcells[-2]
-                                new_method.set_method_output(return_type)
-                                
-                            # -- parameters
-                            if method_param_startIdx > 0 and method_param_endIdx > 0:
-                                method_param_block = eachline[method_param_startIdx+1:method_param_endIdx]
-                                subcells = method_param_block.split(javaconstant.JAVA_SEPERATOR)
-                                
-                                for subparam in subcells:
-                                    internalcells = subparam.lstrip().split(' ')
-                                    if len(internalcells) > 0:
-                                        continue
-                                    params = JavaParameterDTO()
-                                    params.set_parameter_name(internalcells[1])
-                                    params.set_parameter_type(internalcells[0])
-                                    new_method.push_method_inputs(params)
+                            method_name = subcells[-1]
+                            new_method.set_method_name(method_name)
                             
-                            # add method into DTO
-                            javaDTO.push_class_methods(new_method)
+                            return_type = subcells[-2]
+                            new_method.set_method_output(return_type)
+                        
+                        # -- parameters
+                        if method_param_startIdx > 0 and method_param_endIdx > 0:
+                            method_param_block = eachline[method_param_startIdx+1:method_param_endIdx]
+                            subcells = method_param_block.split(javaconstant.JAVA_SEPERATOR)
+                            
+                            for subparam in subcells:
+                                internalcells = subparam.lstrip().split(' ')
+                                if len(internalcells) <= 1:
+                                    continue
+                                params = JavaParameterDTO()
+                                params.set_parameter_name(internalcells[1])
+                                params.set_parameter_type(internalcells[0])
+                                
+                                new_method.push_method_inputs(params)
+                        
+                        # add method into DTO
+                        javaDTO.push_class_methods(new_method)
                             
         file.close()
         return True, None, javaDTO
@@ -416,7 +413,7 @@ class Java_processor(File_processor):
         imports = entityDTO.get_serviceInterDTO().get_class_imports()
         # additional imports for method parameters/result
         additional_imports = []
-        
+                        
         # createEntityContainer()
         mtd_create_entity_container = javaconstant.JAVA_FUNCTION_CREATE + container_inter_name
         valid_flag = False
@@ -455,19 +452,21 @@ class Java_processor(File_processor):
             return False
         
         # fetch parameters
-        mtd_fetch_param_values = ''
-        mtd_fetch_param_inputs = ''
-        mtd_fetch_param_calls = ''
+        mtd_fetch_param_values = ''      # e.g. entity.getParam1(), entity.getParam2(), entity.getParam3()
+        mtd_fetch_param_inputs = ''      # e.g. String param1, Integer param2, Integer param3
+        mtd_fetch_param_calls = ''       # e.g. param1, param2, param3
         for mtd in service_mtd_list:
-            print(mtd.get_method_name())
+            # fetch method in qra service
             if javaconstant.JAVA_FUNCTION_FETCH == mtd.get_method_name():
+                
                 param_nbr = 0
                 for param in mtd.get_method_inputs():
                     param_nbr = param_nbr + 1
                     
                     for tabMtd in maintable_mtd_list:
+                        print(tabMtd.get_method_name())
                         if tabMtd == javaconstant.JAVA_FUNCTION_GET + param.get_parameter_name()[0:1].upper() + param.get_parameter_name()[1:]:
-                            print(tabMtd)
+                            pass
                             
                     
                     if param_nbr == len(mtd.get_method_inputs()):
