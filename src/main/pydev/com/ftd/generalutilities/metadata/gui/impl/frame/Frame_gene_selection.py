@@ -39,7 +39,9 @@ class Frame_gene_selection(FormatableFrame):
         gene_status = self.get_trans().get_generatorstatus()
         for key, value in gene_status.items():
             # disable the java generator
-            if key == 'JAR' and value[1].get() == 0:
+            if key == 'ImplJAR' and value[1].get() == 0:
+                java_flag = False
+            elif key == 'ApiJAR' and value[1].get() == 0:
                 java_flag = False
                 
         #check buttons
@@ -54,8 +56,8 @@ class Frame_gene_selection(FormatableFrame):
         checkbut_frame2 = UnFormatableFrame(self)
         checkbut_frame2.pack(fill=X)
         Label(checkbut_frame2, text = 'Java:', width=10).pack(side=LEFT)
-        self.__checkvalues02 = {frame_constant.DATA_CONTROLLER:IntVar(), 
-                                frame_constant.SERVICE_IMPL:IntVar() }
+        self.__checkvalues02 = {frame_constant.SERVICE_IMPL:IntVar(),
+                                frame_constant.DATA_CONTROLLER:IntVar()}
         for chkv in self.__checkvalues02.keys():
             if java_flag:
                 chk1 = Checkbutton(checkbut_frame2, text = chkv, variable = self.__checkvalues02[chkv], onvalue = 1, offvalue = 0)

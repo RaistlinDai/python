@@ -385,7 +385,7 @@ class Java_processor(File_processor):
         
         
     @staticmethod
-    def create_service_impl(filefullpath, filename, entityDTO, funcList):
+    def create_service_impl(filefullpath, filename, entityDTO, funcList, createOpt):
         '''
         create the serviceImpl file
         @param filefullpath: the serviceImpl file full path

@@ -160,6 +160,25 @@ class Frame_serviceimpl_option(FormatableFrame):
     
         canv2.pack()
         
+        #---- panel 03 ----------
+        canv3 = Canvas(self, height=70, width=550)
+        #label
+        label1 = Label(canv3, text='Options:')
+        label1.place(height=20, width=60, relx= 0, rely=0)
+        #radio box
+        self.__vari1 = IntVar()
+        self.__rad1 = Radiobutton(canv3, text='Re-write the previous file', variable=self.__vari1, value=1)
+        self.__rad1.place(height=20, width=150, relx= 0.5, rely=0.2)
+        self.__rad1.select()
+        self.__rad2 = Radiobutton(canv3, text='Attach new functions to the file', variable=self.__vari1, value=2)
+        self.__rad2.place(height=20, width=20, relx= 0.5, rely=0.5)
+        self.__rad2.deselect()
+        self.__rad3 = Radiobutton(canv3, text='Save the previous file as backup', variable=self.__vari1, value=3)
+        self.__rad3.place(height=20, width=20, relx= 0.5, rely=0.8)
+        self.__rad3.deselect()
+        canv3.pack()
+
+        
         #set the function list to the left box
         for javaMtd in serviceInterDTO.get_class_methods():
             self.__funclists[javaMtd.get_method_name()] = javaMtd
@@ -192,7 +211,7 @@ class Frame_serviceimpl_option(FormatableFrame):
             return
         
         # write serviceImpl
-        Java_processor.create_service_impl(self.get_trans().get_workspacepath() + self.__feet.get(), self.__feet.get(), self.get_dtos(), self.__listboxright.get(0, END))
+        Java_processor.create_service_impl(self.get_trans().get_workspacepath() + self.__feet.get(), self.__feet.get(), self.get_dtos(), self.__listboxright.get(0, END), self.__vari1.get())
         
         return True
         
