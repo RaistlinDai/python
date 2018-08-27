@@ -13,7 +13,6 @@ from src.main.pydev.com.ftd.generalutilities.metadata.service.base.Java_constant
 from src.main.pydev.com.ftd.generalutilities.metadata.dto.javaFile.JavaDTO import JavaDTO,\
     JavaMethodDTO, JavaParameterDTO
 from pathlib import Path
-from abc import abstractstaticmethod
 
 class Java_processor(File_processor):
     '''
@@ -362,9 +361,19 @@ class Java_processor(File_processor):
                                 paramDTO.set_parameter_type(paramcells[-2])
                             
                                 # verify the imports for parameter
+                                # holders
+                                collection_params = []
+                                if javaconstant.JAVA_COLLECTION_HOLDER in paramDTO.get_parameter_type() and javaconstant.JAVA_LEFT_DASH in paramDTO.get_parameter_type() and javaconstant.JAVA_RIGHT_DASH in paramDTO.get_parameter_type():
+                                    left_dash_idx = paramDTO.get_parameter_type().index(javaconstant.JAVA_LEFT_DASH)
+                                    right_dash_idx = paramDTO.get_parameter_type().index(javaconstant.JAVA_RIGJHT_DASH)
+                                    temp_param = paramDTO.get_parameter_type()[left_dash_idx+1:right_dash_idx]
+                                    collection_params.append(temp_param)
+                                    
                                 for imp in javaDTO.get_class_imports():
                                     impcells = imp.split(javaconstant.JAVA_DOT_MARK)
                                     if impcells[-1] == paramDTO.get_parameter_type():
+                                        methodDTO.push_method_related_imports(imp)
+                                    elif len(collection_params) > 0 and impcells[-1] in collection_params:
                                         methodDTO.push_method_related_imports(imp)
                                     
                                 # add input parameter
@@ -534,10 +543,10 @@ class Java_processor(File_processor):
                 # fetch method in qra service
                 if func == mtd.get_method_name():
                     temp_func_list.append(mtd)
-                    
-        
-        # add additional_imports
-        
+                    # add additional_imports
+                    if len(mtd.get_method_related_imports() > 0):
+                        for rel_imp in mtd.get_method_related_imports():
+                            additional_imports.append(rel_imp)
         
         # create file
         Path(filefullpath).touch()
@@ -617,11 +626,17 @@ class Java_processor(File_processor):
             file.write(factory_qra_package + '\n')   # import factory qra
             import_list.append(factory_qra_package)
             
-        factory_qra_package = javaconstant.JAVA_KEY_IMPORT + ' ' + entityDTO.get_maintableInterDTO().get_class_package()[:-1] + javaconstant.JAVA_DOT_MARK + main_table_inter_name + javaconstant.JAVA_END_MARK
-        if factory_qra_package not in import_list:
-            file.write(factory_qra_package + '\n')   # import main table interface
-            import_list.append(factory_qra_package)
-        file.write('\n')
+        mainttbl_inter_package = javaconstant.JAVA_KEY_IMPORT + ' ' + entityDTO.get_maintableInterDTO().get_class_package()[:-1] + javaconstant.JAVA_DOT_MARK + main_table_inter_name + javaconstant.JAVA_END_MARK
+        if mainttbl_inter_package not in import_list:
+            file.write(mainttbl_inter_package + '\n')   # import main table interface
+            import_list.append(mainttbl_inter_package)
+        
+        # additional imports
+        for add_imp in additional_imports:
+            if add_imp not in import_list:
+                file.write(add_imp + '\n')
+                import_list.append(add_imp)
+        file.write('\n')  
         
         # ------------------------------------------------------- #
         # ----- write the service annotation -----
@@ -643,38 +658,38 @@ class Java_processor(File_processor):
             for lines in mtds:
                 lines = javaconstant.JAVA_TAB + lines
                 # replace container interface
-                if javaconstant.JAVA_ENTITYCONST_CONTAINER_INTER in lines:
-                    lines = lines.replace(javaconstant.JAVA_ENTITYCONST_CONTAINER_INTER, container_inter_name)
+                if javaconstant.JAVA_ENTITY_CONST_CONTAINER_INTER in lines:
+                    lines = lines.replace(javaconstant.JAVA_ENTITY_CONST_CONTAINER_INTER, container_inter_name)
                 # replace factory interface
-                if javaconstant.JAVA_ENTITYCONST_FACTORY_INTER in lines:
-                    lines = lines.replace(javaconstant.JAVA_ENTITYCONST_FACTORY_INTER, factory_inter_name)
+                if javaconstant.JAVA_ENTITY_CONST_FACTORY_INTER in lines:
+                    lines = lines.replace(javaconstant.JAVA_ENTITY_CONST_FACTORY_INTER, factory_inter_name)
                 # replace container qra
-                if javaconstant.JAVA_ENTITYCONST_CONTAINER_QRA in lines:
-                    lines = lines.replace(javaconstant.JAVA_ENTITYCONST_CONTAINER_QRA, container_qra_name)
+                if javaconstant.JAVA_ENTITY_CONST_CONTAINER_QRA in lines:
+                    lines = lines.replace(javaconstant.JAVA_ENTITY_CONST_CONTAINER_QRA, container_qra_name)
                 # replace factory qra
-                if javaconstant.JAVA_ENTITYCONST_FACTORY_QRA in lines:
-                    lines = lines.replace(javaconstant.JAVA_ENTITYCONST_FACTORY_QRA, factory_qra_name)
+                if javaconstant.JAVA_ENTITY_CONST_FACTORY_QRA in lines:
+                    lines = lines.replace(javaconstant.JAVA_ENTITY_CONST_FACTORY_QRA, factory_qra_name)
                 # replace entity holder
-                if javaconstant.JAVA_ENTITYCONST_HOLDER in lines:
-                    lines = lines.replace(javaconstant.JAVA_ENTITYCONST_HOLDER, entity_holder)
+                if javaconstant.JAVA_ENTITY_CONST_HOLDER in lines:
+                    lines = lines.replace(javaconstant.JAVA_ENTITY_CONST_HOLDER, entity_holder)
                 # replace create container method
-                if javaconstant.JAVA_ENTITYCONST_CRAET_CONTAINER_INTER in lines:
-                    lines = lines.replace(javaconstant.JAVA_ENTITYCONST_CRAET_CONTAINER_INTER, mtd_create_entity_container)
+                if javaconstant.JAVA_MTD_CONST_CRAET_CONTAINER_INTER in lines:
+                    lines = lines.replace(javaconstant.JAVA_MTD_CONST_CRAET_CONTAINER_INTER, mtd_create_entity_container)
                 # replace get service method
-                if javaconstant.JAVA_ENTITYCONST_GET_SERVICE_INTER in lines:
-                    lines = lines.replace(javaconstant.JAVA_ENTITYCONST_GET_SERVICE_INTER, mtd_get_entity_service)
+                if javaconstant.JAVA_MTD_CONST_GET_SERVICE_INTER in lines:
+                    lines = lines.replace(javaconstant.JAVA_MTD_CONST_GET_SERVICE_INTER, mtd_get_entity_service)
                 # replace initialize entityDataset method
-                if javaconstant.JAVA_ENTITYCONST_INITIAL_ENTITY_DATASET in lines:
-                    lines = lines.replace(javaconstant.JAVA_ENTITYCONST_INITIAL_ENTITY_DATASET, mtd_initialize_entityDS)
+                if javaconstant.JAVA_MTD_CONST_INITIAL_ENTITY_DATASET in lines:
+                    lines = lines.replace(javaconstant.JAVA_MTD_CONST_INITIAL_ENTITY_DATASET, mtd_initialize_entityDS)
                 # replace main table interface
-                if javaconstant.JAVA_ENTITYCONST_ENTITY_DATASET in lines:
-                    lines = lines.replace(javaconstant.JAVA_ENTITYCONST_ENTITY_DATASET, main_table_inter_name)
+                if javaconstant.JAVA_ENTITY_CONST_ENTITY_DATASET in lines:
+                    lines = lines.replace(javaconstant.JAVA_ENTITY_CONST_ENTITY_DATASET, main_table_inter_name)
                 # replace get main table list method
-                if javaconstant.JAVA_ENTITYCONST_GET_ENTITY_DATASET_LIST in lines:
-                    lines = lines.replace(javaconstant.JAVA_ENTITYCONST_GET_ENTITY_DATASET_LIST, mtd_get_maintables)
+                if javaconstant.JAVA_MTD_CONST_GET_ENTITY_DATASET_LIST in lines:
+                    lines = lines.replace(javaconstant.JAVA_MTD_CONST_GET_ENTITY_DATASET_LIST, mtd_get_maintables)
                 # replace fetch input parameters
-                if javaconstant.JAVA_ENTITYCONST_FETCH_METHOD_PARAMS_VALUE in lines:
-                    lines = lines.replace(javaconstant.JAVA_ENTITYCONST_FETCH_METHOD_PARAMS_VALUE, mtd_fetch_param_values)
+                if javaconstant.JAVA_MTD_CONST_FETCH_METHOD_PARAMS_VALUE in lines:
+                    lines = lines.replace(javaconstant.JAVA_MTD_CONST_FETCH_METHOD_PARAMS_VALUE, mtd_fetch_param_values)
                 
                 if '\n' not in lines:
                     file.write(lines + '\n')
@@ -690,50 +705,50 @@ class Java_processor(File_processor):
             for lines in mtds:
                 lines = javaconstant.JAVA_TAB + lines
                 # replace container interface
-                if javaconstant.JAVA_ENTITYCONST_CONTAINER_INTER in lines:
-                    lines = lines.replace(javaconstant.JAVA_ENTITYCONST_CONTAINER_INTER, container_inter_name)
+                if javaconstant.JAVA_ENTITY_CONST_CONTAINER_INTER in lines:
+                    lines = lines.replace(javaconstant.JAVA_ENTITY_CONST_CONTAINER_INTER, container_inter_name)
                 # replace factory interface
-                if javaconstant.JAVA_ENTITYCONST_FACTORY_INTER in lines:
-                    lines = lines.replace(javaconstant.JAVA_ENTITYCONST_FACTORY_INTER, factory_inter_name)
+                if javaconstant.JAVA_ENTITY_CONST_FACTORY_INTER in lines:
+                    lines = lines.replace(javaconstant.JAVA_ENTITY_CONST_FACTORY_INTER, factory_inter_name)
                 # replace container qra
-                if javaconstant.JAVA_ENTITYCONST_CONTAINER_QRA in lines:
-                    lines = lines.replace(javaconstant.JAVA_ENTITYCONST_CONTAINER_QRA, container_qra_name)
+                if javaconstant.JAVA_ENTITY_CONST_CONTAINER_QRA in lines:
+                    lines = lines.replace(javaconstant.JAVA_ENTITY_CONST_CONTAINER_QRA, container_qra_name)
                 # replace factory qra
-                if javaconstant.JAVA_ENTITYCONST_FACTORY_QRA in lines:
-                    lines = lines.replace(javaconstant.JAVA_ENTITYCONST_FACTORY_QRA, factory_qra_name)
+                if javaconstant.JAVA_ENTITY_CONST_FACTORY_QRA in lines:
+                    lines = lines.replace(javaconstant.JAVA_ENTITY_CONST_FACTORY_QRA, factory_qra_name)
                 # replace entity holder
-                if javaconstant.JAVA_ENTITYCONST_HOLDER in lines:
-                    lines = lines.replace(javaconstant.JAVA_ENTITYCONST_HOLDER, entity_holder)
+                if javaconstant.JAVA_ENTITY_CONST_HOLDER in lines:
+                    lines = lines.replace(javaconstant.JAVA_ENTITY_CONST_HOLDER, entity_holder)
                 # replace create container method
-                if javaconstant.JAVA_ENTITYCONST_CRAET_CONTAINER_INTER in lines:
-                    lines = lines.replace(javaconstant.JAVA_ENTITYCONST_CRAET_CONTAINER_INTER, mtd_create_entity_container)
+                if javaconstant.JAVA_MTD_CONST_CRAET_CONTAINER_INTER in lines:
+                    lines = lines.replace(javaconstant.JAVA_MTD_CONST_CRAET_CONTAINER_INTER, mtd_create_entity_container)
                 # replace get service method
-                if javaconstant.JAVA_ENTITYCONST_GET_SERVICE_INTER in lines:
-                    lines = lines.replace(javaconstant.JAVA_ENTITYCONST_GET_SERVICE_INTER, mtd_get_entity_service)
+                if javaconstant.JAVA_MTD_CONST_GET_SERVICE_INTER in lines:
+                    lines = lines.replace(javaconstant.JAVA_MTD_CONST_GET_SERVICE_INTER, mtd_get_entity_service)
                 # replace initialize entityDataset method
-                if javaconstant.JAVA_ENTITYCONST_INITIAL_ENTITY_DATASET in lines:
-                    lines = lines.replace(javaconstant.JAVA_ENTITYCONST_INITIAL_ENTITY_DATASET, mtd_initialize_entityDS)
+                if javaconstant.JAVA_MTD_CONST_INITIAL_ENTITY_DATASET in lines:
+                    lines = lines.replace(javaconstant.JAVA_MTD_CONST_INITIAL_ENTITY_DATASET, mtd_initialize_entityDS)
                 # replace main table interface
-                if javaconstant.JAVA_ENTITYCONST_ENTITY_DATASET in lines:
-                    lines = lines.replace(javaconstant.JAVA_ENTITYCONST_ENTITY_DATASET, main_table_inter_name)
+                if javaconstant.JAVA_ENTITY_CONST_ENTITY_DATASET in lines:
+                    lines = lines.replace(javaconstant.JAVA_ENTITY_CONST_ENTITY_DATASET, main_table_inter_name)
                 # replace get main table list method
-                if javaconstant.JAVA_ENTITYCONST_GET_ENTITY_DATASET_LIST in lines:
-                    lines = lines.replace(javaconstant.JAVA_ENTITYCONST_GET_ENTITY_DATASET_LIST, mtd_get_maintables)
+                if javaconstant.JAVA_MTD_CONST_GET_ENTITY_DATASET_LIST in lines:
+                    lines = lines.replace(javaconstant.JAVA_MTD_CONST_GET_ENTITY_DATASET_LIST, mtd_get_maintables)
                 # replace fetch input parameters
-                if javaconstant.JAVA_ENTITYCONST_FETCH_METHOD_PARAMS_VALUE in lines:
-                    lines = lines.replace(javaconstant.JAVA_ENTITYCONST_FETCH_METHOD_PARAMS_VALUE, mtd_fetch_param_values)
-                if javaconstant.JAVA_ENTITYCONST_FETCH_METHOD_PARAMS_INPUT in lines:
-                    lines = lines.replace(javaconstant.JAVA_ENTITYCONST_FETCH_METHOD_PARAMS_INPUT, mtd_fetch_param_inputs)
-                if javaconstant.JAVA_ENTITYCONST_FETCH_METHOD_PARAMS_CALL in lines:
-                    lines = lines.replace(javaconstant.JAVA_ENTITYCONST_FETCH_METHOD_PARAMS_CALL, mtd_fetch_param_calls)
+                if javaconstant.JAVA_MTD_CONST_FETCH_METHOD_PARAMS_VALUE in lines:
+                    lines = lines.replace(javaconstant.JAVA_MTD_CONST_FETCH_METHOD_PARAMS_VALUE, mtd_fetch_param_values)
+                if javaconstant.JAVA_MTD_CONST_FETCH_METHOD_PARAMS_INPUT in lines:
+                    lines = lines.replace(javaconstant.JAVA_MTD_CONST_FETCH_METHOD_PARAMS_INPUT, mtd_fetch_param_inputs)
+                if javaconstant.JAVA_MTD_CONST_FETCH_METHOD_PARAMS_CALL in lines:
+                    lines = lines.replace(javaconstant.JAVA_MTD_CONST_FETCH_METHOD_PARAMS_CALL, mtd_fetch_param_calls)
                 # replace add main table method
-                if javaconstant.JAVA_ENTITYCONST_ADD_ENTITY_DATASET in lines:
-                    lines = lines.replace(javaconstant.JAVA_ENTITYCONST_ADD_ENTITY_DATASET, mtd_add_maintables)
+                if javaconstant.JAVA_MTD_CONST_ADD_ENTITY_DATASET in lines:
+                    lines = lines.replace(javaconstant.JAVA_MTD_CONST_ADD_ENTITY_DATASET, mtd_add_maintables)
                 # replace fetch input parameters
-                if javaconstant.JAVA_ENTITYCONST_ADD_METHOD_PARAMS_INPUT in lines:
-                    lines = lines.replace(javaconstant.JAVA_ENTITYCONST_ADD_METHOD_PARAMS_INPUT, mtd_add_param_inputs)
-                if javaconstant.JAVA_ENTITYCONST_ADD_METHOD_PARAMS_CALL in lines:
-                    lines = lines.replace(javaconstant.JAVA_ENTITYCONST_ADD_METHOD_PARAMS_CALL, mtd_add_param_calls)
+                if javaconstant.JAVA_MTD_CONST_ADD_METHOD_PARAMS_INPUT in lines:
+                    lines = lines.replace(javaconstant.JAVA_MTD_CONST_ADD_METHOD_PARAMS_INPUT, mtd_add_param_inputs)
+                if javaconstant.JAVA_MTD_CONST_ADD_METHOD_PARAMS_CALL in lines:
+                    lines = lines.replace(javaconstant.JAVA_MTD_CONST_ADD_METHOD_PARAMS_CALL, mtd_add_param_calls)
                 
                 if '\n' not in lines:
                     file.write(lines + '\n')
@@ -778,8 +793,8 @@ class Java_processor(File_processor):
             for lines in javaconstant.JAVA_SERVICEIMPL_COMMON_COMMENT:
                 lines = javaconstant.JAVA_TAB + lines
                 # replace method name
-                if javaconstant.JAVA_ENTITYCONST_COMMON_METHOD_COMMENT in lines:
-                    lines = lines.replace(javaconstant.JAVA_ENTITYCONST_COMMON_METHOD_COMMENT, mtd_param_commt)
+                if javaconstant.JAVA_MTD_CONST_COMMON_METHOD_COMMENT in lines:
+                    lines = lines.replace(javaconstant.JAVA_MTD_CONST_COMMON_METHOD_COMMENT, mtd_param_commt)
                 
                 if '\n' not in lines:
                     file.write(lines + '\n')
@@ -791,13 +806,13 @@ class Java_processor(File_processor):
             for lines in javaconstant.JAVA_SERVICEIMPL_COMMON_FORAMT:
                 lines = javaconstant.JAVA_TAB + lines
                 # replace method name
-                if javaconstant.JAVA_ENTITYCONST_COMMON_MEHTOD_NAME in lines:
-                    lines = lines.replace(javaconstant.JAVA_ENTITYCONST_COMMON_MEHTOD_NAME, temp_func.get_method_name())
-                if javaconstant.JAVA_ENTITYCONST_FACTORY_QRA in lines:
-                    lines = lines.replace(javaconstant.JAVA_ENTITYCONST_FACTORY_QRA, factory_qra_name)
-                if javaconstant.JAVA_ENTITYCONST_GET_SERVICE_INTER in lines:
-                    lines = lines.replace(javaconstant.JAVA_ENTITYCONST_GET_SERVICE_INTER, mtd_get_entity_service)
-                if javaconstant.JAVA_ENTITYCONST_COMMON_METHOD_PARAM_INPUT in lines:
+                if javaconstant.JAVA_MTD_CONST_COMMON_MEHTOD_NAME in lines:
+                    lines = lines.replace(javaconstant.JAVA_MTD_CONST_COMMON_MEHTOD_NAME, temp_func.get_method_name())
+                if javaconstant.JAVA_ENTITY_CONST_FACTORY_QRA in lines:
+                    lines = lines.replace(javaconstant.JAVA_ENTITY_CONST_FACTORY_QRA, factory_qra_name)
+                if javaconstant.JAVA_MTD_CONST_GET_SERVICE_INTER in lines:
+                    lines = lines.replace(javaconstant.JAVA_MTD_CONST_GET_SERVICE_INTER, mtd_get_entity_service)
+                if javaconstant.JAVA_MTD_CONST_COMMON_METHOD_PARAM_INPUT in lines:
                     if '\n' in mtd_param_input:
                         temp_line_nbr = 1
                         for temp_param in mtd_param_input.split('\n'):
@@ -812,9 +827,9 @@ class Java_processor(File_processor):
                                 mtd_param_input = mtd_param_input + temp_param
                             temp_line_nbr = temp_line_nbr + 1
                     mtd_param_input + '\n'
-                    lines = lines.replace(javaconstant.JAVA_ENTITYCONST_COMMON_METHOD_PARAM_INPUT, mtd_param_input)
+                    lines = lines.replace(javaconstant.JAVA_MTD_CONST_COMMON_METHOD_PARAM_INPUT, mtd_param_input)
                     
-                if javaconstant.JAVA_ENTITYCONST_COMMON_METHOD_PARAM_CALL in lines:
+                if javaconstant.JAVA_MTD_CONST_COMMON_METHOD_PARAM_CALL in lines:
                     if '\n' in mtd_param_call:
                         temp_line_nbr = 1
                         for temp_param in mtd_param_call.split('\n'):
@@ -829,7 +844,7 @@ class Java_processor(File_processor):
                                 mtd_param_call = mtd_param_call + temp_param
                             temp_line_nbr = temp_line_nbr + 1
                     mtd_param_call + '\n'
-                    lines = lines.replace(javaconstant.JAVA_ENTITYCONST_COMMON_METHOD_PARAM_CALL, mtd_param_call)
+                    lines = lines.replace(javaconstant.JAVA_MTD_CONST_COMMON_METHOD_PARAM_CALL, mtd_param_call)
     
                 line_tab_count = lines.count(javaconstant.JAVA_TAB)
                 

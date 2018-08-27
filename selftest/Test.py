@@ -7,6 +7,7 @@ course from: https://www.liaoxuefeng.com/wiki/0014316089557264a6b348958f449949df
 '''
 from selftest import MyDef
 from src.main.pydev.com.ftd.generalutilities.metadata.service.fileproc.Java_processor import Java_processor
+from src.main.pydev.com.ftd.generalutilities.metadata.service.base.File_processor import File_processor
 
 print('hello,world')
 
@@ -49,7 +50,11 @@ elif testType == 7:
     print(data)
     
 elif testType == 8:
-    Java_processor.unzip_jar('C:\\Users\\Raistlin\\Desktop\\PyWorkspace\\FtdJD.jar', 'C:\\Users\\Raistlin\\Desktop\\PyWorkspace\\uj', True)
+    tempstr = 'Holder<abcd>'
+    left_dash_idx = tempstr.index('<')
+    right_dash_idx = tempstr.index('>')
+    temp_param = tempstr[left_dash_idx+1:right_dash_idx]
+    print(temp_param)
     
 elif testType == 9:
     Java_processor.java_decomp_ftdJD('C:\\Users\\Raistlin\\Desktop\\PyWorkspace\\FtdJD.jar', 'C:\\Users\\Raistlin\\Desktop\\PyWorkspace\\output\\')
