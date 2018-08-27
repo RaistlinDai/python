@@ -59,6 +59,7 @@ class Java_constant(object):
         self.JAVA_FUNCTION_FETCH = 'fetch'
         self.JAVA_FUNCTION_CLEARINST = 'clearInstance'
         self.JAVA_FUNCTION_GET = 'get'
+        self.JAVA_FUNCTION_ADD = 'add'
         self.JAVA_FUNCTION_INITIALIZE = 'initialize'
         
         # --- impl jar service
@@ -106,9 +107,19 @@ class Java_constant(object):
         self.JAVA_ENTITYCONST_GET_SERVICE_INTER = '%MTD_GET_SERVICE_INTERFACE%'
         self.JAVA_ENTITYCONST_INITIAL_ENTITY_DATASET = '%MTD_INITIAL_ENTITY_DATASET%'
         self.JAVA_ENTITYCONST_GET_ENTITY_DATASET_LIST = '%MTD_GET_ENTITY_DATASET_LIST%'
-        self.JAVA_ENTITYCONST_FETCH_METHOD_PARAMS = '%FETCH_MTD_PARAMETERS%'
+        self.JAVA_ENTITYCONST_FETCH_METHOD_PARAMS_VALUE = '%FETCH_MTD_PARAMETERS_VALUE%'
+        self.JAVA_ENTITYCONST_FETCH_METHOD_PARAMS_INPUT = '%FETCH_MTD_PARAMETERS%_INPUT'
+        self.JAVA_ENTITYCONST_FETCH_METHOD_PARAMS_CALL = '%FETCH_MTD_PARAMETERS%_CALL'
+        self.JAVA_ENTITYCONST_ADD_ENTITY_DATASET = '%MTD_ADD_ENTITY_DATASET%'
+        self.JAVA_ENTITYCONST_ADD_METHOD_PARAMS_INPUT = '%ADD_MTD_PARAMETERS%_INPUT'
+        self.JAVA_ENTITYCONST_ADD_METHOD_PARAMS_CALL = '%ADD_MTD_PARAMETERS%_CALL'
+        self.JAVA_ENTITYCONST_COMMON_MEHTOD_NAME = '%COMMON_METHOD_NAME%'
+        self.JAVA_ENTITYCONST_COMMON_METHOD_PARAM_INPUT = '%COMMON_METHOD_PARAM_INPUT%'
+        self.JAVA_ENTITYCONST_COMMON_METHOD_PARAM_CALL = '%COMMON_METHOD_PARAM_CALL%'
+        self.JAVA_ENTITYCONST_COMMON_METHOD_COMMENT = '%COMMON_METHOD_COMMENT%'
         
-            
+        
+        # ------------------- Standard methods -------------------------- #
         # initialize()
         self.JAVA_SERVICE_OVERRIDE_INITIALIZE = [self.JAVA_ANNOTATION_OVERRIDE,
                                                  'public ' + self.JAVA_ENTITYCONST_CONTAINER_INTER + ' initialize() {',
@@ -162,7 +173,7 @@ class Java_constant(object):
         self.JAVA_SERVICE_OVERRIDE_READENTITY = [self.JAVA_ANNOTATION_OVERRIDE,
                                                  'protected ' + self.JAVA_ENTITYCONST_CONTAINER_INTER + ' readEntity(' + self.JAVA_ENTITYCONST_CONTAINER_INTER + ' container) {',
                                                  self.JAVA_TAB + self.JAVA_ENTITYCONST_ENTITY_DATASET + ' entity = getEntityListFromContainer(container).get(0);',
-                                                 self.JAVA_TAB + 'return read(' + self.JAVA_ENTITYCONST_FETCH_METHOD_PARAMS + ');',
+                                                 self.JAVA_TAB + 'return read(' + self.JAVA_ENTITYCONST_FETCH_METHOD_PARAMS_VALUE + ');',
                                                  self.JAVA_RIGHT_BRACE]
         
         # getJsonFromEntity()
@@ -180,3 +191,62 @@ class Java_constant(object):
                                                   self.JAVA_SERVICE_OVERRIDE_UPDATEENTITY,
                                                   self.JAVA_SERVICE_OVERRIDE_READENTITY,
                                                   self.JAVA_SERVICE_OVERRIDE_GETJSONFROMENTITY]
+        
+        # read()
+        self.JAVA_SERVICE_READ = ['public ' + self.JAVA_ENTITYCONST_CONTAINER_INTER + ' read(' + self.JAVA_ENTITYCONST_FETCH_METHOD_PARAMS_INPUT +') {',
+                                  self.JAVA_TAB + self.JAVA_ENTITYCONST_CONTAINER_QRA + ' container = null;',
+                                  self.JAVA_TAB + 'try {',
+                                  self.JAVA_TAB + self.JAVA_TAB + self.JAVA_ENTITYCONST_FACTORY_QRA + ' factory = (' + self.JAVA_ENTITYCONST_FACTORY_QRA + ') getEntityFactory();',
+                                  self.JAVA_TAB + self.JAVA_TAB + 'container = factory.' + self.JAVA_ENTITYCONST_CRAET_CONTAINER_INTER + '();',
+                                  '\n',
+                                  self.JAVA_TAB + self.JAVA_TAB + 'Holder<DataGraph> holder = new Holder<DataGraph>();',
+                                  self.JAVA_TAB + self.JAVA_TAB + 'factory.' + self.JAVA_ENTITYCONST_GET_SERVICE_INTER + '().fetch(' + self.JAVA_ENTITYCONST_FETCH_METHOD_PARAMS_CALL + ', holder);',
+                                  self.JAVA_TAB + self.JAVA_TAB + 'container.setProDataGraph((ProDataGraph) holder.getValue());',
+                                  '\n',
+                                  self.JAVA_TAB + '} catch (ApiException apie) {',
+                                  self.JAVA_TAB + self.JAVA_TAB + 'if (ExceptionUtil.isMessageNumber(apie, 5)) // Not found',
+                                  self.JAVA_TAB + self.JAVA_TAB + self.JAVA_TAB + 'container = null;',
+                                  self.JAVA_TAB + self.JAVA_TAB + 'else',
+                                  self.JAVA_TAB + self.JAVA_TAB + self.JAVA_TAB + 'throw apie;',
+                                  self.JAVA_TAB + self.JAVA_RIGHT_BRACE,
+                                  '\n',
+                                  self.JAVA_TAB + 'return container;',
+                                  self.JAVA_RIGHT_BRACE]
+        
+        # delete()
+        self.JAVA_SERVICE_DELETE = ['public SubmitResultAndData<' + self.JAVA_ENTITYCONST_CONTAINER_INTER + '> delete(' + self.JAVA_ENTITYCONST_ADD_METHOD_PARAMS_INPUT + ') {',
+                                    self.JAVA_TAB + 'SubmitResultAndData<' + self.JAVA_ENTITYCONST_CONTAINER_INTER + '> submitResultAndData = new SubmitResultAndData<' + self.JAVA_ENTITYCONST_CONTAINER_INTER + '>();',
+                                    self.JAVA_TAB + '' + self.JAVA_ENTITYCONST_CONTAINER_INTER + ' resultContainer = null;',
+                                    '\n',
+                                    self.JAVA_TAB + 'try {',
+                                    self.JAVA_TAB + self.JAVA_TAB + self.JAVA_ENTITYCONST_FACTORY_INTER + ' factory = getEntityFactory();',
+                                    self.JAVA_TAB + self.JAVA_TAB + self.JAVA_ENTITYCONST_CONTAINER_QRA + ' container = (' + self.JAVA_ENTITYCONST_CONTAINER_QRA + ') factory.'+ self.JAVA_ENTITYCONST_CRAET_CONTAINER_INTER + '();',
+                                    self.JAVA_TAB + self.JAVA_TAB + 'container.' + self.JAVA_ENTITYCONST_ADD_ENTITY_DATASET + '(' + self.JAVA_ENTITYCONST_ADD_METHOD_PARAMS_CALL + ');',
+                                    self.JAVA_TAB + self.JAVA_TAB + 'factory.' + self.JAVA_ENTITYCONST_GET_SERVICE_INTER + '().delete(container.getProDataGraph());',
+                                    self.JAVA_TAB + self.JAVA_TAB + 'resultContainer = factory.'+ self.JAVA_ENTITYCONST_CRAET_CONTAINER_INTER + '();',
+                                    self.JAVA_TAB + '} catch (ApiException apie) {',
+                                    self.JAVA_TAB + self.JAVA_TAB + 'ExceptionUtil.convertException(apie, submitResultAndData);',
+                                    self.JAVA_TAB + self.JAVA_RIGHT_BRACE,
+                                    '\n',
+                                    self.JAVA_TAB + 'submitResultAndData.setData(resultContainer);',
+                                    self.JAVA_TAB + 'return submitResultAndData;',
+                                    self.JAVA_RIGHT_BRACE]
+        
+        # CRUD methods list    
+        self.JAVA_SERVICEIMPL_CRUD_METHODS = [self.JAVA_SERVICE_READ,
+                                              self.JAVA_SERVICE_DELETE]
+        
+        
+        # general methods format
+        self.JAVA_SERVICEIMPL_COMMON_FORAMT = ['public void ' + self.JAVA_ENTITYCONST_COMMON_MEHTOD_NAME + '(' + self.JAVA_ENTITYCONST_COMMON_METHOD_PARAM_INPUT + ') {\n',
+                                               '\n',
+                                               self.JAVA_TAB + self.JAVA_ENTITYCONST_FACTORY_QRA + ' factory = (' + self.JAVA_ENTITYCONST_FACTORY_QRA + ') getEntityFactory();',
+                                               '\n',
+                                               self.JAVA_TAB + 'factory.' + self.JAVA_ENTITYCONST_GET_SERVICE_INTER + '().' + self.JAVA_ENTITYCONST_COMMON_MEHTOD_NAME + '(' + self.JAVA_ENTITYCONST_COMMON_METHOD_PARAM_CALL + ');\n',
+                                               self.JAVA_RIGHT_BRACE]
+        
+        # general methods comment
+        self.JAVA_SERVICEIMPL_COMMON_COMMENT = ['/**',
+                                                ' *',
+                                                self.JAVA_ENTITYCONST_COMMON_METHOD_COMMENT,
+                                                ' */']

@@ -13,6 +13,7 @@ from src.main.pydev.com.ftd.generalutilities.metadata.service.base.Java_constant
 from src.main.pydev.com.ftd.generalutilities.metadata.dto.javaFile.JavaDTO import JavaDTO,\
     JavaMethodDTO, JavaParameterDTO
 from pathlib import Path
+from abc import abstractstaticmethod
 
 class Java_processor(File_processor):
     '''
@@ -338,13 +339,14 @@ class Java_processor(File_processor):
                     # all parameters are in a single line
                     if javaconstant.JAVA_LEFT_BRACKET in eachline and javaconstant.JAVA_RIGHT_BRACKET in eachline:
                         mtd_headers_and_param = eachline.split(javaconstant.JAVA_LEFT_BRACKET)
-                        mtd_headers = mtd_headers_and_param[0].split(' ')
+                        mtd_headers = mtd_headers_and_param[0].lstrip().split(' ')
+                        
                         # method name
                         methodDTO.set_method_name(mtd_headers[-1])
                         # method return
                         methodDTO.set_method_output(mtd_headers[-2])
                         # method range
-                        methodDTO.set_method_output(javaconstant.JAVA_KEY_PUBLIC)
+                        methodDTO.set_method_range(javaconstant.JAVA_KEY_PUBLIC)
                         
                         # method inputs
                         method_param = mtd_headers_and_param[1]
@@ -353,9 +355,9 @@ class Java_processor(File_processor):
                             methodDTO.set_method_inputs(None)
                         else:
                             params = method_param.split(javaconstant.JAVA_SEPERATOR)
-                            paramDTO = JavaParameterDTO()
                             for param in params:
                                 paramcells = param.lstrip().split(' ')
+                                paramDTO = JavaParameterDTO()
                                 paramDTO.set_parameter_name(paramcells[-1])
                                 paramDTO.set_parameter_type(paramcells[-2])
                             
@@ -374,7 +376,7 @@ class Java_processor(File_processor):
         
         
     @staticmethod
-    def create_service_impl(filefullpath, filename, entityDTO):
+    def create_service_impl(filefullpath, filename, entityDTO, funcList):
         '''
         create the serviceImpl file
         @param filefullpath: the serviceImpl file full path
@@ -386,6 +388,9 @@ class Java_processor(File_processor):
         service_mtd_list = entityDTO.get_serviceInterDTO().get_class_methods()
         container_mtd_list = entityDTO.get_entContInterDTO().get_class_methods()
         maintable_mtd_list = entityDTO.get_maintableInterDTO().get_class_methods()
+        serviceQra_mtd_list = entityDTO.get_serviceQraDTO().get_class_methods()
+        containerQra_mtd_list = entityDTO.get_entContQraDTO().get_class_methods()
+        temp_func_list = []
         # ------------------------------------------------------- #
         #                       Preparation                       #
         # ------------------------------------------------------- #
@@ -451,36 +456,89 @@ class Java_processor(File_processor):
         if not valid_flag:
             return False
         
+        # addMainTable()
+        mtd_add_maintables = javaconstant.JAVA_FUNCTION_ADD + main_table_inter_name
+        mtd_add_param_inputs = ''      # e.g. String param1, Integer param2, Integer param3
+        mtd_add_param_calls = ''       # e.g. param1, param2, param3
+        valid_flag = False
+        for mtd in containerQra_mtd_list:
+            if mtd_add_maintables == mtd.get_method_name() and main_table_inter_name in mtd.get_method_output():
+                valid_flag = True
+                param_nbr = 0
+                for param in mtd.get_method_inputs():
+                    param_nbr = param_nbr + 1
+                    temp_param_name = param.get_parameter_name()
+                    # trim parameter name
+                    if temp_param_name[0:1] == 'p' and temp_param_name[1:2].isupper():
+                        temp_param_name = temp_param_name[1:2].lower() + temp_param_name[2:]
+                        
+                    if param_nbr == 1:
+                        mtd_add_param_inputs = mtd_add_param_inputs + param.get_parameter_type() + ' ' + temp_param_name
+                        mtd_add_param_calls = mtd_add_param_calls + temp_param_name
+                    else:
+                        mtd_add_param_inputs = mtd_add_param_inputs + javaconstant.JAVA_SEPERATOR + ' ' + param.get_parameter_type() + ' ' + temp_param_name
+                        mtd_add_param_calls = mtd_add_param_calls + javaconstant.JAVA_SEPERATOR + ' ' + temp_param_name
+                        if param_nbr % 5 == 0 and len(mtd.get_method_inputs()) > param_nbr % 5 * 5:
+                            mtd_add_param_inputs = mtd_add_param_inputs + '\n'
+                            mtd_add_param_calls = mtd_add_param_calls + '\n'
+                
+        if not valid_flag:
+            return False
+        
         # fetch parameters
         mtd_fetch_param_values = ''      # e.g. entity.getParam1(), entity.getParam2(), entity.getParam3()
         mtd_fetch_param_inputs = ''      # e.g. String param1, Integer param2, Integer param3
         mtd_fetch_param_calls = ''       # e.g. param1, param2, param3
-        for mtd in service_mtd_list:
+        for mtd in serviceQra_mtd_list:
             # fetch method in qra service
             if javaconstant.JAVA_FUNCTION_FETCH == mtd.get_method_name():
                 
                 param_nbr = 0
                 for param in mtd.get_method_inputs():
                     param_nbr = param_nbr + 1
+                    temp_param_name = param.get_parameter_name()
+                    # trim parameter name
+                    if temp_param_name[0:1] == 'p' and temp_param_name[1:2].isupper():
+                        temp_param_name = temp_param_name[1:2].lower() + temp_param_name[2:]
+                    # skip the Holder parameter for INPUT and VALUE
+                    if param.get_parameter_type() == 'Holder<DataGraph>':
+                        continue
                     
+                    # TODO: this is a hardcode solution, the input parameter name has to be 'pParam' or 'param', and the name has to be the same as table key field
+                    temp_get = 'entity.'
                     for tabMtd in maintable_mtd_list:
-                        print(tabMtd.get_method_name())
-                        if tabMtd == javaconstant.JAVA_FUNCTION_GET + param.get_parameter_name()[0:1].upper() + param.get_parameter_name()[1:]:
-                            pass
-                            
+                        if tabMtd.get_method_name() == javaconstant.JAVA_FUNCTION_GET + temp_param_name[0:1].upper() + temp_param_name[1:]:
+                            temp_get = temp_get + tabMtd.get_method_name() + '()'
+                            break
                     
-                    if param_nbr == len(mtd.get_method_inputs()):
-                        mtd_fetch_param_inputs = mtd_fetch_param_inputs + param.get_parameter_type() + ' ' + param.get_parameter_name()
-                        mtd_fetch_param_calls = mtd_fetch_param_calls + param.get_parameter_name()
+                    if param_nbr == 1:
+                        mtd_fetch_param_values = mtd_fetch_param_values + temp_get
+                        mtd_fetch_param_inputs = mtd_fetch_param_inputs + param.get_parameter_type() + ' ' + temp_param_name
+                        mtd_fetch_param_calls = mtd_fetch_param_calls + temp_param_name
                     else:
-                        mtd_fetch_param_inputs = mtd_fetch_param_inputs + param.get_parameter_type() + ' ' + param.get_parameter_name() + javaconstant.JAVA_SEPERATOR + ' '
-                        mtd_fetch_param_calls = mtd_fetch_param_calls + param.get_parameter_name() + javaconstant.JAVA_SEPERATOR + ' '
-                        if param_nbr % 5 == 0:
+                        mtd_fetch_param_values = mtd_fetch_param_values + javaconstant.JAVA_SEPERATOR + ' ' + temp_get
+                        mtd_fetch_param_inputs = mtd_fetch_param_inputs + javaconstant.JAVA_SEPERATOR + ' ' + param.get_parameter_type() + ' ' + temp_param_name
+                        mtd_fetch_param_calls = mtd_fetch_param_calls + javaconstant.JAVA_SEPERATOR + ' ' + temp_param_name
+                        if param_nbr % 5 == 0 and len(mtd.get_method_inputs()) > param_nbr % 5 * 5:
+                            mtd_fetch_param_values = mtd_fetch_param_values + '\n'
                             mtd_fetch_param_inputs = mtd_fetch_param_inputs + '\n'
                             mtd_fetch_param_calls = mtd_fetch_param_calls + '\n'
                             
                 break
-            
+        
+        # analysis the selected methods
+        for func in funcList:
+            if func == javaconstant.JAVA_FUNCTION_CREATE or func == javaconstant.JAVA_FUNCTION_UPDATE or func == javaconstant.JAVA_FUNCTION_DELETE or func == javaconstant.JAVA_FUNCTION_FETCH:
+                continue
+            for mtd in serviceQra_mtd_list:
+                # fetch method in qra service
+                if func == mtd.get_method_name():
+                    temp_func_list.append(mtd)
+                    
+        
+        # add additional_imports
+        
+        
         # create file
         Path(filefullpath).touch()
         file = open(filefullpath, 'w')
@@ -558,6 +616,11 @@ class Java_processor(File_processor):
         if factory_qra_package not in import_list:
             file.write(factory_qra_package + '\n')   # import factory qra
             import_list.append(factory_qra_package)
+            
+        factory_qra_package = javaconstant.JAVA_KEY_IMPORT + ' ' + entityDTO.get_maintableInterDTO().get_class_package()[:-1] + javaconstant.JAVA_DOT_MARK + main_table_inter_name + javaconstant.JAVA_END_MARK
+        if factory_qra_package not in import_list:
+            file.write(factory_qra_package + '\n')   # import main table interface
+            import_list.append(factory_qra_package)
         file.write('\n')
         
         # ------------------------------------------------------- #
@@ -610,10 +673,8 @@ class Java_processor(File_processor):
                 if javaconstant.JAVA_ENTITYCONST_GET_ENTITY_DATASET_LIST in lines:
                     lines = lines.replace(javaconstant.JAVA_ENTITYCONST_GET_ENTITY_DATASET_LIST, mtd_get_maintables)
                 # replace fetch input parameters
-                if javaconstant.JAVA_ENTITYCONST_FETCH_METHOD_PARAMS in lines:
-                    lines = lines.replace(javaconstant.JAVA_ENTITYCONST_FETCH_METHOD_PARAMS, '%%%%%')
-                
-                
+                if javaconstant.JAVA_ENTITYCONST_FETCH_METHOD_PARAMS_VALUE in lines:
+                    lines = lines.replace(javaconstant.JAVA_ENTITYCONST_FETCH_METHOD_PARAMS_VALUE, mtd_fetch_param_values)
                 
                 if '\n' not in lines:
                     file.write(lines + '\n')
@@ -622,6 +683,162 @@ class Java_processor(File_processor):
             
             file.write('\n')
         
+        # ------------------------------------------------------- #
+        # ----- write the CRUD methods -----
+        # ------------------------------------------------------- #
+        for mtds in javaconstant.JAVA_SERVICEIMPL_CRUD_METHODS:
+            for lines in mtds:
+                lines = javaconstant.JAVA_TAB + lines
+                # replace container interface
+                if javaconstant.JAVA_ENTITYCONST_CONTAINER_INTER in lines:
+                    lines = lines.replace(javaconstant.JAVA_ENTITYCONST_CONTAINER_INTER, container_inter_name)
+                # replace factory interface
+                if javaconstant.JAVA_ENTITYCONST_FACTORY_INTER in lines:
+                    lines = lines.replace(javaconstant.JAVA_ENTITYCONST_FACTORY_INTER, factory_inter_name)
+                # replace container qra
+                if javaconstant.JAVA_ENTITYCONST_CONTAINER_QRA in lines:
+                    lines = lines.replace(javaconstant.JAVA_ENTITYCONST_CONTAINER_QRA, container_qra_name)
+                # replace factory qra
+                if javaconstant.JAVA_ENTITYCONST_FACTORY_QRA in lines:
+                    lines = lines.replace(javaconstant.JAVA_ENTITYCONST_FACTORY_QRA, factory_qra_name)
+                # replace entity holder
+                if javaconstant.JAVA_ENTITYCONST_HOLDER in lines:
+                    lines = lines.replace(javaconstant.JAVA_ENTITYCONST_HOLDER, entity_holder)
+                # replace create container method
+                if javaconstant.JAVA_ENTITYCONST_CRAET_CONTAINER_INTER in lines:
+                    lines = lines.replace(javaconstant.JAVA_ENTITYCONST_CRAET_CONTAINER_INTER, mtd_create_entity_container)
+                # replace get service method
+                if javaconstant.JAVA_ENTITYCONST_GET_SERVICE_INTER in lines:
+                    lines = lines.replace(javaconstant.JAVA_ENTITYCONST_GET_SERVICE_INTER, mtd_get_entity_service)
+                # replace initialize entityDataset method
+                if javaconstant.JAVA_ENTITYCONST_INITIAL_ENTITY_DATASET in lines:
+                    lines = lines.replace(javaconstant.JAVA_ENTITYCONST_INITIAL_ENTITY_DATASET, mtd_initialize_entityDS)
+                # replace main table interface
+                if javaconstant.JAVA_ENTITYCONST_ENTITY_DATASET in lines:
+                    lines = lines.replace(javaconstant.JAVA_ENTITYCONST_ENTITY_DATASET, main_table_inter_name)
+                # replace get main table list method
+                if javaconstant.JAVA_ENTITYCONST_GET_ENTITY_DATASET_LIST in lines:
+                    lines = lines.replace(javaconstant.JAVA_ENTITYCONST_GET_ENTITY_DATASET_LIST, mtd_get_maintables)
+                # replace fetch input parameters
+                if javaconstant.JAVA_ENTITYCONST_FETCH_METHOD_PARAMS_VALUE in lines:
+                    lines = lines.replace(javaconstant.JAVA_ENTITYCONST_FETCH_METHOD_PARAMS_VALUE, mtd_fetch_param_values)
+                if javaconstant.JAVA_ENTITYCONST_FETCH_METHOD_PARAMS_INPUT in lines:
+                    lines = lines.replace(javaconstant.JAVA_ENTITYCONST_FETCH_METHOD_PARAMS_INPUT, mtd_fetch_param_inputs)
+                if javaconstant.JAVA_ENTITYCONST_FETCH_METHOD_PARAMS_CALL in lines:
+                    lines = lines.replace(javaconstant.JAVA_ENTITYCONST_FETCH_METHOD_PARAMS_CALL, mtd_fetch_param_calls)
+                # replace add main table method
+                if javaconstant.JAVA_ENTITYCONST_ADD_ENTITY_DATASET in lines:
+                    lines = lines.replace(javaconstant.JAVA_ENTITYCONST_ADD_ENTITY_DATASET, mtd_add_maintables)
+                # replace fetch input parameters
+                if javaconstant.JAVA_ENTITYCONST_ADD_METHOD_PARAMS_INPUT in lines:
+                    lines = lines.replace(javaconstant.JAVA_ENTITYCONST_ADD_METHOD_PARAMS_INPUT, mtd_add_param_inputs)
+                if javaconstant.JAVA_ENTITYCONST_ADD_METHOD_PARAMS_CALL in lines:
+                    lines = lines.replace(javaconstant.JAVA_ENTITYCONST_ADD_METHOD_PARAMS_CALL, mtd_add_param_calls)
+                
+                if '\n' not in lines:
+                    file.write(lines + '\n')
+                else:
+                    file.write(lines)
+            
+            file.write('\n')
+            
+        
+        # ------------------------------------------------------- #
+        # ----- write the selected methods -----
+        # ------------------------------------------------------- #
+        for temp_func in temp_func_list:
+            
+            param_nbr = 1
+            mtd_param_input = ''
+            mtd_param_call = ''
+            mtd_param_commt = ''
+            line_tab_count = 1
+            for param in temp_func.get_method_inputs():
+                
+                temp_param_name = param.get_parameter_name()
+                
+                if param_nbr == 1:
+                    mtd_param_commt = ' * @param ' + temp_param_name + '\n'
+                    mtd_param_input = mtd_param_input + param.get_parameter_type() + ' ' + temp_param_name
+                    mtd_param_call = mtd_param_call + temp_param_name
+                else:
+                    mtd_param_commt = mtd_param_commt + javaconstant.JAVA_TAB + ' * @param ' + temp_param_name + '\n'
+                    if mtd_param_input[-1] == '\n':
+                        mtd_param_input = mtd_param_input + param.get_parameter_type() + ' ' + temp_param_name
+                        mtd_param_call = mtd_param_call + temp_param_name
+                    else:
+                        mtd_param_input = mtd_param_input + javaconstant.JAVA_SEPERATOR + ' ' + param.get_parameter_type() + ' ' + temp_param_name
+                        mtd_param_call = mtd_param_call + javaconstant.JAVA_SEPERATOR + ' ' + temp_param_name
+                    if param_nbr % 3 == 0 and len(temp_func.get_method_inputs()) > param_nbr:
+                        mtd_param_input = mtd_param_input + javaconstant.JAVA_SEPERATOR + '\n'
+                        mtd_param_call = mtd_param_call + javaconstant.JAVA_SEPERATOR + '\n'
+                param_nbr = param_nbr + 1
+            
+            # ---------- comment ----------
+            for lines in javaconstant.JAVA_SERVICEIMPL_COMMON_COMMENT:
+                lines = javaconstant.JAVA_TAB + lines
+                # replace method name
+                if javaconstant.JAVA_ENTITYCONST_COMMON_METHOD_COMMENT in lines:
+                    lines = lines.replace(javaconstant.JAVA_ENTITYCONST_COMMON_METHOD_COMMENT, mtd_param_commt)
+                
+                if '\n' not in lines:
+                    file.write(lines + '\n')
+                else:
+                    file.write(lines)
+                
+            # ---------- method ----------
+            line_tab_count = 1
+            for lines in javaconstant.JAVA_SERVICEIMPL_COMMON_FORAMT:
+                lines = javaconstant.JAVA_TAB + lines
+                # replace method name
+                if javaconstant.JAVA_ENTITYCONST_COMMON_MEHTOD_NAME in lines:
+                    lines = lines.replace(javaconstant.JAVA_ENTITYCONST_COMMON_MEHTOD_NAME, temp_func.get_method_name())
+                if javaconstant.JAVA_ENTITYCONST_FACTORY_QRA in lines:
+                    lines = lines.replace(javaconstant.JAVA_ENTITYCONST_FACTORY_QRA, factory_qra_name)
+                if javaconstant.JAVA_ENTITYCONST_GET_SERVICE_INTER in lines:
+                    lines = lines.replace(javaconstant.JAVA_ENTITYCONST_GET_SERVICE_INTER, mtd_get_entity_service)
+                if javaconstant.JAVA_ENTITYCONST_COMMON_METHOD_PARAM_INPUT in lines:
+                    if '\n' in mtd_param_input:
+                        temp_line_nbr = 1
+                        for temp_param in mtd_param_input.split('\n'):
+                            if temp_line_nbr == 1:
+                                mtd_param_input = temp_param
+                            else:
+                                mtd_param_input = mtd_param_input + '\n'
+                                temp_tab_line_nbr = 1
+                                while temp_tab_line_nbr <= line_tab_count + 2:
+                                    mtd_param_input = mtd_param_input + javaconstant.JAVA_TAB
+                                    temp_tab_line_nbr = temp_tab_line_nbr + 1
+                                mtd_param_input = mtd_param_input + temp_param
+                            temp_line_nbr = temp_line_nbr + 1
+                    mtd_param_input + '\n'
+                    lines = lines.replace(javaconstant.JAVA_ENTITYCONST_COMMON_METHOD_PARAM_INPUT, mtd_param_input)
+                    
+                if javaconstant.JAVA_ENTITYCONST_COMMON_METHOD_PARAM_CALL in lines:
+                    if '\n' in mtd_param_call:
+                        temp_line_nbr = 1
+                        for temp_param in mtd_param_call.split('\n'):
+                            if temp_line_nbr == 1:
+                                mtd_param_call = temp_param
+                            else:
+                                mtd_param_call = mtd_param_call + '\n'
+                                temp_tab_line_nbr = 1
+                                while temp_tab_line_nbr <= line_tab_count + 2:
+                                    mtd_param_call = mtd_param_call + javaconstant.JAVA_TAB
+                                    temp_tab_line_nbr = temp_tab_line_nbr + 1
+                                mtd_param_call = mtd_param_call + temp_param
+                            temp_line_nbr = temp_line_nbr + 1
+                    mtd_param_call + '\n'
+                    lines = lines.replace(javaconstant.JAVA_ENTITYCONST_COMMON_METHOD_PARAM_CALL, mtd_param_call)
+    
+                line_tab_count = lines.count(javaconstant.JAVA_TAB)
+                
+                if '\n' not in lines:
+                    file.write(lines + '\n')
+                else:
+                    file.write(lines)
+                
+            file.write('\n')
         
         
         # ------------------------------------------------------- #
@@ -650,3 +867,4 @@ class Java_processor(File_processor):
         serviceImpl_folder = javaconstant.JAVA_ENTITY_SERVICEIMPL_PACKAGE % package_parent_name
         
         return serviceImpl_folder
+    

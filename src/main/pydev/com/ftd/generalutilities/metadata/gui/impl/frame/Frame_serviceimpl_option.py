@@ -33,6 +33,7 @@ class Frame_serviceimpl_option(FormatableFrame):
         
     #overwrite create_widges
     def create_widges(self):
+        javaconstant = Java_constant()
         #frame
         self.__frame1 = FormatableFrame(self)
         self.__frame1.pack(side=TOP)
@@ -163,6 +164,11 @@ class Frame_serviceimpl_option(FormatableFrame):
         for javaMtd in serviceInterDTO.get_class_methods():
             self.__funclists[javaMtd.get_method_name()] = javaMtd
             
+            # CRUD functions are mandatory
+            if javaMtd.get_method_name() == javaconstant.JAVA_FUNCTION_CREATE or javaMtd.get_method_name() == javaconstant.JAVA_FUNCTION_UPDATE or javaMtd.get_method_name() == javaconstant.JAVA_FUNCTION_DELETE or javaMtd.get_method_name() == javaconstant.JAVA_FUNCTION_FETCH:
+                self.__listboxright.insert(END, javaMtd.get_method_name())
+                continue
+                
             #add items into list box
             self.__listboxleft.insert(END, javaMtd.get_method_name())
         
@@ -185,11 +191,8 @@ class Frame_serviceimpl_option(FormatableFrame):
             showwarning('Warning', 'There are error existing, the ServiceImpl cannot be generated.')
             return
         
-        # verify the package folder and file
-        
-        
-        # TODO: write serviceImpl
-        Java_processor.create_service_impl(self.get_trans().get_workspacepath() + self.__feet.get(), self.__feet.get(), self.get_dtos())
+        # write serviceImpl
+        Java_processor.create_service_impl(self.get_trans().get_workspacepath() + self.__feet.get(), self.__feet.get(), self.get_dtos(), self.__listboxright.get(0, END))
         
         return True
         
@@ -425,7 +428,6 @@ class Frame_serviceimpl_option(FormatableFrame):
         '''
         # service interface
         maintable_interface_name = self.__classlist[6]
-        print(maintable_interface_name)
         # call the java processor
         result, message, maintableInterDTO = Java_processor.read_java_interface(maintable_interface_name)
         if not result:
@@ -462,6 +464,7 @@ class Frame_serviceimpl_option(FormatableFrame):
         '''
         move the selection to the left list box
         '''
+        javaconstant = Java_constant()
         if not self.__listboxright or self.__listboxright.size() == 0:
             return
         
@@ -471,6 +474,8 @@ class Frame_serviceimpl_option(FormatableFrame):
             idx = 0
             for tup in self.__funclists.items():
                 if tup[0] == selection:
+                    if selection == javaconstant.JAVA_FUNCTION_CREATE or selection == javaconstant.JAVA_FUNCTION_UPDATE or selection == javaconstant.JAVA_FUNCTION_DELETE or selection == javaconstant.JAVA_FUNCTION_FETCH:
+                        return
                     select_item = tup
                     break
                 idx = idx + 1
