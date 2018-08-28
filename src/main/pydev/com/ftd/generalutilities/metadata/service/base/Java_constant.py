@@ -105,7 +105,6 @@ class Java_constant(object):
         self.JAVA_SERVICE_IMPORT_API_DATAGRAPH = 'import commonj.sdo.DataGraph;'
         
         
-        
         # ----------------- Code format ----------------#
         self.JAVA_ENTITY_CONST_CONTAINER_INTER = '%CONTAINER_INTERFACE%'
         self.JAVA_ENTITY_CONST_FACTORY_INTER = '%FACTORY_INTERFACE%'
@@ -262,3 +261,14 @@ class Java_constant(object):
                                                 ' *',
                                                 self.JAVA_MTD_CONST_COMMON_METHOD_COMMENT,
                                                 ' */']
+        
+        
+        # ---------------------------------------------------------------- #
+        #                  dataController.java                             #
+        # ---------------------------------------------------------------- #
+        
+        
+        
+        
+        
+        
