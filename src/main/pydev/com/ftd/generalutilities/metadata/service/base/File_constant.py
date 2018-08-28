@@ -64,6 +64,7 @@ class File_constant(object):
         self.JAVA_HOLDER_SUFFIX ='Holder'
         self.JAVA_QRA_PREFIX = 'Qra'
         self.SERVICEIMPL_SUFFIX = 'ServiceImpl'
+        self.DATACONTROLLER_SUFFIX = 'DataController'
         
         self.UNZIP_JAR_FOLDER = 'uz\\'
         self.BACKUP_JAVA_FOLDER = 'bck\\'

@@ -130,6 +130,128 @@ class Java_processor(File_processor):
     
     
     @staticmethod
+    def validate_javas(transDto, entityDto):
+        '''
+        validate the jar files, return back the serviceImpl/dataController name and jar file list
+        '''
+        #get the entity info
+        resDto = entityDto.get_resourceDTO()
+        returnList = []
+        
+        #get the entity interface
+        prim_uri = resDto.get_primary_secure_uri()
+        entity_interface = prim_uri[prim_uri.rindex(':')+1:]
+        package_list = entity_interface.split('.')
+        
+        #verify if the java decompiled files existing
+        fileconstant = File_constant()
+        unzip_path = transDto.get_workspacepath() + fileconstant.UNZIP_JAR_FOLDER
+        if not File_processor.verify_dir_existing(unzip_path):
+            message = 'The decompile folder not existing, please re-generate!'
+            return False, message, None, None
+        
+        api_unzip_path = unzip_path + fileconstant.API_FOLDER
+        impl_unzip_path = unzip_path + fileconstant.IMPL_FOLDER
+        idx = 0
+        while idx < len(package_list):
+            if idx != len(package_list) -1:
+                api_unzip_path = api_unzip_path + package_list[idx] + '\\'
+                impl_unzip_path = impl_unzip_path + package_list[idx] + '\\'
+            else:
+                impl_unzip_path = impl_unzip_path + fileconstant.IMPL_FOLDER
+            idx = idx + 1
+        
+        
+        # TODO: this is a hard-code style, should be enhancement later!!!
+        business_entity_name = package_list[-1][1:]
+        
+        # --------------------------------------------------------------------- #
+        #                   The interface of service,factory                    #
+        # --------------------------------------------------------------------- #
+        # Validate the Api package
+        decp_service_interface_name = business_entity_name + fileconstant.JAVA_SERVICE_SUFFIX + fileconstant.DEPOMPILE_JAVA_SUFFIX
+        decp_factory_interface_name = business_entity_name + fileconstant.JAVA_FACTORY_SUFFIX + fileconstant.DEPOMPILE_JAVA_SUFFIX
+        
+        if not File_processor.verify_dir_existing(api_unzip_path):
+            message = 'There is no api package for entity %s,\n please check your api jar!' % business_entity_name
+            return False, message, business_entity_name, None
+        
+        if not File_processor.verify_dir_existing(api_unzip_path + decp_service_interface_name):
+            message = 'There is no service-interface for entity %s,\n please check your api jar!' % decp_service_interface_name
+            return False, message, business_entity_name, None
+        
+        if not File_processor.verify_dir_existing(api_unzip_path + decp_factory_interface_name):
+            message = 'There is no factory-interface for entity %s,\n please check your api jar!' % decp_factory_interface_name
+            return False, message, business_entity_name, None
+        
+        # set the return list (idx = 0,1)
+        returnList.append(api_unzip_path + decp_service_interface_name)
+        returnList.append(api_unzip_path + decp_factory_interface_name)
+        
+        # --------------------------------------------------------------------- #
+        #                   The impl of service,factory                         #
+        # --------------------------------------------------------------------- #
+        # Validate the Impl package
+        decp_service_impl_name = fileconstant.JAVA_QRA_PREFIX + business_entity_name + fileconstant.JAVA_SERVICE_SUFFIX + fileconstant.DEPOMPILE_JAVA_SUFFIX
+        decp_factory_impl_name = fileconstant.JAVA_QRA_PREFIX + business_entity_name + fileconstant.JAVA_FACTORY_SUFFIX + fileconstant.DEPOMPILE_JAVA_SUFFIX
+        
+        if not File_processor.verify_dir_existing(impl_unzip_path):
+            message = 'There is no serviceImpl package for entity %s,\n please check your impl jar!' % business_entity_name
+            return False, message, business_entity_name, None
+        
+        if not File_processor.verify_dir_existing(impl_unzip_path + decp_service_impl_name):
+            message = 'There is no service-class for entity %s,\n please check your impl jar!' % decp_service_impl_name
+            return False, message, business_entity_name, None
+        
+        if not File_processor.verify_dir_existing(impl_unzip_path + decp_factory_impl_name):
+            message = 'There is no factory-class for entity %s,\n please check your impl jar!' % decp_factory_impl_name
+            return False, message, business_entity_name, None
+        
+        # set the return list (idx = 2,3)
+        returnList.append(impl_unzip_path + decp_service_impl_name)
+        returnList.append(impl_unzip_path + decp_factory_impl_name)
+        
+        # Validate the additional functionality
+        
+        
+        #--- the entity name
+        entityDSName = entityDto.get_resourceDTO().get_view_parameters().get_data_resource()
+        mainTableName = entityDto.get_resourceDTO().get_view_parameters().get_table()
+        # --------------------------------------------------------------------- #
+        #                The interface & Impl of container                      #
+        # --------------------------------------------------------------------- #
+        # Validate the container interface
+        entity_container_interface_name = entityDSName[:1].upper() + entityDSName[1:-1] + fileconstant.JAVA_CONTAINER_SUFFIX + fileconstant.DEPOMPILE_JAVA_SUFFIX
+        entity_container_impl_name = fileconstant.JAVA_QRA_PREFIX + entityDSName[:1].upper() + entityDSName[1:-1] + fileconstant.JAVA_CONTAINER_SUFFIX + fileconstant.DEPOMPILE_JAVA_SUFFIX
+        
+        if not File_processor.verify_dir_existing(api_unzip_path + entity_container_interface_name):
+            message = 'There is no interface for container %s,\n please check your api jar!' % entity_container_interface_name
+            return False, message, business_entity_name, None
+        
+        if not File_processor.verify_dir_existing(impl_unzip_path + entity_container_impl_name):
+            message = 'There is no impl for container %s,\n please check your impl jar!' % entity_container_impl_name
+            return False, message, business_entity_name, None
+        
+        # set the return list (idx = 4,5)
+        returnList.append(api_unzip_path + entity_container_interface_name)
+        returnList.append(impl_unzip_path + entity_container_impl_name)
+        
+        # --------------------------------------------------------------------- #
+        #                The interface of main table                            #
+        # --------------------------------------------------------------------- #
+        main_table_interface_name = mainTableName[:1].upper() + mainTableName[1:] + fileconstant.DEPOMPILE_JAVA_SUFFIX
+        
+        if not File_processor.verify_dir_existing(api_unzip_path + main_table_interface_name):
+            message = 'There is no interface for main table %s,\n please check your api jar!' % main_table_interface_name
+            return False, message, business_entity_name, None
+        
+        # set the return list (idx = 6)
+        returnList.append(api_unzip_path + main_table_interface_name)
+        
+        return True, None, business_entity_name, returnList
+    
+    
+    @staticmethod
     def read_java_interface(srcfile):
         '''
         read and analysis the java interface, output the information in JavaDTO
@@ -275,7 +397,7 @@ class Java_processor(File_processor):
      
      
     @staticmethod
-    def read_java_class(srcfile, interDTO): 
+    def read_java_class(srcfile): 
         '''
         read and analysis the java class, get the functions' parameters and set them in JavaDTO
         NOTE: this is a light weight reader for java file. Generally we should use java reflection
