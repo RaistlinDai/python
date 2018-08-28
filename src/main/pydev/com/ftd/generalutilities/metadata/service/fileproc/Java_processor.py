@@ -365,7 +365,7 @@ class Java_processor(File_processor):
                                 collection_params = []
                                 if javaconstant.JAVA_COLLECTION_HOLDER in paramDTO.get_parameter_type() and javaconstant.JAVA_LEFT_DASH in paramDTO.get_parameter_type() and javaconstant.JAVA_RIGHT_DASH in paramDTO.get_parameter_type():
                                     left_dash_idx = paramDTO.get_parameter_type().index(javaconstant.JAVA_LEFT_DASH)
-                                    right_dash_idx = paramDTO.get_parameter_type().index(javaconstant.JAVA_RIGJHT_DASH)
+                                    right_dash_idx = paramDTO.get_parameter_type().index(javaconstant.JAVA_RIGHT_DASH)
                                     temp_param = paramDTO.get_parameter_type()[left_dash_idx+1:right_dash_idx]
                                     collection_params.append(temp_param)
                                     
@@ -385,7 +385,7 @@ class Java_processor(File_processor):
         
         
     @staticmethod
-    def create_service_impl(filefullpath, filename, entityDTO, funcList, createOpt):
+    def create_service_impl(filename, transDTO, entityDTO, funcList, createOpt):
         '''
         create the serviceImpl file
         @param filefullpath: the serviceImpl file full path
@@ -400,6 +400,17 @@ class Java_processor(File_processor):
         serviceQra_mtd_list = entityDTO.get_serviceQraDTO().get_class_methods()
         containerQra_mtd_list = entityDTO.get_entContQraDTO().get_class_methods()
         temp_func_list = []
+        
+        # ------------------------------------------------------- #
+        #                    Creation option                      #
+        # ------------------------------------------------------- #
+        filefullpath = transDTO.get_workspacepath() + filename
+        if createOpt == 3:     # backup previous file
+            backup_path = transDTO.get_workspacepath() + fileconstant.BACKUP_JAVA_FOLDER
+            if not File_processor.verify_dir_existing(backup_path):
+                File_processor.create_folder(backup_path)
+                File_processor.copy_file(filefullpath, backup_path + filename)
+        
         # ------------------------------------------------------- #
         #                       Preparation                       #
         # ------------------------------------------------------- #
@@ -544,7 +555,7 @@ class Java_processor(File_processor):
                 if func == mtd.get_method_name():
                     temp_func_list.append(mtd)
                     # add additional_imports
-                    if len(mtd.get_method_related_imports() > 0):
+                    if len(mtd.get_method_related_imports()) > 0:
                         for rel_imp in mtd.get_method_related_imports():
                             additional_imports.append(rel_imp)
         
@@ -633,6 +644,7 @@ class Java_processor(File_processor):
         
         # additional imports
         for add_imp in additional_imports:
+            add_imp = javaconstant.JAVA_KEY_IMPORT + ' ' + add_imp + javaconstant.JAVA_END_MARK
             if add_imp not in import_list:
                 file.write(add_imp + '\n')
                 import_list.append(add_imp)

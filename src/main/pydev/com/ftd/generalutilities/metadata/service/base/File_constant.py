@@ -66,6 +66,8 @@ class File_constant(object):
         self.SERVICEIMPL_SUFFIX = 'ServiceImpl'
         
         self.UNZIP_JAR_FOLDER = 'uz\\'
+        self.BACKUP_JAVA_FOLDER = 'bck\\'
+        
         self.BACKUP_SUFFIX = '.bck'
         self.XML_SUFFIX = ".xml"
         self.JAR_SUFFIX = ".jar"
