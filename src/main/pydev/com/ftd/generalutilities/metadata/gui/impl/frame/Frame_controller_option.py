@@ -9,7 +9,7 @@ from src.main.pydev.com.ftd.generalutilities.metadata.gui.impl.base.FormatableFr
 from src.main.pydev.com.ftd.generalutilities.metadata.service.fileproc.Java_processor import Java_processor
 from src.main.pydev.com.ftd.generalutilities.metadata.service.base.Java_constant import Java_constant
 from src.main.pydev.com.ftd.generalutilities.metadata.service.base.File_constant import File_constant
-from tkinter.messagebox import showwarning
+from tkinter.messagebox import showwarning, showerror
 
 class Frame_controller_option(FormatableFrame):
     '''
@@ -21,7 +21,7 @@ class Frame_controller_option(FormatableFrame):
         '''
         Constructor
         '''
-        self.__funclists = {}       #functions list backup
+        self.__funclists = []       #functions list backup
         self.__result = None
         self.__error = None
         self.__classlist = []       # 0:service interface, 1:factory interface, 2:qra service class, 3:qra factory class
@@ -135,7 +135,22 @@ class Frame_controller_option(FormatableFrame):
                 self.__pack_errorpanel()
                 return
             else:
-                self.get_dtos().set_maintableInterDTO(maintableInterDTO)   
+                self.get_dtos().set_maintableInterDTO(maintableInterDTO)
+        
+        
+        #get the function list from serviceImpl
+        if self.get_dtos().get_serviceImplPath():
+            serviceImpl_path = self.get_dtos().get_serviceImplPath()
+        else:
+            tempstr01, tempstr02, parent_pack, tempstr03 = Java_processor.analysis_package_name(self.get_dtos().get_serviceInterDTO().get_class_package())
+            serviceImpl_path = self.get_trans().get_projectpath() + fileconstant.JAVA_SERVICEIMPL_PATH % (parent_pack, business_entity_name + fileconstant.SERVICEIMPL_SUFFIX + fileconstant.JAVA_SUFFIX)
+            
+        self.__result, self.__error, func_list = Java_processor.analysis_service_impl(serviceImpl_path, self.get_dtos())
+        if not self.__result:
+            #---- panel 02 ----------
+            self.__pack_errorpanel()
+            return
+            
         
         #---- panel 02 ----------
         canv2 = Canvas(self, height=150, width=550)
@@ -151,13 +166,21 @@ class Frame_controller_option(FormatableFrame):
         self.__scrollleft.config(command = self.__listboxleft.yview)
         
         #middle buttons
-        self.__button01 = Button(canv2, text='>>', relief=RAISED, cursor='hand2')
+        self.__button01 = Button(canv2, text='>', relief=RAISED, cursor='hand2')
         self.__button01.bind('<Button-1>', self.__to_right_click_event) #bind button click event
-        self.__button01.place(height=35, width=25, relx=0.465, rely=0.3)
+        self.__button01.place(height=25, width=25, relx=0.465, rely=0.2)
         
-        self.__button02 = Button(canv2, text='<<', relief=RAISED, cursor='hand2')
-        self.__button02.bind('<Button-1>', self.__to_left_click_event) #bind button click event
-        self.__button02.place(height=35, width=25, relx=0.465, rely=0.6)
+        self.__button02 = Button(canv2, text='>>', relief=RAISED, cursor='hand2')
+        self.__button02.bind('<Button-1>', self.__all_to_right_click_event) #bind button click event
+        self.__button02.place(height=25, width=25, relx=0.465, rely=0.4)
+        
+        self.__button03 = Button(canv2, text='<', relief=RAISED, cursor='hand2')
+        self.__button03.bind('<Button-1>', self.__to_left_click_event) #bind button click event
+        self.__button03.place(height=25, width=25, relx=0.465, rely=0.6)
+        
+        self.__button04 = Button(canv2, text='<<', relief=RAISED, cursor='hand2')
+        self.__button04.bind('<Button-1>', self.__all_to_left_click_event) #bind button click event
+        self.__button04.place(height=25, width=25, relx=0.465, rely=0.8)
         
         #right listbox and scrollbar
         self.__listboxright = Listbox(canv2, width=30)
@@ -186,12 +209,20 @@ class Frame_controller_option(FormatableFrame):
         self.__rad3.place(height=20, width=220, relx= 0.1, rely=0.7)
         self.__rad3.deselect()
         canv3.pack()
-
         
-        #set the function list to the left box
-        
-        
-        
+        # set the functions into left box
+        if func_list:
+            for func_name in func_list:
+                # CRUD functions are mandatory
+                if func_name == javaconstant.JAVA_FUNCTION_CREATE or func_name == javaconstant.JAVA_FUNCTION_UPDATE or func_name == javaconstant.JAVA_FUNCTION_DELETE or func_name == javaconstant.JAVA_FUNCTION_FETCH:
+                    self.__listboxright.insert(END, func_name)
+                    continue
+                    
+                #add items into list box
+                self.__listboxleft.insert(END, func_name)
+                self.__funclists.append(func_name)
+            
+            
     
     #overwrite create_widges
     def add_bottom(self, parent):
@@ -212,8 +243,13 @@ class Frame_controller_option(FormatableFrame):
             return
         
         # write dataController
-        # Java_processor.create_service_impl(self.__feet.get(), self.get_trans(), self.get_dtos(), self.__listboxright.get(0, END), self.__vari1.get())
+        result, message, filefullpath = Java_processor.create_data_controller(self.__feet.get(), self.get_trans(), self.get_dtos(), self.__listboxright.get(0, END), self.__vari1.get())
+        if not result:
+            showerror('Error', message)
+            return False
         
+        # store the serviceImpl full path
+        self.get_dtos().set_dataControllerPath(filefullpath)
         return True
     
     
@@ -239,19 +275,34 @@ class Frame_controller_option(FormatableFrame):
         if len(self.__listboxleft.curselection()) > 0:
             selection = self.__listboxleft.selection_get()
             #the dict.items() will convert to tuple
-            for tup in self.__funclists.items():
-                if tup[0] == selection:
+            for tup in self.__funclists:
+                if tup == selection:
                     select_item = tup
                     break
         
         if select_item:
             #add into right
-            self.__listboxright.insert(END, select_item[0])
+            self.__listboxright.insert(END, select_item)
             select_idx = self.__listboxleft.curselection()
             #remove from left
             self.__listboxleft.delete(select_idx[0])
             
-    
+        
+    def __all_to_right_click_event(self, event):
+        '''
+        move all items to the right list box
+        '''
+        select_items = []
+        if len(self.__listboxleft.get(0, END)) > 0:
+            for select_item in self.__listboxleft.get(0, END):
+                select_items.append(select_item)
+            self.__listboxleft.delete(0, END)
+            
+            for select_item in select_items:
+                #add into right
+                self.__listboxright.insert(END, select_item)
+                
+                
     def __to_left_click_event(self, event):
         '''
         move the selection to the left list box
@@ -260,12 +311,13 @@ class Frame_controller_option(FormatableFrame):
         if not self.__listboxright or self.__listboxright.size() == 0:
             return
         
+        select_item = None
         if len(self.__listboxright.curselection()) > 0:
             selection = self.__listboxright.selection_get()
             #the dict.items() will convert to tuple
             idx = 0
-            for tup in self.__funclists.items():
-                if tup[0] == selection:
+            for tup in self.__funclists:
+                if tup == selection:
                     if selection == javaconstant.JAVA_FUNCTION_CREATE or selection == javaconstant.JAVA_FUNCTION_UPDATE or selection == javaconstant.JAVA_FUNCTION_DELETE or selection == javaconstant.JAVA_FUNCTION_FETCH:
                         return
                     select_item = tup
@@ -274,7 +326,27 @@ class Frame_controller_option(FormatableFrame):
         
         if select_item:
             #add into left
-            self.__listboxleft.insert(idx, select_item[0])
+            self.__listboxleft.insert(idx, select_item)
             select_idx = self.__listboxright.curselection()
             #remove from right
             self.__listboxright.delete(select_idx[0])
+            
+            
+    def __all_to_left_click_event(self, event):
+        '''
+        move all items to the right list box
+        '''
+        javaconstant = Java_constant()
+        select_items = []
+        if len(self.__listboxright.get(0, END)) > 0:
+            crud_nbr = 0
+            for select_item in self.__listboxright.get(0, END):
+                if select_item == javaconstant.JAVA_FUNCTION_CREATE or select_item == javaconstant.JAVA_FUNCTION_UPDATE or select_item == javaconstant.JAVA_FUNCTION_DELETE or select_item == javaconstant.JAVA_FUNCTION_FETCH:
+                    crud_nbr = crud_nbr + 1
+                    continue
+                select_items.append(select_item)
+            self.__listboxright.delete(crud_nbr -1, END)
+            
+            for select_item in select_items:
+                #add into right
+                self.__listboxleft.insert(END, select_item)

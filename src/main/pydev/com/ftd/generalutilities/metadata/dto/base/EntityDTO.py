@@ -27,6 +27,8 @@ class EntityDTO(object):
         self.__dto = {'Entity':None,                      # entity name
                       'ViewFullPath':None,                # view metadata path
                       'ResourceFullPath':None,            # resource metadata path
+                      'ServiceImplPath':None,             # generated serviceImpl path
+                      'DataControllerPath':None,          # generated dataController path
                       'ViewMetaData':viewDTO,             # view metadata DTO
                       'ResourceMetaData':resourceDTO,     # resource metadata DTO
                       'ServiceInterDTO':serviceInterDTO,  # service interface DTO
@@ -82,6 +84,30 @@ class EntityDTO(object):
         else:
             return None
         
+    
+    def set_dataControllerPath(self, value):
+        if self.__dto:
+            self.__dto['DataControllerPath'] = value
+        
+        
+    def get_dataControllerPath(self):
+        if self.__dto:
+            return self.__dto['DataControllerPath']
+        else:
+            return None
+    
+    
+    def set_serviceImplPath(self, value):
+        if self.__dto:
+            self.__dto['ServiceImplPath'] = value
+        
+        
+    def get_serviceImplPath(self):
+        if self.__dto:
+            return self.__dto['ServiceImplPath']
+        else:
+            return None
+    
         
     def set_serviceInterDTO(self, value):
         if self.__dto:

@@ -174,7 +174,7 @@ class Java_constant(object):
         
         # updateEntity()
         self.JAVA_SERVICE_OVERRIDE_UPDATEENTITY = [self.JAVA_ANNOTATION_OVERRIDE,
-                                                   'protected ' + self.JAVA_ENTITY_CONST_CONTAINER_INTER + ' updateEntity(' + self.JAVA_ENTITY_CONST_CONTAINER_INTER + ' container) {',
+                                                   'public ' + self.JAVA_ENTITY_CONST_CONTAINER_INTER + ' updateEntity(' + self.JAVA_ENTITY_CONST_CONTAINER_INTER + ' container) {',
                                                    self.JAVA_TAB + self.JAVA_ENTITY_CONST_FACTORY_INTER + ' factory = getEntityFactory();',
                                                    self.JAVA_TAB + 'factory.' + self.JAVA_MTD_CONST_GET_SERVICE_INTER + '().update(((' + self.JAVA_ENTITY_CONST_CONTAINER_QRA + ') container).getProDataGraph());',
                                                    self.JAVA_TAB + 'return container;',

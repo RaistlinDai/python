@@ -8,7 +8,7 @@ from src.main.pydev.com.ftd.generalutilities.metadata.gui.impl.frame.Frame_botto
 from src.main.pydev.com.ftd.generalutilities.metadata.gui.impl.base.FormatableFrame import FormatableFrame
 from src.main.pydev.com.ftd.generalutilities.metadata.service.base.File_constant import File_constant
 from src.main.pydev.com.ftd.generalutilities.metadata.service.base.File_processor import File_processor
-from tkinter.messagebox import showwarning
+from tkinter.messagebox import showwarning, showerror
 from src.main.pydev.com.ftd.generalutilities.metadata.service.fileproc.Java_processor import Java_processor
 from src.main.pydev.com.ftd.generalutilities.metadata.service.base.Java_constant import Java_constant
 
@@ -147,13 +147,21 @@ class Frame_serviceimpl_option(FormatableFrame):
         self.__scrollleft.config(command = self.__listboxleft.yview)
         
         #middle buttons
-        self.__button01 = Button(canv2, text='>>', relief=RAISED, cursor='hand2')
+        self.__button01 = Button(canv2, text='>', relief=RAISED, cursor='hand2')
         self.__button01.bind('<Button-1>', self.__to_right_click_event) #bind button click event
-        self.__button01.place(height=35, width=25, relx=0.465, rely=0.3)
+        self.__button01.place(height=25, width=25, relx=0.465, rely=0.2)
         
-        self.__button02 = Button(canv2, text='<<', relief=RAISED, cursor='hand2')
-        self.__button02.bind('<Button-1>', self.__to_left_click_event) #bind button click event
-        self.__button02.place(height=35, width=25, relx=0.465, rely=0.6)
+        self.__button02 = Button(canv2, text='>>', relief=RAISED, cursor='hand2')
+        self.__button02.bind('<Button-1>', self.__all_to_right_click_event) #bind button click event
+        self.__button02.place(height=25, width=25, relx=0.465, rely=0.4)
+        
+        self.__button03 = Button(canv2, text='<', relief=RAISED, cursor='hand2')
+        self.__button03.bind('<Button-1>', self.__to_left_click_event) #bind button click event
+        self.__button03.place(height=25, width=25, relx=0.465, rely=0.6)
+        
+        self.__button04 = Button(canv2, text='<<', relief=RAISED, cursor='hand2')
+        self.__button04.bind('<Button-1>', self.__all_to_left_click_event) #bind button click event
+        self.__button04.place(height=25, width=25, relx=0.465, rely=0.8)
         
         #right listbox and scrollbar
         self.__listboxright = Listbox(canv2, width=30)
@@ -216,8 +224,13 @@ class Frame_serviceimpl_option(FormatableFrame):
             return
         
         # write serviceImpl
-        Java_processor.create_service_impl(self.__feet.get(), self.get_trans(), self.get_dtos(), self.__listboxright.get(0, END), self.__vari1.get())
+        result, message, filefullpath = Java_processor.create_service_impl(self.__feet.get(), self.get_trans(), self.get_dtos(), self.__listboxright.get(0, END), self.__vari1.get())
+        if not result:
+            showerror('Error', message)
+            return False
         
+        # store the serviceImpl full path
+        self.get_dtos().set_serviceImplPath(filefullpath)
         return True
         
         
@@ -253,8 +266,24 @@ class Frame_serviceimpl_option(FormatableFrame):
             self.__listboxright.insert(END, select_item[0])
             select_idx = self.__listboxleft.curselection()
             #remove from left
+            print(select_idx[0])
             self.__listboxleft.delete(select_idx[0])
             
+    
+    def __all_to_right_click_event(self, event):
+        '''
+        move all items to the right list box
+        '''
+        select_items = []
+        if len(self.__listboxleft.get(0, END)) > 0:
+            for select_item in self.__listboxleft.get(0, END):
+                select_items.append(select_item)
+            self.__listboxleft.delete(0, END)
+            
+            for select_item in select_items:
+                #add into right
+                self.__listboxright.insert(END, select_item)
+        
     
     def __to_left_click_event(self, event):
         '''
@@ -264,6 +293,7 @@ class Frame_serviceimpl_option(FormatableFrame):
         if not self.__listboxright or self.__listboxright.size() == 0:
             return
         
+        select_item = None
         if len(self.__listboxright.curselection()) > 0:
             selection = self.__listboxright.selection_get()
             #the dict.items() will convert to tuple
@@ -282,3 +312,23 @@ class Frame_serviceimpl_option(FormatableFrame):
             select_idx = self.__listboxright.curselection()
             #remove from right
             self.__listboxright.delete(select_idx[0])
+            
+    
+    def __all_to_left_click_event(self, event):
+        '''
+        move all items to the right list box
+        '''
+        javaconstant = Java_constant()
+        select_items = []
+        if len(self.__listboxright.get(0, END)) > 0:
+            crud_nbr = 0
+            for select_item in self.__listboxright.get(0, END):
+                if select_item == javaconstant.JAVA_FUNCTION_CREATE or select_item == javaconstant.JAVA_FUNCTION_UPDATE or select_item == javaconstant.JAVA_FUNCTION_DELETE or select_item == javaconstant.JAVA_FUNCTION_FETCH:
+                    crud_nbr = crud_nbr + 1
+                    continue
+                select_items.append(select_item)
+            self.__listboxright.delete(crud_nbr -1, END)
+            
+            for select_item in select_items:
+                #add into right
+                self.__listboxleft.insert(END, select_item)

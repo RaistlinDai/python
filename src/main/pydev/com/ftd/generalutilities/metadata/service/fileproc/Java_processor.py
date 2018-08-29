@@ -510,7 +510,7 @@ class Java_processor(File_processor):
     def create_service_impl(filename, transDTO, entityDTO, funcList, createOpt):
         '''
         create the serviceImpl file
-        @param filefullpath: the serviceImpl file full path
+        @param filename: the serviceImpl file name
         '''
         javaconstant = Java_constant()
         fileconstant = File_constant()
@@ -526,7 +526,12 @@ class Java_processor(File_processor):
         # ------------------------------------------------------- #
         #                    Creation option                      #
         # ------------------------------------------------------- #
-        filefullpath = transDTO.get_workspacepath() + filename
+        # get the package name
+        serviceImpl_pack_name, tempstr01, parent_pack, tempstr02 = Java_processor.analysis_package_name(entityDTO.get_serviceInterDTO().get_class_package())
+        filefullpath = transDTO.get_projectpath() + fileconstant.JAVA_SERVICEIMPL_PATH % (parent_pack, filename)
+        if not Java_processor.verify_dir_existing(filefullpath):
+            return False, '%s does not exist in your project, please check!' % filename, None
+        
         if createOpt == 3:     # backup previous file
             backup_path = transDTO.get_workspacepath() + fileconstant.BACKUP_JAVA_FOLDER
             if not File_processor.verify_dir_existing(backup_path):
@@ -536,8 +541,6 @@ class Java_processor(File_processor):
         # ------------------------------------------------------- #
         #                       Preparation                       #
         # ------------------------------------------------------- #
-        # get the package name
-        pack_name = Java_processor.analysis_package_name(entityDTO.get_serviceInterDTO().get_class_package())
         # get the serviceImpl name
         serviceimpl_name = filename.replace(fileconstant.JAVA_SUFFIX, '')
         # get the container interface name
@@ -568,7 +571,7 @@ class Java_processor(File_processor):
             if mtd_create_entity_container == mtd.get_method_name() and container_inter_name == mtd.get_method_output():
                 valid_flag = True
         if not valid_flag:
-            return False
+            return False, '%s analysis failed, please verify your jar!' % container_inter_name, None
         
         # getEntityService()
         mtd_get_entity_service = javaconstant.JAVA_FUNCTION_GET + service_inter_name
@@ -577,7 +580,7 @@ class Java_processor(File_processor):
             if mtd_get_entity_service == mtd.get_method_name() and service_inter_name == mtd.get_method_output():
                 valid_flag = True
         if not valid_flag:
-            return False
+            return False, '%s analysis failed, please verify your jar!' % service_inter_name, None
         
         # initializeEntityDataset()
         entity_dataset_name = entityDTO.get_resourceDTO().get_view_parameters().get_table()
@@ -587,7 +590,7 @@ class Java_processor(File_processor):
             if mtd_initialize_entityDS == mtd.get_method_name():
                 valid_flag = True
         if not valid_flag:
-            return False
+            return False, '%s analysis failed, please verify your jar!' % entity_dataset_name, None
         
         # getMainTables()
         mtd_get_maintables = javaconstant.JAVA_FUNCTION_GET + main_table_inter_name + 's'
@@ -596,7 +599,7 @@ class Java_processor(File_processor):
             if mtd_get_maintables == mtd.get_method_name() and main_table_inter_name in mtd.get_method_output():
                 valid_flag = True
         if not valid_flag:
-            return False
+            return False, '%s analysis failed, please verify your jar!' % main_table_inter_name, None
         
         # addMainTable()
         mtd_add_maintables = javaconstant.JAVA_FUNCTION_ADD + main_table_inter_name
@@ -625,7 +628,7 @@ class Java_processor(File_processor):
                             mtd_add_param_calls = mtd_add_param_calls + '\n'
                 
         if not valid_flag:
-            return False
+            return False, '%s analysis failed, please verify your jar!' % main_table_inter_name, None
         
         # fetch parameters
         mtd_fetch_param_values = ''      # e.g. entity.getParam1(), entity.getParam2(), entity.getParam3()
@@ -694,7 +697,7 @@ class Java_processor(File_processor):
         # ------------------------------------------------------- #
         # ----- write the package -----
         # ------------------------------------------------------- #
-        file.write(javaconstant.JAVA_KEY_PACKAGE + ' ' + pack_name + javaconstant.JAVA_END_MARK + '\n')
+        file.write(javaconstant.JAVA_KEY_PACKAGE + ' ' + serviceImpl_pack_name + javaconstant.JAVA_END_MARK + '\n')
         file.write('\n')
         
         # ------------------------------------------------------- #
@@ -775,7 +778,7 @@ class Java_processor(File_processor):
         # ------------------------------------------------------- #
         # ----- write the service annotation -----
         # ------------------------------------------------------- #
-        tempStr = pack_name + javaconstant.JAVA_DOT_MARK + serviceimpl_name
+        tempStr = serviceImpl_pack_name + javaconstant.JAVA_DOT_MARK + serviceimpl_name
         file.write(javaconstant.JAVA_ANNOTATION_SERVICE % tempStr + '\n')
         
         # ------------------------------------------------------- #
@@ -996,24 +999,118 @@ class Java_processor(File_processor):
         file.write('\n' + javaconstant.JAVA_RIGHT_BRACE)
         file.close()
         
-        return True
+        return True, None, filefullpath
     
     
     @staticmethod
-    def analysis_package_name(package_name):
+    def analysis_service_impl(filefullpath, entityDTO):
         '''
-        analysis the package name
+        analysis the serviceImpl to get the service functions
+        '''
+        javaconstant = Java_constant()
+        # verify if file is existing
+        if not File_processor.verify_dir_existing(filefullpath):
+            return False, 'The serviceImpl is not exist, please check.', None
+        
+        service_funcs = []
+        
+        # create file
+        with open(filefullpath, 'r') as file:
+            lines = file.readlines()
+    
+        # get the service interface name
+        service_inter_name = entityDTO.get_serviceInterDTO().get_class_name()
+        # getEntityService()
+        mtd_get_entity_service = javaconstant.JAVA_FUNCTION_GET + service_inter_name + javaconstant.JAVA_LEFT_BRACKET + javaconstant.JAVA_RIGHT_BRACKET
+        for eachline in lines:
+            if mtd_get_entity_service in eachline:
+                sub_cells = eachline.split(javaconstant.JAVA_DOT_MARK)
+                if len(sub_cells) > 2 and sub_cells[1] == mtd_get_entity_service and javaconstant.JAVA_LEFT_BRACKET in sub_cells[2]:
+                    func_name = sub_cells[2][:sub_cells[2].index(javaconstant.JAVA_LEFT_BRACKET)]
+                    service_funcs.append(func_name)
+                    
+        return True, None, service_funcs
+    
+    
+            
+    @staticmethod
+    def create_data_controller(filename, transDTO, entityDTO, funcList, createOpt):
+        '''
+        create the serviceImpl file
+        @param filename: the serviceImpl file name
+        '''
+        javaconstant = Java_constant()
+        fileconstant = File_constant()
+        
+        factory_mtd_list = entityDTO.get_factoryInterDTO().get_class_methods()
+        service_mtd_list = entityDTO.get_serviceInterDTO().get_class_methods()
+        container_mtd_list = entityDTO.get_entContInterDTO().get_class_methods()
+        maintable_mtd_list = entityDTO.get_maintableInterDTO().get_class_methods()
+        serviceQra_mtd_list = entityDTO.get_serviceQraDTO().get_class_methods()
+        containerQra_mtd_list = entityDTO.get_entContQraDTO().get_class_methods()
+        temp_func_list = []
+        
+        # ------------------------------------------------------- #
+        #                    Creation option                      #
+        # ------------------------------------------------------- #
+        tempstr01, dataController_pack_name, parent_pack, tempstr03 = Java_processor.analysis_package_name(entityDTO.get_serviceInterDTO().get_class_package())
+        filefullpath = transDTO.get_projectpath() + fileconstant.JAVA_DATACONTROLLER_PATH % (parent_pack, filename)
+        print(filefullpath)
+        if not Java_processor.verify_dir_existing(filefullpath):
+            return False, '%s does not exist in your project, please check!' % filename, None
+        
+        if createOpt == 3:     # backup previous file
+            backup_path = transDTO.get_workspacepath() + fileconstant.BACKUP_JAVA_FOLDER
+            if not File_processor.verify_dir_existing(backup_path):
+                File_processor.create_folder(backup_path)
+                File_processor.copy_file(filefullpath, backup_path + filename)
+                
+        
+        
+        # create file
+        Path(filefullpath).touch()
+        file = open(filefullpath, 'w')
+        
+        # ------------------------------------------------------- #
+        # ----- write the class comments title -----
+        # ------------------------------------------------------- #
+        file.write(javaconstant.JAVA_ENTITY_TITLE)
+        file.write('\n')
+        
+        # ------------------------------------------------------- #
+        # ----- write the package -----
+        # ------------------------------------------------------- #
+        file.write(javaconstant.JAVA_KEY_PACKAGE + ' ' + dataController_pack_name + javaconstant.JAVA_END_MARK + '\n')
+        file.write('\n')
+        
+        
+        
+        
+        # ------------------------------------------------------- #
+        # ----- write the class ender -----
+        # ------------------------------------------------------- #
+        #file.write('\n' + javaconstant.JAVA_RIGHT_BRACE)
+        file.close()
+        
+        return True, None, filefullpath
+    
+    
+    @staticmethod
+    def analysis_package_name(api_package_name):
+        '''
+        analysis the api package name, to generate the serviceImpl & dataController package name, and also the parent package folder name. e.g. paymentinstruments
         @return: serviceImpl_folder
         '''
         javaconstant = Java_constant()
         package_parent_name = None    # package parent name
         package_sub_name = None       # package self name
-        if javaconstant.JAVA_IMPL_PACKAGE_PREFIX in package_name:
-            temp_str = package_name[len(javaconstant.JAVA_IMPL_PACKAGE_PREFIX):]
+        if javaconstant.JAVA_IMPL_PACKAGE_PREFIX in api_package_name:
+            temp_str = api_package_name[len(javaconstant.JAVA_IMPL_PACKAGE_PREFIX):]
             package_parent_name = temp_str[:temp_str.index('.')]
             package_sub_name = temp_str[temp_str.index('.')+1:].replace(javaconstant.JAVA_END_MARK,'')
         
         serviceImpl_folder = javaconstant.JAVA_ENTITY_SERVICEIMPL_PACKAGE % package_parent_name
+        dataController_folder = javaconstant.JAVA_ENTITY_DATACONTROLLER_PACKAGE % package_parent_name
         
-        return serviceImpl_folder
+        return serviceImpl_folder, dataController_folder, package_parent_name, package_sub_name
     
