@@ -230,7 +230,7 @@ class Frame_serviceimpl_option(FormatableFrame):
             return False
         
         # store the serviceImpl full path
-        self.get_dtos().set_serviceImplPath(filefullpath)
+        self.get_dtos().set_serviceImplInfo(self.__feet.get(), filefullpath)
         return True
         
         
@@ -266,7 +266,6 @@ class Frame_serviceimpl_option(FormatableFrame):
             self.__listboxright.insert(END, select_item[0])
             select_idx = self.__listboxleft.curselection()
             #remove from left
-            print(select_idx[0])
             self.__listboxleft.delete(select_idx[0])
             
     

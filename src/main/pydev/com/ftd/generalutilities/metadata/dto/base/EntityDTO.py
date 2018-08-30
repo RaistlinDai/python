@@ -27,8 +27,8 @@ class EntityDTO(object):
         self.__dto = {'Entity':None,                      # entity name
                       'ViewFullPath':None,                # view metadata path
                       'ResourceFullPath':None,            # resource metadata path
-                      'ServiceImplPath':None,             # generated serviceImpl path
-                      'DataControllerPath':None,          # generated dataController path
+                      'ServiceImplInfo':[],               # generated serviceImpl
+                      'DataControllerInfo':[],            # generated dataController
                       'ViewMetaData':viewDTO,             # view metadata DTO
                       'ResourceMetaData':resourceDTO,     # resource metadata DTO
                       'ServiceInterDTO':serviceInterDTO,  # service interface DTO
@@ -85,26 +85,42 @@ class EntityDTO(object):
             return None
         
     
-    def set_dataControllerPath(self, value):
+    def set_dataControllerInfo(self, name, path):
         if self.__dto:
-            self.__dto['DataControllerPath'] = value
+            self.__dto['DataControllerInfo'].append(name)
+            self.__dto['DataControllerInfo'].append(path)
         
         
     def get_dataControllerPath(self):
-        if self.__dto:
-            return self.__dto['DataControllerPath']
+        if self.__dto and len(self.__dto['DataControllerInfo']) > 1:
+            return self.__dto['DataControllerInfo'][1]
+        else:
+            return None
+        
+        
+    def get_dataControllerName(self):
+        if self.__dto and len(self.__dto['DataControllerInfo']) > 1:
+            return self.__dto['DataControllerInfo'][0]
         else:
             return None
     
     
-    def set_serviceImplPath(self, value):
+    def set_serviceImplInfo(self, name, path):
         if self.__dto:
-            self.__dto['ServiceImplPath'] = value
+            self.__dto['ServiceImplInfo'].append(name)
+            self.__dto['ServiceImplInfo'].append(path)
         
         
     def get_serviceImplPath(self):
-        if self.__dto:
-            return self.__dto['ServiceImplPath']
+        if self.__dto and len(self.__dto['ServiceImplInfo']) > 1:
+            return self.__dto['ServiceImplInfo'][1]
+        else:
+            return None
+        
+        
+    def get_serviceImplName(self):
+        if self.__dto and len(self.__dto['ServiceImplInfo']) > 1:
+            return self.__dto['ServiceImplInfo'][0]
         else:
             return None
     

@@ -74,6 +74,8 @@ class Java_constant(object):
         # ---------------------------------------------------------------- #
         self.JAVA_ANNOTATION_SERVICE = '@Service(\"%s\")'
         self.JAVA_ANNOTATION_OVERRIDE = '@Override'
+        self.JAVA_ANNOTATION_CONTROLLER = '@Controller(\"%s\")'
+        self.JAVA_ANNOTATION_AUTOWIRED = '@Autowired'
         
         # ---------------------------------------------------------------- #
         #                  serviceImpl.java                                #
@@ -86,7 +88,6 @@ class Java_constant(object):
         
         # ----------------- serviceImpl package ------------------ #
         self.JAVA_ENTITY_SERVICEIMPL_PACKAGE = 'com.qad.erp.financials.%s.service.impl'
-        self.JAVA_ENTITY_DATACONTROLLER_PACKAGE = 'com.qad.erp.financials.%s.mvc.controller.data'
         
         # ----------------- serviceImpl header ------------------ #
         self.JAVA_SERVICE_HEADER = 'public class %s extends FinQraEntityService<%s, %s> {'
@@ -112,11 +113,14 @@ class Java_constant(object):
         self.JAVA_ENTITY_CONST_FACTORY_QRA = '%FACTORY_QRA%'
         self.JAVA_ENTITY_CONST_HOLDER = '%ENTITYHOLDER%'
         self.JAVA_ENTITY_CONST_ENTITY_DATASET = '%ENTITY_DATASET%'
+        self.JAVA_ENTITY_CONST_SERVICEIMPL = '%SERVICEIMPL%'
         
         self.JAVA_MTD_CONST_CRAET_CONTAINER_INTER = '%MTD_CREATE_CONTAINER_INTERFACE%'
         self.JAVA_MTD_CONST_GET_SERVICE_INTER = '%MTD_GET_SERVICE_INTERFACE%'
         self.JAVA_MTD_CONST_INITIAL_ENTITY_DATASET = '%MTD_INITIAL_ENTITY_DATASET%'
         self.JAVA_MTD_CONST_GET_ENTITY_DATASET_LIST = '%MTD_GET_ENTITY_DATASET_LIST%'
+        self.JAVA_MTD_CONST_GET_SERVICEIMPL = '%MTD_GET_SERVICEIMPL%'
+        self.JAVA_MTD_CONST_ENTITY_DATASET = '%MTD_ENTITY_DATASET%'
         
         self.JAVA_MTD_CONST_FETCH_METHOD_PARAMS_VALUE = '%FETCH_MTD_PARAMETERS_VALUE%'
         self.JAVA_MTD_CONST_FETCH_METHOD_PARAMS_INPUT = '%FETCH_MTD_PARAMETERS%_INPUT'
@@ -266,9 +270,98 @@ class Java_constant(object):
         # ---------------------------------------------------------------- #
         #                  dataController.java                             #
         # ---------------------------------------------------------------- #
+        # ----------------- dataController package ------------------ #
+        self.JAVA_ENTITY_DATACONTROLLER_PACKAGE = 'com.qad.erp.financials.%s.mvc.controller.data'
+        
+        # ----------------- serviceImpl header ------------------ #
+        self.JAVA_CONTROLLER_HEADER = 'public class %s extends FinQraDataController<%s> %s{'
+        
+        # ----------------- standard imports ------------------ #
+        self.JAVA_CONTROLLER_IMPORTS = ['import java.math.BigDecimal;',
+                                        'import java.util.Arrays;',
+                                        'import java.util.GregorianCalendar;',
+                                        'import java.util.HashSet;',
+                                        'import java.util.Iterator;',
+                                        'import java.util.List;',
+                                        'import java.util.Map.Entry;',
+                                        'import java.util.Set;',
+                                        'import org.slf4j.Logger;',
+                                        'import org.slf4j.LoggerFactory;',
+                                        'import org.springframework.beans.factory.annotation.Autowired;',
+                                        'import org.springframework.http.MediaType;',
+                                        'import org.springframework.stereotype.Controller;',
+                                        'import org.springframework.ui.Model;',
+                                        'import org.springframework.web.bind.annotation.ModelAttribute;',
+                                        'import org.springframework.web.bind.annotation.RequestBody;',
+                                        'import org.springframework.web.bind.annotation.RequestMapping;',
+                                        'import org.springframework.web.bind.annotation.RequestMethod;',
+                                        'import org.springframework.web.bind.annotation.RequestParam;',
+                                        'import org.springframework.web.bind.annotation.ResponseBody;',
+                                        'import org.springframework.web.servlet.View;',
+                                        'import commonj.sdo.DataGraph;',
+                                        'import com.progress.open4gl.ProDataGraph;',
+                                        'import com.qad.erp.financials.mvc.controller.data.FinQraDataController;',
+                                        'import com.qad.erp.financials.util.service.impl.FinancialsDataSetUtil;',
+                                        'import com.qad.qra.Holder;',
+                                        'import com.qad.qracore.util.QraWorkspaceUtil;',
+                                        'import com.qad.qraview.dto.QueryParameters;',
+                                        'import com.qad.qraview.dto.SubmitResult;',
+                                        'import com.qad.qraview.dto.SubmitResultAndData;',
+                                        'import com.qad.qraview.util.StringUtil;',
+                                        'import com.qad.webshell.util.JsonDataHolder;']
+        
+        self.JAVA_CONTROLLER_CROSS_WORKSPACE_CONTROLLER = 'import com.qad.webshell.security.authorization.CrossWorkspaceController;'
+        
+        # ----------------- static final properties ------------------ #
+        self.JAVA_CONTROLLER_STATIC_FINAL_PROP_SUFFIX = 'private static final Logger logger = %s'
+        self.JAVA_CONTROLLER_STATIC_FINAL_PROP_LOGGER = 'private static final Logger logger = LoggerFactory.getLogger(%s.class);'
         
         
+        # ------------------- Standard methods -------------------------- #
+        # setServiceImpl()
+        self.JAVA_CONTROLLER_OVERRIDE_INITIALIZE = [self.JAVA_ANNOTATION_AUTOWIRED,
+                                                    'public void ' + self.JAVA_MTD_CONST_GET_SERVICEIMPL + '(' + self.JAVA_ENTITY_CONST_SERVICEIMPL + ' service) {',
+                                                    self.JAVA_TAB + 'crudProviderService = service;',
+                                                    self.JAVA_RIGHT_BRACE]
         
+        # getServiceProviderName()
+        self.JAVA_CONTROLLER_OVERRIDE_GET_SERVICE_PROVIDER_NAME = [self.JAVA_ANNOTATION_OVERRIDE,
+                                                                   'public String getServiceProviderName() {',
+                                                                   self.JAVA_TAB + 'return com.qad.erp.financials.Plugin.PLUGIN_NAME;',
+                                                                   self.JAVA_RIGHT_BRACE]
         
+        # getEntityFromJson()
+        self.JAVA_CONTROLLER_OVERRIDE_GET_ENTITY_FROM_JSON = [self.JAVA_ANNOTATION_OVERRIDE,
+                                                              'protected ' + self.JAVA_ENTITY_CONST_CONTAINER_INTER + ' getEntityFromJson(String json) {',
+                                                              self.JAVA_TAB + self.JAVA_ENTITY_CONST_SERVICEIMPL + ' service = (' + self.JAVA_ENTITY_CONST_SERVICEIMPL + ')crudProviderService;',
+                                                              self.JAVA_TAB + self.JAVA_ENTITY_CONST_FACTORY_INTER + ' factory = service.getEntityFactory();',
+                                                              self.JAVA_TAB + self.JAVA_ENTITY_CONST_CONTAINER_INTER + ' container = null;',
+                                                              self.JAVA_TAB + 'try {',
+                                                              self.JAVA_TAB + self.JAVA_TAB + 'container = factory.' + self.JAVA_MTD_CONST_CRAET_CONTAINER_INTER + '(json);',
+                                                              self.JAVA_TAB + '} catch (Exception e) {',
+                                                              self.JAVA_TAB + self.JAVA_TAB + 'e.printStackTrace();',
+                                                              self.JAVA_TAB + self.JAVA_TAB + 'throw(new RuntimeException(e));',
+                                                              self.JAVA_TAB + self.JAVA_RIGHT_BRACE,
+                                                              '\n',
+                                                              self.JAVA_TAB + 'return container;',
+                                                              self.JAVA_RIGHT_BRACE]
         
+        # getJsonFromEntity()
+        self.JAVA_CONTROLLER_OVERRIDE_GET_JSON_FROM_ENTITY = [self.JAVA_ANNOTATION_OVERRIDE,
+                                                              'protected String getJsonFromEntity(' + self.JAVA_ENTITY_CONST_CONTAINER_INTER + ' entity) {',
+                                                              self.JAVA_TAB + self.JAVA_ENTITY_CONST_FACTORY_INTER + ' factory = ((' + self.JAVA_ENTITY_CONST_SERVICEIMPL + ')crudProviderService).getEntityFactory();',
+                                                              self.JAVA_TAB + 'return factory.containerToJson(entity);',
+                                                              self.JAVA_RIGHT_BRACE]
         
+        # getEntityCount()
+        self.JAVA_CONTROLLER_OVERRIDE_GET_ENTITY_COUNT = [self.JAVA_ANNOTATION_OVERRIDE,
+                                                          'protected int getEntityCount(' + self.JAVA_ENTITY_CONST_CONTAINER_INTER + ' container) {',
+                                                          self.JAVA_TAB + 'return container.' + self.JAVA_MTD_CONST_ENTITY_DATASET + '().size();',
+                                                          self.JAVA_RIGHT_BRACE]
+        
+        # override methods list    
+        self.JAVA_CONTRLLER_OVERRIDE_METHODS = [self.JAVA_CONTROLLER_OVERRIDE_INITIALIZE,
+                                                self.JAVA_CONTROLLER_OVERRIDE_GET_SERVICE_PROVIDER_NAME,
+                                                self.JAVA_CONTROLLER_OVERRIDE_GET_ENTITY_FROM_JSON,
+                                                self.JAVA_CONTROLLER_OVERRIDE_GET_JSON_FROM_ENTITY,
+                                                self.JAVA_CONTROLLER_OVERRIDE_GET_ENTITY_COUNT]

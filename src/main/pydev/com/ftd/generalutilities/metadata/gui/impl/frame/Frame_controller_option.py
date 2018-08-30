@@ -144,6 +144,8 @@ class Frame_controller_option(FormatableFrame):
         else:
             tempstr01, tempstr02, parent_pack, tempstr03 = Java_processor.analysis_package_name(self.get_dtos().get_serviceInterDTO().get_class_package())
             serviceImpl_path = self.get_trans().get_projectpath() + fileconstant.JAVA_SERVICEIMPL_PATH % (parent_pack, business_entity_name + fileconstant.SERVICEIMPL_SUFFIX + fileconstant.JAVA_SUFFIX)
+            #set the serviceImpl info into dtos
+            self.get_dtos().set_serviceImplInfo(business_entity_name + fileconstant.SERVICEIMPL_SUFFIX + fileconstant.JAVA_SUFFIX, serviceImpl_path)
             
         self.__result, self.__error, func_list = Java_processor.analysis_service_impl(serviceImpl_path, self.get_dtos())
         if not self.__result:
@@ -249,7 +251,7 @@ class Frame_controller_option(FormatableFrame):
             return False
         
         # store the serviceImpl full path
-        self.get_dtos().set_dataControllerPath(filefullpath)
+        self.get_dtos().set_dataControllerInfo(self.__feet.get(), filefullpath)
         return True
     
     

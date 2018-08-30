@@ -1037,7 +1037,7 @@ class Java_processor(File_processor):
     def create_data_controller(filename, transDTO, entityDTO, funcList, createOpt):
         '''
         create the serviceImpl file
-        @param filename: the serviceImpl file name
+        @param filename: the dataController file name
         '''
         javaconstant = Java_constant()
         fileconstant = File_constant()
@@ -1064,7 +1064,42 @@ class Java_processor(File_processor):
             if not File_processor.verify_dir_existing(backup_path):
                 File_processor.create_folder(backup_path)
                 File_processor.copy_file(filefullpath, backup_path + filename)
-                
+        
+        # ------------------------------------------------------- #
+        #                       Preparation                       #
+        # ------------------------------------------------------- #
+        # get the dataController name
+        datacontroller_name = filename.replace(fileconstant.JAVA_SUFFIX, '')
+        # get the serviceImpl name
+        serviceImpl_name = entityDTO.get_serviceImplName().replace(fileconstant.JAVA_SUFFIX,'')
+        # get the container interface name
+        container_inter_name = entityDTO.get_entContInterDTO().get_class_name()
+        # get the service interface name
+        service_inter_name = entityDTO.get_serviceInterDTO().get_class_name()
+        # get the factory interface name
+        factory_inter_name = entityDTO.get_factoryInterDTO().get_class_name()
+        # get the container qra name
+        container_qra_name = entityDTO.get_entContQraDTO().get_class_name()
+        # get the service qra name
+        service_qra_name = entityDTO.get_serviceQraDTO().get_class_name()
+        # get the factory interface name
+        factory_qra_name = entityDTO.get_factoryQraDTO().get_class_name()
+        # get the main table interface name
+        main_table_inter_name = entityDTO.get_maintableInterDTO().get_class_name()
+        # entity holder
+        entity_holder = container_inter_name.replace(fileconstant.JAVA_CONTAINER_SUFFIX, '') + fileconstant.JAVA_HOLDER_SUFFIX
+        
+        # get the additional implements
+        implement_cells = ''
+        # get the properties
+        additional_properties = []
+        # additional imports for method parameters/result
+        additional_imports = []
+        
+        # createEntityContainer()
+        mtd_create_entity_container = javaconstant.JAVA_FUNCTION_CREATE + container_inter_name
+        # getMainTables()
+        mtd_maintables = main_table_inter_name[0].lower() + main_table_inter_name[1:] + 's'
         
         
         # create file
@@ -1083,13 +1118,83 @@ class Java_processor(File_processor):
         file.write(javaconstant.JAVA_KEY_PACKAGE + ' ' + dataController_pack_name + javaconstant.JAVA_END_MARK + '\n')
         file.write('\n')
         
+        # ------------------------------------------------------- #
+        # ----- write the imports -----
+        # ------------------------------------------------------- #
+        import_list = []
+        for importcell in javaconstant.JAVA_CONTROLLER_IMPORTS:
+            file.write(importcell + '\n')
+            import_list.append(importcell + '\n')
+        
+        file.write('\n')
+        
+        # ------------------------------------------------------- #
+        # ----- write the controller annotation -----
+        # ------------------------------------------------------- #
+        tempStr = dataController_pack_name + javaconstant.JAVA_DOT_MARK + datacontroller_name
+        file.write(javaconstant.JAVA_ANNOTATION_CONTROLLER % tempStr + '\n')
+        
+        # ------------------------------------------------------- #
+        # ----- write the class header -----
+        # ------------------------------------------------------- #
+        tempStr = javaconstant.JAVA_CONTROLLER_HEADER % (datacontroller_name, container_inter_name, implement_cells)
+        file.write(tempStr + '\n')
+        file.write('\n')
+        
+        # ------------------------------------------------------- #
+        # ----- write the properties -----
+        # ------------------------------------------------------- #
+        file.write(javaconstant.JAVA_TAB + javaconstant.JAVA_CONTROLLER_STATIC_FINAL_PROP_LOGGER % datacontroller_name + '\n')
+        for prop_cell in additional_properties:
+            file.write(javaconstant.JAVA_TAB + javaconstant.JAVA_CONTROLLER_STATIC_FINAL_PROP_SUFFIX % prop_cell + javaconstant.JAVA_END_MARK + '\n')
+        
+        # ------------------------------------------------------- #
+        # ----- write the override methods -----
+        # ------------------------------------------------------- #
+        for mtds in javaconstant.JAVA_CONTRLLER_OVERRIDE_METHODS:
+            for lines in mtds:
+                lines = javaconstant.JAVA_TAB + lines
+                # replace container interface
+                if javaconstant.JAVA_ENTITY_CONST_CONTAINER_INTER in lines:
+                    lines = lines.replace(javaconstant.JAVA_ENTITY_CONST_CONTAINER_INTER, container_inter_name)
+                # replace serviceImpl
+                if javaconstant.JAVA_ENTITY_CONST_SERVICEIMPL in lines:
+                    lines = lines.replace(javaconstant.JAVA_ENTITY_CONST_SERVICEIMPL, serviceImpl_name)
+                # replace factory interface
+                if javaconstant.JAVA_ENTITY_CONST_FACTORY_INTER in lines:
+                    lines = lines.replace(javaconstant.JAVA_ENTITY_CONST_FACTORY_INTER, factory_inter_name)
+                # replace container qra
+                if javaconstant.JAVA_ENTITY_CONST_CONTAINER_QRA in lines:
+                    lines = lines.replace(javaconstant.JAVA_ENTITY_CONST_CONTAINER_QRA, container_qra_name)
+                # replace factory qra
+                if javaconstant.JAVA_ENTITY_CONST_FACTORY_QRA in lines:
+                    lines = lines.replace(javaconstant.JAVA_ENTITY_CONST_FACTORY_QRA, factory_qra_name)
+                # replace entity holder
+                if javaconstant.JAVA_ENTITY_CONST_HOLDER in lines:
+                    lines = lines.replace(javaconstant.JAVA_ENTITY_CONST_HOLDER, entity_holder)
+                # replace create container method
+                if javaconstant.JAVA_MTD_CONST_CRAET_CONTAINER_INTER in lines:
+                    lines = lines.replace(javaconstant.JAVA_MTD_CONST_CRAET_CONTAINER_INTER, mtd_create_entity_container)
+                # replace main table interface
+                if javaconstant.JAVA_ENTITY_CONST_ENTITY_DATASET in lines:
+                    lines = lines.replace(javaconstant.JAVA_ENTITY_CONST_ENTITY_DATASET, main_table_inter_name)
+                # replace get main table list method
+                if javaconstant.JAVA_MTD_CONST_ENTITY_DATASET in lines:
+                    lines = lines.replace(javaconstant.JAVA_MTD_CONST_ENTITY_DATASET, mtd_maintables)
+                    
+                if '\n' not in lines:
+                    file.write(lines + '\n')
+                else:
+                    file.write(lines)
+            
+            file.write('\n')
         
         
         
         # ------------------------------------------------------- #
         # ----- write the class ender -----
         # ------------------------------------------------------- #
-        #file.write('\n' + javaconstant.JAVA_RIGHT_BRACE)
+        file.write('\n' + javaconstant.JAVA_RIGHT_BRACE)
         file.close()
         
         return True, None, filefullpath
