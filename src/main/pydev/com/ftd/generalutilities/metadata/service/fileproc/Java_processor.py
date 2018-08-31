@@ -1055,7 +1055,6 @@ class Java_processor(File_processor):
         # ------------------------------------------------------- #
         tempstr01, dataController_pack_name, parent_pack, tempstr03 = Java_processor.analysis_package_name(entityDTO.get_serviceInterDTO().get_class_package())
         filefullpath = transDTO.get_projectpath() + fileconstant.JAVA_DATACONTROLLER_PATH % (parent_pack, filename)
-        print(filefullpath)
         if not Java_processor.verify_dir_existing(filefullpath):
             return False, '%s does not exist in your project, please check!' % filename, None
         
@@ -1088,6 +1087,8 @@ class Java_processor(File_processor):
         main_table_inter_name = entityDTO.get_maintableInterDTO().get_class_name()
         # entity holder
         entity_holder = container_inter_name.replace(fileconstant.JAVA_CONTAINER_SUFFIX, '') + fileconstant.JAVA_HOLDER_SUFFIX
+        # entity data resource
+        data_resource = entityDTO.get_resourceDTO().get_view_parameters().get_data_resource()
         
         # get the additional implements
         implement_cells = ''
@@ -1095,11 +1096,84 @@ class Java_processor(File_processor):
         additional_properties = []
         # additional imports for method parameters/result
         additional_imports = []
+        # entity key fields
+        key_fields = []
         
         # createEntityContainer()
         mtd_create_entity_container = javaconstant.JAVA_FUNCTION_CREATE + container_inter_name
         # getMainTables()
         mtd_maintables = main_table_inter_name[0].lower() + main_table_inter_name[1:] + 's'
+        
+        
+        # fetch parameters
+        mtd_fetch_param_calls = ''       # e.g. param1, param2, param3
+        mtd_fetch_param_ajax = ''        # e.g. @RequestParam(value = "entityCode", required = false) String entityCode,
+        mtd_fetch_param_verify = ''      # e.g. StringUtil.isNullOrEmpty(custPaymentType) && custPaymentYear == null
+        mtd_fetch_param_verifyNon = ''   # e.g. !StringUtil.isNullOrEmpty(custPaymentType) && custPaymentYear != null
+        mtd_fetch_param_comps = ''       # e.g. custPaymentType.equalsIgnoreCase(entity.getCustPaymentType())
+        mtd_param_commt = ''             # e.g. @param custPaymentType
+        
+        for mtd in serviceQra_mtd_list:
+            # fetch method in qra service
+            if javaconstant.JAVA_FUNCTION_FETCH == mtd.get_method_name():
+                
+                param_nbr = 0
+                for param in mtd.get_method_inputs():
+                    param_nbr = param_nbr + 1
+                    temp_param_name = param.get_parameter_name()
+                    
+                    # trim parameter name
+                    if temp_param_name[0:1] == 'p' and temp_param_name[1:2].isupper():
+                        temp_param_name = temp_param_name[1:2].lower() + temp_param_name[2:]
+                    # skip the Holder parameter for INPUT and VALUE
+                    if param.get_parameter_type() == 'Holder<DataGraph>':
+                        continue
+                    
+                    # ajax params
+                    temp_param_ajax = javaconstant.JAVA_MTD_CONST_CONTROLLER_AJAX_PARAM_TEMP % (temp_param_name,param.get_parameter_type(),temp_param_name)
+                    
+                    # params verifation
+                    if param.get_parameter_type() == javaconstant.JAVA_TYPE_STRING:
+                        temp_param_verify = 'StringUtil.isNullOrEmpty(%s)' % temp_param_name
+                        temp_param_verifyNon = '!StringUtil.isNullOrEmpty(%s)' % temp_param_name
+                    else:
+                        temp_param_verify = '%s == null' % temp_param_name
+                        temp_param_verifyNon = '%s != null' % temp_param_name
+                        
+                    # TODO: this is a hardcode solution, the input parameter name has to be 'pParam' or 'param', and the name has to be the same as table key field
+                    temp_get = 'entity.'
+                    for tabMtd in maintable_mtd_list:
+                        if tabMtd.get_method_name() == javaconstant.JAVA_FUNCTION_GET + temp_param_name[0:1].upper() + temp_param_name[1:]:
+                            temp_get = temp_get + tabMtd.get_method_name() + '()'
+                            break
+                        
+                    # params comparation
+                    if param.get_parameter_type() == javaconstant.JAVA_TYPE_STRING:
+                        temp_param_comp = '!%s.equalsIgnoreCase(%s)' % (temp_param_name, temp_get)
+                    else:
+                        temp_param_comp = '!%s.equals(%s)' % (temp_param_name, temp_get)
+                    
+                    if param_nbr == 1:
+                        mtd_fetch_param_calls = mtd_fetch_param_calls + temp_param_name
+                        mtd_fetch_param_ajax = mtd_fetch_param_ajax + temp_param_ajax
+                        mtd_fetch_param_verify = mtd_fetch_param_verify + temp_param_verify
+                        mtd_fetch_param_verifyNon = mtd_fetch_param_verifyNon + temp_param_verifyNon
+                        mtd_fetch_param_comps = mtd_fetch_param_comps + temp_param_comp
+                        mtd_param_commt = ' * @param ' + temp_param_name + '\n'
+                    else:
+                        mtd_fetch_param_calls = mtd_fetch_param_calls + javaconstant.JAVA_SEPERATOR + ' ' + temp_param_name
+                        if param_nbr % 5 == 0 and len(mtd.get_method_inputs()) > param_nbr % 5 * 5:
+                            mtd_fetch_param_calls = mtd_fetch_param_calls + '\n'
+                            
+                        mtd_fetch_param_ajax = mtd_fetch_param_ajax + javaconstant.JAVA_SEPERATOR + '\n' + javaconstant.JAVA_TAB + javaconstant.JAVA_TAB + javaconstant.JAVA_TAB + temp_param_ajax
+                        mtd_fetch_param_verify = mtd_fetch_param_verify + ' ' + javaconstant.JAVA_AND_MARK + '\n' + temp_param_verify
+                        mtd_fetch_param_verifyNon = mtd_fetch_param_verifyNon + ' ' + javaconstant.JAVA_AND_MARK + '\n' + temp_param_verifyNon
+                        mtd_fetch_param_comps = mtd_fetch_param_comps + ' ' + javaconstant.JAVA_AND_MARK + '\n' + temp_param_comp
+                        mtd_param_commt = mtd_param_commt + javaconstant.JAVA_TAB + ' * @param ' + temp_param_name + '\n'
+                        
+                    key_fields.append({temp_param_name:[param.get_parameter_type(), temp_get]})
+                            
+                break       
         
         
         # create file
@@ -1151,15 +1225,15 @@ class Java_processor(File_processor):
         # ------------------------------------------------------- #
         # ----- write the override methods -----
         # ------------------------------------------------------- #
-        for mtds in javaconstant.JAVA_CONTRLLER_OVERRIDE_METHODS:
+        for mtds in javaconstant.JAVA_CONTROLLER_OVERRIDE_METHODS:
             for lines in mtds:
                 lines = javaconstant.JAVA_TAB + lines
                 # replace container interface
                 if javaconstant.JAVA_ENTITY_CONST_CONTAINER_INTER in lines:
                     lines = lines.replace(javaconstant.JAVA_ENTITY_CONST_CONTAINER_INTER, container_inter_name)
                 # replace serviceImpl
-                if javaconstant.JAVA_ENTITY_CONST_SERVICEIMPL in lines:
-                    lines = lines.replace(javaconstant.JAVA_ENTITY_CONST_SERVICEIMPL, serviceImpl_name)
+                if javaconstant.JAVA_ENTITY_CONST_SERVICEIMPL_NAME in lines:
+                    lines = lines.replace(javaconstant.JAVA_ENTITY_CONST_SERVICEIMPL_NAME, serviceImpl_name)
                 # replace factory interface
                 if javaconstant.JAVA_ENTITY_CONST_FACTORY_INTER in lines:
                     lines = lines.replace(javaconstant.JAVA_ENTITY_CONST_FACTORY_INTER, factory_inter_name)
@@ -1188,6 +1262,106 @@ class Java_processor(File_processor):
                     file.write(lines)
             
             file.write('\n')
+        
+        
+        # ------------------------------------------------------- #
+        # ----- write the standard CRUD methods -----
+        # ------------------------------------------------------- #
+        for mtds in javaconstant.JAVA_CONTROLLER_STANDARD_METHODS:
+            line_tab_count = 1
+            for lines in mtds:
+                lines = javaconstant.JAVA_TAB + lines
+                # replace dataResource
+                if javaconstant.JAVA_ENTITY_CONST_DATARESOURCE in lines:
+                    lines = lines.replace(javaconstant.JAVA_ENTITY_CONST_DATARESOURCE, data_resource)
+                # replace entity name
+                if javaconstant.JAVA_ENTITY_CONST_ENTITY_NAME in lines:
+                    lines = lines.replace(javaconstant.JAVA_ENTITY_CONST_ENTITY_NAME, container_inter_name.replace(fileconstant.JAVA_CONTAINER_SUFFIX, ''))
+                # replace controller name
+                if javaconstant.JAVA_ENTITY_CONST_CONTROLLER_NAME in lines:
+                    lines = lines.replace(javaconstant.JAVA_ENTITY_CONST_CONTROLLER_NAME, datacontroller_name)
+                # replace container interface name
+                if javaconstant.JAVA_ENTITY_CONST_CONTAINER_INTER in lines:
+                    lines = lines.replace(javaconstant.JAVA_ENTITY_CONST_CONTAINER_INTER, container_inter_name)
+                # replace the ajax parameters
+                if javaconstant.JAVA_MTD_CONST_CONTROLLER_AJAX_PARAM in lines:
+                    lines = lines.replace(javaconstant.JAVA_MTD_CONST_CONTROLLER_AJAX_PARAM, mtd_fetch_param_ajax)
+                # replace the serviceImpl name
+                if javaconstant.JAVA_ENTITY_CONST_SERVICEIMPL_NAME in lines:
+                    lines = lines.replace(javaconstant.JAVA_ENTITY_CONST_SERVICEIMPL_NAME, serviceImpl_name)
+                #  replace main table interface
+                if javaconstant.JAVA_ENTITY_CONST_ENTITY_DATASET in lines:
+                    lines = lines.replace(javaconstant.JAVA_ENTITY_CONST_ENTITY_DATASET, main_table_inter_name)
+                
+                # replace method comment
+                if javaconstant.JAVA_MTD_CONST_COMMON_METHOD_COMMENT in lines:
+                    lines = lines.replace(javaconstant.JAVA_MTD_CONST_COMMON_METHOD_COMMENT, mtd_param_commt)
+                    
+                # replace the parameters verify                    
+                if javaconstant.JAVA_MTD_CONST_PARAM_VERIFY in lines:
+                    if '\n' in mtd_fetch_param_verify:
+                        temp_line_nbr = 1
+                        for temp_param in mtd_fetch_param_verify.split('\n'):
+                            if temp_line_nbr == 1:
+                                mtd_fetch_param_verify = temp_param
+                            else:
+                                mtd_fetch_param_verify = mtd_fetch_param_verify + '\n'
+                                temp_tab_line_nbr = 1
+                                while temp_tab_line_nbr <= line_tab_count + 2:
+                                    mtd_fetch_param_verify = mtd_fetch_param_verify + javaconstant.JAVA_TAB
+                                    temp_tab_line_nbr = temp_tab_line_nbr + 1
+                                mtd_fetch_param_verify = mtd_fetch_param_verify + temp_param
+                            temp_line_nbr = temp_line_nbr + 1
+                    mtd_fetch_param_verify + '\n'
+                    lines = lines.replace(javaconstant.JAVA_MTD_CONST_PARAM_VERIFY, mtd_fetch_param_verify)
+                    
+                # replace the parameters verify None                   
+                if javaconstant.JAVA_MTD_CONST_PARAM_VERIFY_NON in lines:
+                    if '\n' in mtd_fetch_param_verifyNon:
+                        temp_line_nbr = 1
+                        for temp_param in mtd_fetch_param_verifyNon.split('\n'):
+                            if temp_line_nbr == 1:
+                                mtd_fetch_param_verifyNon = temp_param
+                            else:
+                                mtd_fetch_param_verifyNon = mtd_fetch_param_verifyNon + '\n'
+                                temp_tab_line_nbr = 1
+                                while temp_tab_line_nbr <= line_tab_count + 2:
+                                    mtd_fetch_param_verifyNon = mtd_fetch_param_verifyNon + javaconstant.JAVA_TAB
+                                    temp_tab_line_nbr = temp_tab_line_nbr + 1
+                                mtd_fetch_param_verifyNon = mtd_fetch_param_verifyNon + temp_param
+                            temp_line_nbr = temp_line_nbr + 1
+                    mtd_fetch_param_verifyNon + '\n'
+                    lines = lines.replace(javaconstant.JAVA_MTD_CONST_PARAM_VERIFY_NON, mtd_fetch_param_verifyNon)
+                
+                # replace the parameters comparation 
+                if javaconstant.JAVA_MTD_CONST_PARAM_COMPARATION in lines:
+                    print(line_tab_count)
+                    if '\n' in mtd_fetch_param_comps:
+                        temp_line_nbr = 1
+                        for temp_param in mtd_fetch_param_comps.split('\n'):
+                            if temp_line_nbr == 1:
+                                mtd_fetch_param_comps = temp_param
+                            else:
+                                mtd_fetch_param_comps = mtd_fetch_param_comps + '\n'
+                                temp_tab_line_nbr = 1
+                                while temp_tab_line_nbr <= line_tab_count + 3:
+                                    mtd_fetch_param_comps = mtd_fetch_param_comps + javaconstant.JAVA_TAB
+                                    temp_tab_line_nbr = temp_tab_line_nbr + 1
+                                mtd_fetch_param_comps = mtd_fetch_param_comps + temp_param
+                            temp_line_nbr = temp_line_nbr + 1
+                    mtd_fetch_param_comps + '\n'
+                    lines = lines.replace(javaconstant.JAVA_MTD_CONST_PARAM_COMPARATION, mtd_fetch_param_comps)
+    
+    
+                line_tab_count = lines.count(javaconstant.JAVA_TAB)
+                    
+                if '\n' not in lines:
+                    file.write(lines + '\n')
+                else:
+                    file.write(lines)
+            
+            file.write('\n')
+        
         
         
         

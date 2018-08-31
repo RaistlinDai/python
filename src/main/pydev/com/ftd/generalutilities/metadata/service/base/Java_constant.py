@@ -41,6 +41,10 @@ class Java_constant(object):
         self.JAVA_RIGHT_DASH = '>'
         self.JAVA_TAB = '\t'
         
+        # java processing flag
+        self.JAVA_AND_MARK = '&&'
+        self.JAVA_AND_MARK = '||'
+        
         # java keywords
         self.JAVA_PRIMITIVE_TYPE_ARRAY = ["boolean", "char", "byte", "short", "int",
                                           "long", "float", "double", "void"]
@@ -67,6 +71,9 @@ class Java_constant(object):
         
         # ----------------- collections ----------------
         self.JAVA_COLLECTION_HOLDER = 'Holder'
+        
+        # ----------------- types ------------------
+        self.JAVA_TYPE_STRING = 'String'
         
         
         # ---------------------------------------------------------------- #
@@ -113,7 +120,10 @@ class Java_constant(object):
         self.JAVA_ENTITY_CONST_FACTORY_QRA = '%FACTORY_QRA%'
         self.JAVA_ENTITY_CONST_HOLDER = '%ENTITYHOLDER%'
         self.JAVA_ENTITY_CONST_ENTITY_DATASET = '%ENTITY_DATASET%'
-        self.JAVA_ENTITY_CONST_SERVICEIMPL = '%SERVICEIMPL%'
+        self.JAVA_ENTITY_CONST_DATARESOURCE = '%ENTITY_DATARESOURCE%'
+        self.JAVA_ENTITY_CONST_ENTITY_NAME = '%ENTITY_NAME%'
+        self.JAVA_ENTITY_CONST_SERVICEIMPL_NAME = '%SERVICEIMPL_NAME%'
+        self.JAVA_ENTITY_CONST_CONTROLLER_NAME = '%CONTROLLER_NAME%'
         
         self.JAVA_MTD_CONST_CRAET_CONTAINER_INTER = '%MTD_CREATE_CONTAINER_INTERFACE%'
         self.JAVA_MTD_CONST_GET_SERVICE_INTER = '%MTD_GET_SERVICE_INTERFACE%'
@@ -133,6 +143,11 @@ class Java_constant(object):
         self.JAVA_MTD_CONST_COMMON_METHOD_PARAM_CALL = '%COMMON_METHOD_PARAM_CALL%'
         self.JAVA_MTD_CONST_COMMON_METHOD_COMMENT = '%COMMON_METHOD_COMMENT%'
         
+        self.JAVA_MTD_CONST_CONTROLLER_STANDARD_DESCRIPTION = '%CONTROLLER_STANDARD_DESCRIPTION%'
+        self.JAVA_MTD_CONST_CONTROLLER_AJAX_PARAM = '%CONTROLLER_AJAX_PARAM%'
+        self.JAVA_MTD_CONST_PARAM_VERIFY = '%PARAM_VERIFY%'
+        self.JAVA_MTD_CONST_PARAM_VERIFY_NON = '%PARAM_VERIFY_NON%'
+        self.JAVA_MTD_CONST_PARAM_COMPARATION = '%PARAM_COMPARATION%'
         
         # ------------------- Standard methods -------------------------- #
         # initialize()
@@ -320,7 +335,7 @@ class Java_constant(object):
         # ------------------- Standard methods -------------------------- #
         # setServiceImpl()
         self.JAVA_CONTROLLER_OVERRIDE_INITIALIZE = [self.JAVA_ANNOTATION_AUTOWIRED,
-                                                    'public void ' + self.JAVA_MTD_CONST_GET_SERVICEIMPL + '(' + self.JAVA_ENTITY_CONST_SERVICEIMPL + ' service) {',
+                                                    'public void ' + self.JAVA_MTD_CONST_GET_SERVICEIMPL + '(' + self.JAVA_ENTITY_CONST_SERVICEIMPL_NAME + ' service) {',
                                                     self.JAVA_TAB + 'crudProviderService = service;',
                                                     self.JAVA_RIGHT_BRACE]
         
@@ -333,7 +348,7 @@ class Java_constant(object):
         # getEntityFromJson()
         self.JAVA_CONTROLLER_OVERRIDE_GET_ENTITY_FROM_JSON = [self.JAVA_ANNOTATION_OVERRIDE,
                                                               'protected ' + self.JAVA_ENTITY_CONST_CONTAINER_INTER + ' getEntityFromJson(String json) {',
-                                                              self.JAVA_TAB + self.JAVA_ENTITY_CONST_SERVICEIMPL + ' service = (' + self.JAVA_ENTITY_CONST_SERVICEIMPL + ')crudProviderService;',
+                                                              self.JAVA_TAB + self.JAVA_ENTITY_CONST_SERVICEIMPL_NAME + ' service = (' + self.JAVA_ENTITY_CONST_SERVICEIMPL_NAME + ')crudProviderService;',
                                                               self.JAVA_TAB + self.JAVA_ENTITY_CONST_FACTORY_INTER + ' factory = service.getEntityFactory();',
                                                               self.JAVA_TAB + self.JAVA_ENTITY_CONST_CONTAINER_INTER + ' container = null;',
                                                               self.JAVA_TAB + 'try {',
@@ -349,7 +364,7 @@ class Java_constant(object):
         # getJsonFromEntity()
         self.JAVA_CONTROLLER_OVERRIDE_GET_JSON_FROM_ENTITY = [self.JAVA_ANNOTATION_OVERRIDE,
                                                               'protected String getJsonFromEntity(' + self.JAVA_ENTITY_CONST_CONTAINER_INTER + ' entity) {',
-                                                              self.JAVA_TAB + self.JAVA_ENTITY_CONST_FACTORY_INTER + ' factory = ((' + self.JAVA_ENTITY_CONST_SERVICEIMPL + ')crudProviderService).getEntityFactory();',
+                                                              self.JAVA_TAB + self.JAVA_ENTITY_CONST_FACTORY_INTER + ' factory = ((' + self.JAVA_ENTITY_CONST_SERVICEIMPL_NAME + ')crudProviderService).getEntityFactory();',
                                                               self.JAVA_TAB + 'return factory.containerToJson(entity);',
                                                               self.JAVA_RIGHT_BRACE]
         
@@ -360,8 +375,83 @@ class Java_constant(object):
                                                           self.JAVA_RIGHT_BRACE]
         
         # override methods list    
-        self.JAVA_CONTRLLER_OVERRIDE_METHODS = [self.JAVA_CONTROLLER_OVERRIDE_INITIALIZE,
-                                                self.JAVA_CONTROLLER_OVERRIDE_GET_SERVICE_PROVIDER_NAME,
-                                                self.JAVA_CONTROLLER_OVERRIDE_GET_ENTITY_FROM_JSON,
-                                                self.JAVA_CONTROLLER_OVERRIDE_GET_JSON_FROM_ENTITY,
-                                                self.JAVA_CONTROLLER_OVERRIDE_GET_ENTITY_COUNT]
+        self.JAVA_CONTROLLER_OVERRIDE_METHODS = [self.JAVA_CONTROLLER_OVERRIDE_INITIALIZE,
+                                                 self.JAVA_CONTROLLER_OVERRIDE_GET_SERVICE_PROVIDER_NAME,
+                                                 self.JAVA_CONTROLLER_OVERRIDE_GET_ENTITY_FROM_JSON,
+                                                 self.JAVA_CONTROLLER_OVERRIDE_GET_JSON_FROM_ENTITY,
+                                                 self.JAVA_CONTROLLER_OVERRIDE_GET_ENTITY_COUNT]
+        
+        
+        # createAndUpdateApi()
+        self.JAVA_CONTROLLER_CRAETE_AND_UPDATE = ['/**',
+                                                  ' * Handle API submit request for Update and Create actions.',
+                                                  ' *',
+                                                  ' * @param model',
+                                                  ' * @param json',
+                                                  self.JAVA_MTD_CONST_COMMON_METHOD_COMMENT,
+                                                  ' @return View - Springs representation of the view using the model provided',
+                                                  ' */',
+                                                  '@RequestMapping(value = "/api/erp/' + self.JAVA_ENTITY_CONST_DATARESOURCE + '", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)',
+                                                  'public @ResponseBody View ' + self.JAVA_ENTITY_CONST_ENTITY_NAME + 'CreateaAndUpdateApi(Model model, @RequestBody String json,',
+                                                  self.JAVA_TAB + self.JAVA_TAB + self.JAVA_MTD_CONST_CONTROLLER_AJAX_PARAM + ') {',
+                                                  '\n',
+                                                  self.JAVA_TAB + 'if (logger.isDebugEnabled())',
+                                                  self.JAVA_TAB + self.JAVA_TAB + 'logger.debug("' + self.JAVA_ENTITY_CONST_CONTROLLER_NAME + '.' + self.JAVA_ENTITY_CONST_ENTITY_NAME + 'CreateaAndUpdateApi() invoked");',
+                                                  self.JAVA_TAB + self.JAVA_ENTITY_CONST_CONTAINER_INTER + ' container = getEntityFromJson(json);',
+                                                  '\n',
+                                                  self.JAVA_TAB + 'if (' + self.JAVA_MTD_CONST_PARAM_VERIFY + ') {',
+                                                  '\n',
+                                                  self.JAVA_TAB + self.JAVA_TAB + '// Create',
+                                                  self.JAVA_TAB + self.JAVA_TAB + 'View view = getEntityCreateView(model, container);',
+                                                  self.JAVA_TAB + self.JAVA_TAB + 'return view;',
+                                                  self.JAVA_TAB + '} else if (' + self.JAVA_MTD_CONST_PARAM_VERIFY_NON + ') {',
+                                                  '\n',
+                                                  self.JAVA_TAB + self.JAVA_TAB + '// Update',
+                                                  self.JAVA_TAB + self.JAVA_TAB + self.JAVA_ENTITY_CONST_SERVICEIMPL_NAME + ' service = ((' + self.JAVA_ENTITY_CONST_SERVICEIMPL_NAME + ') crudProviderService);',
+                                                  self.JAVA_TAB + self.JAVA_TAB + 'List<' + self.JAVA_ENTITY_CONST_ENTITY_DATASET + '> entityList = service.getEntityListFromContainer(container);',
+                                                  self.JAVA_TAB + self.JAVA_TAB + 'if (entityList.size() == 0)',
+                                                  self.JAVA_TAB + self.JAVA_TAB +self.JAVA_TAB + 'throw new IllegalArgumentException("No entity data submitted in update request.");',
+                                                  '\n',
+                                                  self.JAVA_TAB + self.JAVA_TAB + '// domainCode validation against the entity data now takes place in the service base classes.',
+                                                  self.JAVA_TAB + self.JAVA_TAB + '// Do not validate domainCode in specific data controller implementations.',
+                                                  self.JAVA_TAB + self.JAVA_TAB + self.JAVA_ENTITY_CONST_ENTITY_DATASET + ' entity = entityList.get(0);',
+                                                  '\n',
+                                                  self.JAVA_TAB + self.JAVA_TAB + 'if (' + self.JAVA_MTD_CONST_PARAM_COMPARATION + ')',
+                                                  '\n',
+                                                  self.JAVA_TAB + self.JAVA_TAB +self.JAVA_TAB + 'throw new IllegalArgumentException("Key field parameter(s) must match the corresponding value in the submitted entity data.");',
+                                                  '\n',
+                                                  self.JAVA_TAB + self.JAVA_TAB + 'return getEntityUpdateView(model, container);',
+                                                  self.JAVA_TAB + '} else {',
+                                                  self.JAVA_TAB + self.JAVA_TAB + 'throw new IllegalArgumentException("Key field parameter(s) must all be null or all non-null.");',
+                                                  self.JAVA_TAB + self.JAVA_RIGHT_BRACE,
+                                                  self.JAVA_RIGHT_BRACE]
+        
+        # readApi()
+        self.JAVA_CONTROLLER_READ = ['/**',
+                                     ' * Handle API request for List and Read actions.',
+                                     ' *',
+                                     ' * @param model',
+                                     ' * @param queryParameters',
+                                     self.JAVA_MTD_CONST_COMMON_METHOD_COMMENT,
+                                     ' @return View - Springs representation of the view using the model provided',
+                                     ' */']
+        
+        # deleteApi()
+        self.JAVA_CONTROLLER_DELETE = ['/**',
+                                       ' * Handle API request for Delete action.',
+                                       ' *',
+                                       ' * @param model',
+                                       self.JAVA_MTD_CONST_COMMON_METHOD_COMMENT,
+                                       ' @return View - Springs representation of the view using the model provided',
+                                       ' */']
+        
+        # standard methods list
+        self.JAVA_CONTROLLER_STANDARD_METHODS = [self.JAVA_CONTROLLER_CRAETE_AND_UPDATE,
+                                                 self.JAVA_CONTROLLER_READ,
+                                                 self.JAVA_CONTROLLER_DELETE]
+        
+        # ajax parameters template
+        self.JAVA_MTD_CONST_CONTROLLER_AJAX_PARAM_TEMP = '@RequestParam(value = "%s", required = false) %s %s'
+        
+        
+        
