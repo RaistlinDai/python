@@ -939,9 +939,9 @@ class Java_processor(File_processor):
                     file.write(lines)
                 
             # ---------- method ----------
-            line_tab_count = 1
             for lines in javaconstant.JAVA_SERVICEIMPL_COMMON_FORAMT:
                 lines = javaconstant.JAVA_TAB + lines
+                line_tab_count = lines.count(javaconstant.JAVA_TAB)
                 # replace method name
                 if javaconstant.JAVA_MTD_CONST_COMMON_MEHTOD_NAME in lines:
                     lines = lines.replace(javaconstant.JAVA_MTD_CONST_COMMON_MEHTOD_NAME, temp_func.get_method_name())
@@ -961,7 +961,7 @@ class Java_processor(File_processor):
                                 while temp_tab_line_nbr <= line_tab_count + 2:
                                     mtd_param_input = mtd_param_input + javaconstant.JAVA_TAB
                                     temp_tab_line_nbr = temp_tab_line_nbr + 1
-                                mtd_param_input = mtd_param_input + temp_param
+                                mtd_param_input = mtd_param_input + temp_param.lstrip()
                             temp_line_nbr = temp_line_nbr + 1
                     mtd_param_input + '\n'
                     lines = lines.replace(javaconstant.JAVA_MTD_CONST_COMMON_METHOD_PARAM_INPUT, mtd_param_input)
@@ -978,13 +978,11 @@ class Java_processor(File_processor):
                                 while temp_tab_line_nbr <= line_tab_count + 2:
                                     mtd_param_call = mtd_param_call + javaconstant.JAVA_TAB
                                     temp_tab_line_nbr = temp_tab_line_nbr + 1
-                                mtd_param_call = mtd_param_call + temp_param
+                                mtd_param_call = mtd_param_call + temp_param.lstrip()
                             temp_line_nbr = temp_line_nbr + 1
                     mtd_param_call + '\n'
                     lines = lines.replace(javaconstant.JAVA_MTD_CONST_COMMON_METHOD_PARAM_CALL, mtd_param_call)
     
-                line_tab_count = lines.count(javaconstant.JAVA_TAB)
-                
                 if '\n' not in lines:
                     file.write(lines + '\n')
                 else:
@@ -1168,7 +1166,7 @@ class Java_processor(File_processor):
                         mtd_fetch_param_ajax = mtd_fetch_param_ajax + javaconstant.JAVA_SEPERATOR + '\n' + javaconstant.JAVA_TAB + javaconstant.JAVA_TAB + javaconstant.JAVA_TAB + temp_param_ajax
                         mtd_fetch_param_verify = mtd_fetch_param_verify + ' ' + javaconstant.JAVA_AND_MARK + '\n' + temp_param_verify
                         mtd_fetch_param_verifyNon = mtd_fetch_param_verifyNon + ' ' + javaconstant.JAVA_AND_MARK + '\n' + temp_param_verifyNon
-                        mtd_fetch_param_comps = mtd_fetch_param_comps + ' ' + javaconstant.JAVA_AND_MARK + '\n' + temp_param_comp
+                        mtd_fetch_param_comps = mtd_fetch_param_comps + ' ' + javaconstant.JAVA_OR_MARK + '\n' + temp_param_comp
                         mtd_param_commt = mtd_param_commt + javaconstant.JAVA_TAB + ' * @param ' + temp_param_name + '\n'
                         
                     key_fields.append({temp_param_name:[param.get_parameter_type(), temp_get]})
@@ -1268,9 +1266,9 @@ class Java_processor(File_processor):
         # ----- write the standard CRUD methods -----
         # ------------------------------------------------------- #
         for mtds in javaconstant.JAVA_CONTROLLER_STANDARD_METHODS:
-            line_tab_count = 1
             for lines in mtds:
                 lines = javaconstant.JAVA_TAB + lines
+                line_tab_count = lines.count(javaconstant.JAVA_TAB)
                 # replace dataResource
                 if javaconstant.JAVA_ENTITY_CONST_DATARESOURCE in lines:
                     lines = lines.replace(javaconstant.JAVA_ENTITY_CONST_DATARESOURCE, data_resource)
@@ -1292,11 +1290,24 @@ class Java_processor(File_processor):
                 #  replace main table interface
                 if javaconstant.JAVA_ENTITY_CONST_ENTITY_DATASET in lines:
                     lines = lines.replace(javaconstant.JAVA_ENTITY_CONST_ENTITY_DATASET, main_table_inter_name)
-                
+                # replace the parameters
+                if javaconstant.JAVA_MTD_CONST_FETCH_METHOD_PARAMS_VALUE in lines:
+                    lines = lines.replace(javaconstant.JAVA_MTD_CONST_FETCH_METHOD_PARAMS_VALUE, mtd_fetch_param_calls)
                 # replace method comment
                 if javaconstant.JAVA_MTD_CONST_COMMON_METHOD_COMMENT in lines:
                     lines = lines.replace(javaconstant.JAVA_MTD_CONST_COMMON_METHOD_COMMENT, mtd_param_commt)
-                    
+                # replace current entity/domain
+                if javaconstant.JAVA_MTD_CONST_CURRENT_ENTITY_DOMAIN in lines:
+                    get_current_entity_domain = ''
+                    for key_field in key_fields:
+                        if javaconstant.JAVA_KEY_FIELD_ENTITY in key_field.keys():
+                            get_current_entity_domain = javaconstant.JAVA_TAB + 'if (StringUtil.isNullOrEmpty(' + javaconstant.JAVA_KEY_FIELD_ENTITY + '))\n' + javaconstant.JAVA_TAB + javaconstant.JAVA_TAB + javaconstant.JAVA_TAB
+                            get_current_entity_domain = get_current_entity_domain + javaconstant.JAVA_KEY_FIELD_ENTITY + ' = QraWorkspaceUtil.getFinancialEntityCode(sessionDataHolder.getCurrentWorkspace());\n'
+                            get_current_entity_domain = get_current_entity_domain + '\n'
+                        elif javaconstant.JAVA_KEY_FIELD_DOMAIN in key_field.keys():
+                            pass      # TODO: get current domain code
+                    lines = lines.replace(javaconstant.JAVA_MTD_CONST_CURRENT_ENTITY_DOMAIN, get_current_entity_domain)
+                
                 # replace the parameters verify                    
                 if javaconstant.JAVA_MTD_CONST_PARAM_VERIFY in lines:
                     if '\n' in mtd_fetch_param_verify:
@@ -1310,7 +1321,7 @@ class Java_processor(File_processor):
                                 while temp_tab_line_nbr <= line_tab_count + 2:
                                     mtd_fetch_param_verify = mtd_fetch_param_verify + javaconstant.JAVA_TAB
                                     temp_tab_line_nbr = temp_tab_line_nbr + 1
-                                mtd_fetch_param_verify = mtd_fetch_param_verify + temp_param
+                                mtd_fetch_param_verify = mtd_fetch_param_verify + temp_param.lstrip()
                             temp_line_nbr = temp_line_nbr + 1
                     mtd_fetch_param_verify + '\n'
                     lines = lines.replace(javaconstant.JAVA_MTD_CONST_PARAM_VERIFY, mtd_fetch_param_verify)
@@ -1328,14 +1339,13 @@ class Java_processor(File_processor):
                                 while temp_tab_line_nbr <= line_tab_count + 2:
                                     mtd_fetch_param_verifyNon = mtd_fetch_param_verifyNon + javaconstant.JAVA_TAB
                                     temp_tab_line_nbr = temp_tab_line_nbr + 1
-                                mtd_fetch_param_verifyNon = mtd_fetch_param_verifyNon + temp_param
+                                mtd_fetch_param_verifyNon = mtd_fetch_param_verifyNon + temp_param.lstrip()
                             temp_line_nbr = temp_line_nbr + 1
                     mtd_fetch_param_verifyNon + '\n'
                     lines = lines.replace(javaconstant.JAVA_MTD_CONST_PARAM_VERIFY_NON, mtd_fetch_param_verifyNon)
                 
                 # replace the parameters comparation 
                 if javaconstant.JAVA_MTD_CONST_PARAM_COMPARATION in lines:
-                    print(line_tab_count)
                     if '\n' in mtd_fetch_param_comps:
                         temp_line_nbr = 1
                         for temp_param in mtd_fetch_param_comps.split('\n'):
@@ -1344,16 +1354,13 @@ class Java_processor(File_processor):
                             else:
                                 mtd_fetch_param_comps = mtd_fetch_param_comps + '\n'
                                 temp_tab_line_nbr = 1
-                                while temp_tab_line_nbr <= line_tab_count + 3:
+                                while temp_tab_line_nbr <= line_tab_count + 2:
                                     mtd_fetch_param_comps = mtd_fetch_param_comps + javaconstant.JAVA_TAB
                                     temp_tab_line_nbr = temp_tab_line_nbr + 1
-                                mtd_fetch_param_comps = mtd_fetch_param_comps + temp_param
+                                mtd_fetch_param_comps = mtd_fetch_param_comps + temp_param.lstrip()
                             temp_line_nbr = temp_line_nbr + 1
                     mtd_fetch_param_comps + '\n'
                     lines = lines.replace(javaconstant.JAVA_MTD_CONST_PARAM_COMPARATION, mtd_fetch_param_comps)
-    
-    
-                line_tab_count = lines.count(javaconstant.JAVA_TAB)
                     
                 if '\n' not in lines:
                     file.write(lines + '\n')

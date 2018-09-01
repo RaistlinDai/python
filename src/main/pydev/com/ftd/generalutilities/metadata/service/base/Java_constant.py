@@ -43,7 +43,7 @@ class Java_constant(object):
         
         # java processing flag
         self.JAVA_AND_MARK = '&&'
-        self.JAVA_AND_MARK = '||'
+        self.JAVA_OR_MARK = '||'
         
         # java keywords
         self.JAVA_PRIMITIVE_TYPE_ARRAY = ["boolean", "char", "byte", "short", "int",
@@ -68,6 +68,10 @@ class Java_constant(object):
         self.JAVA_FUNCTION_GET = 'get'
         self.JAVA_FUNCTION_ADD = 'add'
         self.JAVA_FUNCTION_INITIALIZE = 'initialize'
+        
+        #------------------ entity/domain --------------
+        self.JAVA_KEY_FIELD_ENTITY = 'entityCode'
+        self.JAVA_KEY_FIELD_DOMAIN = 'domainCode'
         
         # ----------------- collections ----------------
         self.JAVA_COLLECTION_HOLDER = 'Holder'
@@ -148,6 +152,7 @@ class Java_constant(object):
         self.JAVA_MTD_CONST_PARAM_VERIFY = '%PARAM_VERIFY%'
         self.JAVA_MTD_CONST_PARAM_VERIFY_NON = '%PARAM_VERIFY_NON%'
         self.JAVA_MTD_CONST_PARAM_COMPARATION = '%PARAM_COMPARATION%'
+        self.JAVA_MTD_CONST_CURRENT_ENTITY_DOMAIN = '%CURRENT_ENTITY_DOMAIN%'
         
         # ------------------- Standard methods -------------------------- #
         # initialize()
@@ -389,7 +394,7 @@ class Java_constant(object):
                                                   ' * @param model',
                                                   ' * @param json',
                                                   self.JAVA_MTD_CONST_COMMON_METHOD_COMMENT,
-                                                  ' @return View - Springs representation of the view using the model provided',
+                                                  ' * @return View - Springs representation of the view using the model provided',
                                                   ' */',
                                                   '@RequestMapping(value = "/api/erp/' + self.JAVA_ENTITY_CONST_DATARESOURCE + '", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)',
                                                   'public @ResponseBody View ' + self.JAVA_ENTITY_CONST_ENTITY_NAME + 'CreateaAndUpdateApi(Model model, @RequestBody String json,',
@@ -433,8 +438,35 @@ class Java_constant(object):
                                      ' * @param model',
                                      ' * @param queryParameters',
                                      self.JAVA_MTD_CONST_COMMON_METHOD_COMMENT,
-                                     ' @return View - Springs representation of the view using the model provided',
-                                     ' */']
+                                     ' * @param initialize'
+                                     ' * @return View - Springs representation of the view using the model provided',
+                                     ' */',
+                                     '@RequestMapping(value = "/api/erp/' + self.JAVA_ENTITY_CONST_DATARESOURCE + '", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)',
+                                     'public View ' + self.JAVA_ENTITY_CONST_ENTITY_NAME + 'ReadApi(Model model, @ModelAttribute("QueryParameters") QueryParameters queryParameters,',
+                                     self.JAVA_TAB + self.JAVA_TAB + self.JAVA_MTD_CONST_CONTROLLER_AJAX_PARAM + ',\n\t\t\t@RequestParam(value = "initialize", required = false) boolean initialize) {',
+                                     '\n',
+                                     self.JAVA_TAB + 'if (logger.isDebugEnabled())',
+                                     self.JAVA_TAB + self.JAVA_TAB + 'logger.debug("' + self.JAVA_ENTITY_CONST_CONTROLLER_NAME + '.' + self.JAVA_ENTITY_CONST_ENTITY_NAME + 'ReadApi() invoked");',
+                                     '\n',
+                                     self.JAVA_MTD_CONST_CURRENT_ENTITY_DOMAIN,
+                                     self.JAVA_TAB + 'if (initialize) {',
+                                     self.JAVA_TAB + self.JAVA_TAB + '// Initialize',
+                                     self.JAVA_TAB + self.JAVA_TAB + self.JAVA_ENTITY_CONST_CONTAINER_INTER + ' entity = ((' + self.JAVA_ENTITY_CONST_SERVICEIMPL_NAME + ') crudProviderService).initialize();',
+                                     self.JAVA_TAB + self.JAVA_TAB + 'return getEntityReadView(model, entity);',
+                                     self.JAVA_TAB + '} else if (' + self.JAVA_MTD_CONST_PARAM_VERIFY + ') {',
+                                     '\n',
+                                     self.JAVA_TAB + self.JAVA_TAB + '//List',
+                                     self.JAVA_TAB + self.JAVA_TAB + 'return getEntityListView(model, queryParameters);',
+                                     self.JAVA_TAB + '} else if (' + self.JAVA_MTD_CONST_PARAM_VERIFY_NON + ') {',
+                                     '\n',
+                                     self.JAVA_TAB + self.JAVA_TAB + '//Read',
+                                     self.JAVA_TAB + self.JAVA_TAB + 'CustPaymentContainer entity = ',
+                                     self.JAVA_TAB + self.JAVA_TAB + self.JAVA_TAB + self.JAVA_TAB + '((' + self.JAVA_ENTITY_CONST_SERVICEIMPL_NAME + ') crudProviderService).read(' + self.JAVA_MTD_CONST_FETCH_METHOD_PARAMS_VALUE + ');',
+                                     '\n',
+                                     self.JAVA_TAB + self.JAVA_TAB + 'return getEntityReadView(model, entity);',
+                                     self.JAVA_TAB + '} else',
+                                     self.JAVA_TAB + self.JAVA_TAB + 'throw new IllegalArgumentException("Key field parameters must all be null or all non-null.");',
+                                     self.JAVA_RIGHT_BRACE]
         
         # deleteApi()
         self.JAVA_CONTROLLER_DELETE = ['/**',
@@ -443,7 +475,19 @@ class Java_constant(object):
                                        ' * @param model',
                                        self.JAVA_MTD_CONST_COMMON_METHOD_COMMENT,
                                        ' @return View - Springs representation of the view using the model provided',
-                                       ' */']
+                                       ' */',
+                                       '@RequestMapping(value = "/api/erp/' + self.JAVA_ENTITY_CONST_DATARESOURCE + '", method = RequestMethod.DELETE, produces = MediaType.APPLICATION_JSON_VALUE)',
+                                       'public @ResponseBody View ' + self.JAVA_ENTITY_CONST_ENTITY_NAME + 'DeleteApi(Model model,',
+                                       self.JAVA_TAB + self.JAVA_TAB + self.JAVA_MTD_CONST_CONTROLLER_AJAX_PARAM + ') {',
+                                       '\n',
+                                       self.JAVA_TAB + 'if (logger.isDebugEnabled())',
+                                       self.JAVA_TAB + self.JAVA_TAB + 'logger.debug("' + self.JAVA_ENTITY_CONST_CONTROLLER_NAME + '.' + self.JAVA_ENTITY_CONST_ENTITY_NAME + 'DeleteApi() invoked");',
+                                       '\n',
+                                       self.JAVA_MTD_CONST_CURRENT_ENTITY_DOMAIN,
+                                       self.JAVA_TAB + 'SubmitResultAndData<' + self.JAVA_ENTITY_CONST_CONTAINER_INTER + '> result = ',
+                                       self.JAVA_TAB + self.JAVA_TAB + self.JAVA_TAB + '((' + self.JAVA_ENTITY_CONST_SERVICEIMPL_NAME + ') crudProviderService).delete(' + self.JAVA_MTD_CONST_FETCH_METHOD_PARAMS_VALUE + ');',
+                                       self.JAVA_TAB + 'return getEntityDeleteView(model, result);',
+                                       self.JAVA_RIGHT_BRACE]
         
         # standard methods list
         self.JAVA_CONTROLLER_STANDARD_METHODS = [self.JAVA_CONTROLLER_CRAETE_AND_UPDATE,
