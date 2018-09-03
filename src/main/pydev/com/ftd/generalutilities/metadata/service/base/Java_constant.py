@@ -75,10 +75,12 @@ class Java_constant(object):
         
         # ----------------- collections ----------------
         self.JAVA_COLLECTION_HOLDER = 'Holder'
+        self.JAVA_COLLECTION_HOLDER_DATAGRAPH = 'Holder<DataGraph>'
         
         # ----------------- types ------------------
         self.JAVA_TYPE_STRING = 'String'
-        
+        self.JAVA_TYPE_GREGORIANCALENDAR = 'GregorianCalendar'
+        self.JAVA_PROGRESS_TYPE_PREFIX = ['ii','it','ic','il','id','ig','oi','ot','oc','ol','od','og']
         
         # ---------------------------------------------------------------- #
         #                  annotation                                      #
@@ -153,6 +155,10 @@ class Java_constant(object):
         self.JAVA_MTD_CONST_PARAM_VERIFY_NON = '%PARAM_VERIFY_NON%'
         self.JAVA_MTD_CONST_PARAM_COMPARATION = '%PARAM_COMPARATION%'
         self.JAVA_MTD_CONST_CURRENT_ENTITY_DOMAIN = '%CURRENT_ENTITY_DOMAIN%'
+        self.JAVA_MTD_CONST_HOLDER_CREATE = '%HOLDER_CREATE%'
+        self.JAVA_MTD_CONST_REQUEST_CONVERSION = '%REQUEST_CONVERSION%'
+        self.JAVA_MTD_CONST_ADD_HASHSET = '%ADD_HASHSET%'
+        self.JAVA_MTD_CONST_ADD_ATTRIBUTE = '%ADD_ATTRIBUTE%'
         
         # ------------------- Standard methods -------------------------- #
         # initialize()
@@ -333,7 +339,7 @@ class Java_constant(object):
         self.JAVA_CONTROLLER_CROSS_WORKSPACE_CONTROLLER = 'import com.qad.webshell.security.authorization.CrossWorkspaceController;'
         
         # ----------------- static final properties ------------------ #
-        self.JAVA_CONTROLLER_STATIC_FINAL_PROP_SUFFIX = 'private static final Logger logger = %s'
+        self.JAVA_CONTROLLER_STATIC_FINAL_PROP_SUFFIX = 'private static final String %s = "%s";'
         self.JAVA_CONTROLLER_STATIC_FINAL_PROP_LOGGER = 'private static final Logger logger = LoggerFactory.getLogger(%s.class);'
         
         
@@ -496,6 +502,44 @@ class Java_constant(object):
         
         # ajax parameters template
         self.JAVA_MTD_CONST_CONTROLLER_AJAX_PARAM_TEMP = '@RequestParam(value = "%s", required = false) %s %s'
+        # holder creater template
+        self.JAVA_MTD_CONST_HOLDER_CREATE_TEMP = '%s %s = new %s();'
+        # data conversion template
+        self.JAVA_MTD_CONST_DATE_CONVERT_TEMP = 'GregorianCalendar transactionDate = new GregorianCalendar();\n' + self.JAVA_TAB + self.JAVA_TAB + 'FinancialsDataSetUtil.convertDateFromStringToDate(%s, transactionDate);\n'
+        # hashset add template
+        self.JAVA_MTD_ADD_HASHSET_TEMP = 'set.add(%s);'
+        # add attribute template
+        self.JAVA_MTD_ADD_ATTRIBUTE_TEMP = 'model.addAttribute(%s, %s.getValue());'
         
+        # datacontroller common function template
+        self.JAVA_CONTROLLER_COMMON_FORMAT = ['@RequestMapping(value = "/api/erp/custPayments/' + self.JAVA_MTD_CONST_COMMON_MEHTOD_NAME + '", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)',
+                                              'public View ' + self.JAVA_MTD_CONST_COMMON_MEHTOD_NAME + '(Model model,',
+                                              self.JAVA_TAB + self.JAVA_TAB + self.JAVA_MTD_CONST_CONTROLLER_AJAX_PARAM + ') {',
+                                              '\n',
+                                              self.JAVA_TAB + 'if (logger.isDebugEnabled())',
+                                              self.JAVA_TAB + self.JAVA_TAB + 'logger.debug("' + self.JAVA_ENTITY_CONST_CONTROLLER_NAME + '.' + self.JAVA_MTD_CONST_COMMON_MEHTOD_NAME + '() invoked");',
+                                              '\n',
+                                              self.JAVA_TAB + self.JAVA_ENTITY_CONST_FACTORY_QRA + ' factory = ',
+                                              self.JAVA_TAB + self.JAVA_TAB + '(' + self.JAVA_ENTITY_CONST_FACTORY_QRA + ')((' + self.JAVA_ENTITY_CONST_SERVICEIMPL_NAME + ') crudProviderService).getEntityFactory();',
+                                              '\n',
+                                              self.JAVA_TAB + self.JAVA_MTD_CONST_HOLDER_CREATE,
+                                              self.JAVA_TAB + self.JAVA_MTD_CONST_REQUEST_CONVERSION,
+                                              '\n',
+                                              
+                                              
+                                              self.JAVA_TAB + '((' + self.JAVA_ENTITY_CONST_SERVICEIMPL_NAME + ') crudProviderService).' + self.JAVA_MTD_CONST_COMMON_MEHTOD_NAME + '(' + self.JAVA_MTD_CONST_COMMON_METHOD_PARAM_CALL + ');\n',
+                                              '\n',
+                                              self.JAVA_TAB + 'Set<String> set = new HashSet<String>();',
+                                              self.JAVA_TAB + self.JAVA_MTD_CONST_ADD_HASHSET,
+                                              '\n',
+                                              self.JAVA_TAB + self.JAVA_MTD_CONST_ADD_ATTRIBUTE,
+                                              '\n',
+                                              self.JAVA_TAB + 'return createJsonView(set);',
+                                              self.JAVA_RIGHT_BRACE]
         
-        
+        # general methods comment
+        self.JAVA_CONTROLLER_COMMON_COMMENT = ['/**',
+                                               ' *',
+                                               self.JAVA_MTD_CONST_COMMON_METHOD_COMMENT,
+                                               ' * @return View - HttpResponse',
+                                               ' */']

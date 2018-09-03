@@ -1096,6 +1096,8 @@ class Java_processor(File_processor):
         additional_imports = []
         # entity key fields
         key_fields = []
+        # data controller function list
+        temp_func_list = []
         
         # createEntityContainer()
         mtd_create_entity_container = javaconstant.JAVA_FUNCTION_CREATE + container_inter_name
@@ -1152,11 +1154,11 @@ class Java_processor(File_processor):
                         temp_param_comp = '!%s.equals(%s)' % (temp_param_name, temp_get)
                     
                     if param_nbr == 1:
-                        mtd_fetch_param_calls = mtd_fetch_param_calls + temp_param_name
-                        mtd_fetch_param_ajax = mtd_fetch_param_ajax + temp_param_ajax
-                        mtd_fetch_param_verify = mtd_fetch_param_verify + temp_param_verify
-                        mtd_fetch_param_verifyNon = mtd_fetch_param_verifyNon + temp_param_verifyNon
-                        mtd_fetch_param_comps = mtd_fetch_param_comps + temp_param_comp
+                        mtd_fetch_param_calls = temp_param_name
+                        mtd_fetch_param_ajax = temp_param_ajax
+                        mtd_fetch_param_verify = temp_param_verify
+                        mtd_fetch_param_verifyNon = temp_param_verifyNon
+                        mtd_fetch_param_comps = temp_param_comp
                         mtd_param_commt = ' * @param ' + temp_param_name + '\n'
                     else:
                         mtd_fetch_param_calls = mtd_fetch_param_calls + javaconstant.JAVA_SEPERATOR + ' ' + temp_param_name
@@ -1173,6 +1175,29 @@ class Java_processor(File_processor):
                             
                 break       
         
+        # analysis the selected methods
+        for func in funcList:
+            if func == javaconstant.JAVA_FUNCTION_CREATE or func == javaconstant.JAVA_FUNCTION_UPDATE or func == javaconstant.JAVA_FUNCTION_DELETE or func == javaconstant.JAVA_FUNCTION_FETCH:
+                continue
+            for mtd in serviceQra_mtd_list:
+                # fetch method in qra service
+                if func == mtd.get_method_name():
+                    temp_func_list.append(mtd)
+                    # add additional_imports
+                    if len(mtd.get_method_related_imports()) > 0:
+                        for rel_imp in mtd.get_method_related_imports():
+                            additional_imports.append(rel_imp)
+                    # add propertory const
+                    for param in mtd.get_method_inputs():
+                        if javaconstant.JAVA_COLLECTION_HOLDER in param.get_parameter_type():
+                            # trim parameter name
+                            temp_common_param_name = param.get_parameter_name()
+                            if temp_common_param_name[0:1] == 'p' and temp_common_param_name[1:2].isupper():
+                                temp_common_param_name = temp_common_param_name[1:2].lower() + temp_common_param_name[2:]
+                            elif temp_common_param_name[0:2] in javaconstant.JAVA_PROGRESS_TYPE_PREFIX and temp_common_param_name[2:3].isupper():
+                                temp_common_param_name = temp_common_param_name[2:3].lower() + temp_common_param_name[3:]
+                    
+                            additional_properties.append(temp_common_param_name)
         
         # create file
         Path(filefullpath).touch()
@@ -1200,6 +1225,14 @@ class Java_processor(File_processor):
         
         file.write('\n')
         
+        # additional imports
+        for add_imp in additional_imports:
+            add_imp = javaconstant.JAVA_KEY_IMPORT + ' ' + add_imp + javaconstant.JAVA_END_MARK
+            if add_imp not in import_list:
+                file.write(add_imp + '\n')
+                import_list.append(add_imp)
+        file.write('\n')  
+        
         # ------------------------------------------------------- #
         # ----- write the controller annotation -----
         # ------------------------------------------------------- #
@@ -1218,7 +1251,8 @@ class Java_processor(File_processor):
         # ------------------------------------------------------- #
         file.write(javaconstant.JAVA_TAB + javaconstant.JAVA_CONTROLLER_STATIC_FINAL_PROP_LOGGER % datacontroller_name + '\n')
         for prop_cell in additional_properties:
-            file.write(javaconstant.JAVA_TAB + javaconstant.JAVA_CONTROLLER_STATIC_FINAL_PROP_SUFFIX % prop_cell + javaconstant.JAVA_END_MARK + '\n')
+            file.write(javaconstant.JAVA_TAB + javaconstant.JAVA_CONTROLLER_STATIC_FINAL_PROP_SUFFIX % (prop_cell.upper(),prop_cell) + '\n')
+        file.write('\n')
         
         # ------------------------------------------------------- #
         # ----- write the override methods -----
@@ -1260,7 +1294,6 @@ class Java_processor(File_processor):
                     file.write(lines)
             
             file.write('\n')
-        
         
         # ------------------------------------------------------- #
         # ----- write the standard CRUD methods -----
@@ -1369,8 +1402,130 @@ class Java_processor(File_processor):
             
             file.write('\n')
         
+        # ------------------------------------------------------- #
+        # ----- write the selected methods -----
+        # ------------------------------------------------------- #
+        for mtd in temp_func_list:
+            param_nbr = 0
+            mtd_common_param_calls = ''       # e.g. param1, param2, param3
+            mtd_common_param_ajax = ''        # e.g. @RequestParam(value = "entityCode", required = false) String entityCode,
+            mtd_common_param_commt = ''       # e.g. @param custPaymentType
+            mtd_common_holder_create = ''     # e.g. Holder<DataGraph> dsCust = new Holder<DataGraph>();
+            mtd_common_param_date_conv = ''
+            mtd_common_param_add_hashset = ''
+            mtd_common_param_add_attr = ''
+            
+            line_tab_count = 1
+            
+            for param in mtd.get_method_inputs():
+                param_nbr = param_nbr + 1
+                temp_common_param_name = param.get_parameter_name()
+                
+                # trim parameter name
+                if temp_common_param_name[0:1] == 'p' and temp_common_param_name[1:2].isupper():
+                    temp_common_param_name = temp_common_param_name[1:2].lower() + temp_common_param_name[2:]
+                elif temp_common_param_name[0:2] in javaconstant.JAVA_PROGRESS_TYPE_PREFIX and temp_common_param_name[2:3].isupper():
+                    temp_common_param_name = temp_common_param_name[2:3].lower() + temp_common_param_name[3:]
         
-        
+                # ajax params
+                if javaconstant.JAVA_TYPE_GREGORIANCALENDAR == param.get_parameter_type():
+                    temp_common_param_ajax = javaconstant.JAVA_MTD_CONST_CONTROLLER_AJAX_PARAM_TEMP % (temp_common_param_name,param.get_parameter_type(),temp_common_param_name)
+                    mtd_common_param_date_conv = mtd_common_param_date_conv + javaconstant.JAVA_MTD_CONST_DATE_CONVERT_TEMP % temp_common_param_name
+                else:
+                    temp_common_param_ajax = javaconstant.JAVA_MTD_CONST_CONTROLLER_AJAX_PARAM_TEMP % (temp_common_param_name,javaconstant.JAVA_TYPE_STRING,temp_common_param_name)
+                
+                if param_nbr == 1:
+                    mtd_common_param_calls = temp_common_param_name
+                    #  the Holder parameter for ajax request
+                    if javaconstant.JAVA_COLLECTION_HOLDER not in param.get_parameter_type():
+                        mtd_common_param_ajax = temp_common_param_ajax
+                        mtd_common_param_commt = ' * @param ' + temp_common_param_name + '\n'
+                else:
+                    if mtd_common_param_calls[-1] == '\n':
+                        mtd_common_param_calls = mtd_common_param_calls + temp_common_param_name
+                    else:
+                        mtd_common_param_calls = mtd_common_param_calls + javaconstant.JAVA_SEPERATOR + ' ' + temp_common_param_name
+                    if param_nbr % 5 == 0 and len(mtd.get_method_inputs()) > param_nbr % 5 * 5:
+                        mtd_common_param_calls = mtd_common_param_calls + javaconstant.JAVA_SEPERATOR + '\n'
+
+                    #  the Holder parameter for ajax request
+                    if javaconstant.JAVA_COLLECTION_HOLDER not in param.get_parameter_type():
+                        mtd_common_param_ajax = mtd_common_param_ajax + javaconstant.JAVA_SEPERATOR + '\n' + javaconstant.JAVA_TAB + javaconstant.JAVA_TAB + javaconstant.JAVA_TAB + temp_common_param_ajax
+                        mtd_common_param_commt = mtd_common_param_commt + javaconstant.JAVA_TAB + ' * @param ' + temp_common_param_name + '\n'
+                
+                # holder creater
+                if javaconstant.JAVA_COLLECTION_HOLDER in param.get_parameter_type():
+                    if mtd_common_holder_create == '':
+                        mtd_common_holder_create = javaconstant.JAVA_MTD_CONST_HOLDER_CREATE_TEMP % (param.get_parameter_type(),temp_common_param_name,param.get_parameter_type()) + '\n'
+                        mtd_common_param_add_hashset = javaconstant.JAVA_MTD_ADD_HASHSET_TEMP % temp_common_param_name.upper() + '\n'
+                        mtd_common_param_add_attr = javaconstant.JAVA_MTD_ADD_ATTRIBUTE_TEMP % (temp_common_param_name.upper(),temp_common_param_name) + '\n'
+                    else:
+                        mtd_common_holder_create = mtd_common_holder_create + javaconstant.JAVA_TAB + javaconstant.JAVA_TAB + javaconstant.JAVA_MTD_CONST_HOLDER_CREATE_TEMP % (param.get_parameter_type(),temp_common_param_name,param.get_parameter_type()) + '\n'
+                        mtd_common_param_add_hashset = mtd_common_param_add_hashset + javaconstant.JAVA_TAB + javaconstant.JAVA_TAB + javaconstant.JAVA_MTD_ADD_HASHSET_TEMP % temp_common_param_name.upper() + '\n'
+                        mtd_common_param_add_attr = mtd_common_param_add_attr + javaconstant.JAVA_TAB + javaconstant.JAVA_TAB + javaconstant.JAVA_MTD_ADD_ATTRIBUTE_TEMP % (temp_common_param_name.upper(),temp_common_param_name) + '\n'
+
+            # ---------- comment ----------
+            for lines in javaconstant.JAVA_CONTROLLER_COMMON_COMMENT:
+                lines = javaconstant.JAVA_TAB + lines
+                # replace method name
+                if javaconstant.JAVA_MTD_CONST_COMMON_METHOD_COMMENT in lines:
+                    lines = lines.replace(javaconstant.JAVA_MTD_CONST_COMMON_METHOD_COMMENT, mtd_common_param_commt)
+                
+                if '\n' not in lines:
+                    file.write(lines + '\n')
+                else:
+                    file.write(lines)
+                
+            # ---------- method ----------
+            for lines in javaconstant.JAVA_CONTROLLER_COMMON_FORMAT:
+                lines = javaconstant.JAVA_TAB + lines
+                line_tab_count = lines.count(javaconstant.JAVA_TAB)
+                # replace method name
+                if javaconstant.JAVA_MTD_CONST_COMMON_MEHTOD_NAME in lines:
+                    lines = lines.replace(javaconstant.JAVA_MTD_CONST_COMMON_MEHTOD_NAME, mtd.get_method_name())
+                if javaconstant.JAVA_MTD_CONST_CONTROLLER_AJAX_PARAM in lines:
+                    lines = lines.replace(javaconstant.JAVA_MTD_CONST_CONTROLLER_AJAX_PARAM, mtd_common_param_ajax)
+                if javaconstant.JAVA_ENTITY_CONST_CONTROLLER_NAME in lines:
+                    lines = lines.replace(javaconstant.JAVA_ENTITY_CONST_CONTROLLER_NAME, datacontroller_name)
+                if javaconstant.JAVA_ENTITY_CONST_FACTORY_QRA in lines:
+                    lines = lines.replace(javaconstant.JAVA_ENTITY_CONST_FACTORY_QRA, factory_qra_name)
+                if javaconstant.JAVA_ENTITY_CONST_SERVICEIMPL_NAME in lines:
+                    lines = lines.replace(javaconstant.JAVA_ENTITY_CONST_SERVICEIMPL_NAME, serviceImpl_name)
+                if javaconstant.JAVA_MTD_CONST_HOLDER_CREATE in lines:
+                    lines = lines.replace(javaconstant.JAVA_MTD_CONST_HOLDER_CREATE, mtd_common_holder_create)
+                if javaconstant.JAVA_MTD_CONST_REQUEST_CONVERSION in lines:
+                    lines = lines.replace(javaconstant.JAVA_MTD_CONST_REQUEST_CONVERSION, mtd_common_param_date_conv)
+                
+                if javaconstant.JAVA_MTD_CONST_COMMON_METHOD_PARAM_CALL in lines:
+                    if '\n' in mtd_common_param_calls:
+                        temp_line_nbr = 1
+                        for temp_param in mtd_common_param_calls.split('\n'):
+                            if temp_line_nbr == 1:
+                                mtd_common_param_calls = temp_param
+                            else:
+                                mtd_common_param_calls = mtd_common_param_calls + '\n'
+                                temp_tab_line_nbr = 1
+                                while temp_tab_line_nbr <= line_tab_count + 2:
+                                    mtd_common_param_calls = mtd_common_param_calls + javaconstant.JAVA_TAB
+                                    temp_tab_line_nbr = temp_tab_line_nbr + 1
+                                mtd_common_param_calls = mtd_common_param_calls + temp_param.lstrip()
+                            temp_line_nbr = temp_line_nbr + 1
+                    mtd_common_param_calls + '\n'
+                    lines = lines.replace(javaconstant.JAVA_MTD_CONST_COMMON_METHOD_PARAM_CALL, mtd_common_param_calls)
+                
+                if javaconstant.JAVA_MTD_CONST_ADD_HASHSET in lines:
+                    lines = lines.replace(javaconstant.JAVA_MTD_CONST_ADD_HASHSET, mtd_common_param_add_hashset)
+                
+                if javaconstant.JAVA_MTD_CONST_ADD_ATTRIBUTE in lines:
+                    lines = lines.replace(javaconstant.JAVA_MTD_CONST_ADD_ATTRIBUTE, mtd_common_param_add_attr)
+                
+                
+                if '\n' not in lines:
+                    file.write(lines + '\n')
+                else:
+                    file.write(lines)
+            
+            file.write('\n')
         
         # ------------------------------------------------------- #
         # ----- write the class ender -----
