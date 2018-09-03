@@ -1196,8 +1196,9 @@ class Java_processor(File_processor):
                                 temp_common_param_name = temp_common_param_name[1:2].lower() + temp_common_param_name[2:]
                             elif temp_common_param_name[0:2] in javaconstant.JAVA_PROGRESS_TYPE_PREFIX and temp_common_param_name[2:3].isupper():
                                 temp_common_param_name = temp_common_param_name[2:3].lower() + temp_common_param_name[3:]
-                    
-                            additional_properties.append(temp_common_param_name)
+                            
+                            if temp_common_param_name not in additional_properties:
+                                additional_properties.append(temp_common_param_name)
         
         # create file
         Path(filefullpath).touch()
