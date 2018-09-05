@@ -159,6 +159,8 @@ class Java_constant(object):
         self.JAVA_MTD_CONST_REQUEST_CONVERSION = '%REQUEST_CONVERSION%'
         self.JAVA_MTD_CONST_ADD_HASHSET = '%ADD_HASHSET%'
         self.JAVA_MTD_CONST_ADD_ATTRIBUTE = '%ADD_ATTRIBUTE%'
+        self.JAVA_MTD_CONST_CONTAINER_CREATE = '%CONTAINER_CREATE%'
+        self.JAVA_MTD_CONST_CONTAINER_ASSIGN = '%CONTAINER_ASSIGN%'
         
         # ------------------- Standard methods -------------------------- #
         # initialize()
@@ -303,9 +305,7 @@ class Java_constant(object):
         self.JAVA_CONTROLLER_HEADER = 'public class %s extends FinQraDataController<%s> %s{'
         
         # ----------------- standard imports ------------------ #
-        self.JAVA_CONTROLLER_IMPORTS = ['import java.math.BigDecimal;',
-                                        'import java.util.Arrays;',
-                                        'import java.util.GregorianCalendar;',
+        self.JAVA_CONTROLLER_IMPORTS = ['import java.util.Arrays;',
                                         'import java.util.HashSet;',
                                         'import java.util.Iterator;',
                                         'import java.util.List;',
@@ -324,7 +324,6 @@ class Java_constant(object):
                                         'import org.springframework.web.bind.annotation.RequestParam;',
                                         'import org.springframework.web.bind.annotation.ResponseBody;',
                                         'import org.springframework.web.servlet.View;',
-                                        'import commonj.sdo.DataGraph;',
                                         'import com.progress.open4gl.ProDataGraph;',
                                         'import com.qad.erp.financials.mvc.controller.data.FinQraDataController;',
                                         'import com.qad.erp.financials.util.service.impl.FinancialsDataSetUtil;',
@@ -505,9 +504,13 @@ class Java_constant(object):
         # holder creater template
         self.JAVA_MTD_CONST_HOLDER_CREATE_TEMP = '%s %s = new %s();'
         # data conversion template
-        self.JAVA_MTD_CONST_DATE_CONVERT_TEMP = 'GregorianCalendar transactionDate = new GregorianCalendar();\n' + self.JAVA_TAB + self.JAVA_TAB + 'FinancialsDataSetUtil.convertDateFromStringToDate(%s, transactionDate);\n'
+        self.JAVA_MTD_CONST_DATE_CONVERT_TEMP = self.JAVA_TAB + self.JAVA_TAB + 'GregorianCalendar trans%s = new GregorianCalendar();\n\t\tif (%s == null || %s.isEmpty())\n\t\t\ttrans%s = null;\n\t\telse\n\t\t\tFinancialsDataSetUtil.convertDateFromStringToDate(%s, trans%s);\n'
         # hashset add template
         self.JAVA_MTD_ADD_HASHSET_TEMP = 'set.add(%s);'
+        # create container template
+        self.JAVA_MTD_CONST_CONTAINER_CREATE_TEMP = '\t\t%s %sEntity = factory.create%s();\n'
+        # assign container template
+        self.JAVA_MTD_CONST_CONTAINER_ASSIGN_TEMP = '\t\t((%s) %sEntity)\n\t\t\t\t.setProDataGraph((ProDataGraph) %s.getValue());\n\n'
         # add attribute template
         self.JAVA_MTD_ADD_ATTRIBUTE_TEMP = 'model.addAttribute(%s, %s.getValue());'
         
@@ -524,11 +527,11 @@ class Java_constant(object):
                                               '\n',
                                               self.JAVA_TAB + self.JAVA_MTD_CONST_HOLDER_CREATE,
                                               self.JAVA_TAB + self.JAVA_MTD_CONST_REQUEST_CONVERSION,
+                                              self.JAVA_TAB + self.JAVA_MTD_CONST_CONTAINER_CREATE,
                                               '\n',
-                                              
-                                              
                                               self.JAVA_TAB + '((' + self.JAVA_ENTITY_CONST_SERVICEIMPL_NAME + ') crudProviderService).' + self.JAVA_MTD_CONST_COMMON_MEHTOD_NAME + '(' + self.JAVA_MTD_CONST_COMMON_METHOD_PARAM_CALL + ');\n',
                                               '\n',
+                                              self.JAVA_TAB + self.JAVA_MTD_CONST_CONTAINER_ASSIGN,
                                               self.JAVA_TAB + 'Set<String> set = new HashSet<String>();',
                                               self.JAVA_TAB + self.JAVA_MTD_CONST_ADD_HASHSET,
                                               '\n',

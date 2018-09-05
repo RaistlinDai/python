@@ -130,6 +130,60 @@ class Java_processor(File_processor):
     
     
     @staticmethod
+    def validate_containers(transDto, entityDto, containerName):
+        '''
+        validate the jar files, return back the serviceImpl/dataController name and jar file list
+        '''
+        #get the entity info
+        resDto = entityDto.get_resourceDTO()
+        
+        #get the entity interface
+        prim_uri = resDto.get_primary_secure_uri()
+        entity_interface = prim_uri[prim_uri.rindex(':')+1:]
+        package_list = entity_interface.split('.')
+        
+        #verify if the java decompiled files existing
+        fileconstant = File_constant()
+        unzip_path = transDto.get_workspacepath() + fileconstant.UNZIP_JAR_FOLDER
+        if not File_processor.verify_dir_existing(unzip_path):
+            message = 'The decompile folder not existing, please re-generate!'
+            return False, message, None, None
+        
+        api_unzip_path = unzip_path + fileconstant.API_FOLDER
+        impl_unzip_path = unzip_path + fileconstant.IMPL_FOLDER
+        idx = 0
+        while idx < len(package_list):
+            if idx != len(package_list) -1:
+                api_unzip_path = api_unzip_path + package_list[idx] + '\\'
+                impl_unzip_path = impl_unzip_path + package_list[idx] + '\\'
+            else:
+                impl_unzip_path = impl_unzip_path + fileconstant.IMPL_FOLDER
+            idx = idx + 1
+        
+        # container interface and QraImpl name
+        container_inter_name = containerName + fileconstant.JAVA_CONTAINER_SUFFIX + fileconstant.DEPOMPILE_JAVA_SUFFIX
+        container_qra_name = fileconstant.JAVA_QRA_PREFIX + containerName + fileconstant.JAVA_CONTAINER_SUFFIX + fileconstant.DEPOMPILE_JAVA_SUFFIX
+        
+        if not File_processor.verify_dir_existing(api_unzip_path + container_inter_name):
+            message = 'There is no container %s,\n please check your api jar!' % container_inter_name
+            return False, message, None, None
+        
+        if not File_processor.verify_dir_existing(impl_unzip_path + container_qra_name):
+            message = 'There is no QRA container %s,\n please check your impl jar!' % container_qra_name
+            return False, message, None, None
+        
+        result, error, containerInterDTO = Java_processor.read_java_interface(api_unzip_path + container_inter_name)
+        if not result:
+            return False, error, None, None
+        
+        result, error, containerQraDTO = Java_processor.read_java_class(impl_unzip_path + container_qra_name)
+        if not result:
+            return False, error, None, None
+        
+        return True, None, containerInterDTO, containerQraDTO
+    
+    
+    @staticmethod
     def validate_javas(transDto, entityDto):
         '''
         validate the jar files, return back the serviceImpl/dataController name and jar file list
@@ -1200,6 +1254,21 @@ class Java_processor(File_processor):
                             if temp_common_param_name not in additional_properties:
                                 additional_properties.append(temp_common_param_name)
         
+                        # container creator
+                        if javaconstant.JAVA_COLLECTION_HOLDER_DATAGRAPH == param.get_parameter_type() and param.get_parameter_name()[:2] == 'ds':
+                            temp_container_name = param.get_parameter_name()[2:3].upper() + param.get_parameter_name()[3:]
+                            # verify container
+                            result, message, temp_container_inter, temp_container_qra = Java_processor.validate_containers(transDTO, entityDTO, temp_container_name)
+                            if not result:
+                                return False, message, None
+                            else:
+                                temp_package = temp_container_inter.get_class_package()[:-1] + javaconstant.JAVA_DOT_MARK + temp_container_inter.get_class_name()
+                                if temp_package not in additional_imports:
+                                    additional_imports.append(temp_package)
+                                temp_package = temp_container_qra.get_class_package()[:-1] + javaconstant.JAVA_DOT_MARK + temp_container_qra.get_class_name()
+                                if temp_package not in additional_imports:
+                                    additional_imports.append(temp_package)
+
         # create file
         Path(filefullpath).touch()
         file = open(filefullpath, 'w')
@@ -1412,6 +1481,8 @@ class Java_processor(File_processor):
             mtd_common_param_ajax = ''        # e.g. @RequestParam(value = "entityCode", required = false) String entityCode,
             mtd_common_param_commt = ''       # e.g. @param custPaymentType
             mtd_common_holder_create = ''     # e.g. Holder<DataGraph> dsCust = new Holder<DataGraph>();
+            mtd_common_container_create = ''
+            mtd_common_container_set = ''
             mtd_common_param_date_conv = ''
             mtd_common_param_add_hashset = ''
             mtd_common_param_add_attr = ''
@@ -1430,10 +1501,14 @@ class Java_processor(File_processor):
         
                 # ajax params
                 if javaconstant.JAVA_TYPE_GREGORIANCALENDAR == param.get_parameter_type():
-                    temp_common_param_ajax = javaconstant.JAVA_MTD_CONST_CONTROLLER_AJAX_PARAM_TEMP % (temp_common_param_name,param.get_parameter_type(),temp_common_param_name)
-                    mtd_common_param_date_conv = mtd_common_param_date_conv + javaconstant.JAVA_MTD_CONST_DATE_CONVERT_TEMP % temp_common_param_name
-                else:
                     temp_common_param_ajax = javaconstant.JAVA_MTD_CONST_CONTROLLER_AJAX_PARAM_TEMP % (temp_common_param_name,javaconstant.JAVA_TYPE_STRING,temp_common_param_name)
+                    
+                    if mtd_common_param_date_conv == '':
+                        mtd_common_param_date_conv = '\n\t\t// Convert date type\n'
+                    mtd_common_param_date_conv = mtd_common_param_date_conv + javaconstant.JAVA_MTD_CONST_DATE_CONVERT_TEMP % (temp_common_param_name,temp_common_param_name,temp_common_param_name,temp_common_param_name,temp_common_param_name,temp_common_param_name)
+                    temp_common_param_name = 'trans' + temp_common_param_name
+                else:
+                    temp_common_param_ajax = javaconstant.JAVA_MTD_CONST_CONTROLLER_AJAX_PARAM_TEMP % (temp_common_param_name,param.get_parameter_type(),temp_common_param_name)
                 
                 if param_nbr == 1:
                     mtd_common_param_calls = temp_common_param_name
@@ -1454,17 +1529,41 @@ class Java_processor(File_processor):
                         mtd_common_param_ajax = mtd_common_param_ajax + javaconstant.JAVA_SEPERATOR + '\n' + javaconstant.JAVA_TAB + javaconstant.JAVA_TAB + javaconstant.JAVA_TAB + temp_common_param_ajax
                         mtd_common_param_commt = mtd_common_param_commt + javaconstant.JAVA_TAB + ' * @param ' + temp_common_param_name + '\n'
                 
-                # holder creater
+                # holder & container creator
                 if javaconstant.JAVA_COLLECTION_HOLDER in param.get_parameter_type():
+                    
+                    temp_holder_assign = temp_common_param_name
+                    
+                    # container creator
+                    if javaconstant.JAVA_COLLECTION_HOLDER_DATAGRAPH == param.get_parameter_type() and param.get_parameter_name()[:2] == 'ds':
+                        temp_container_name = param.get_parameter_name()[2:3].upper() + param.get_parameter_name()[3:]
+                        temp_container_inter_name = temp_container_name + fileconstant.JAVA_CONTAINER_SUFFIX
+                        temp_container_qra_name = fileconstant.JAVA_QRA_PREFIX + temp_container_name + fileconstant.JAVA_CONTAINER_SUFFIX
+                        # verify container
+                        for packs in additional_imports:
+                            pack_cells = packs.split(javaconstant.JAVA_DOT_MARK)
+                            if temp_container_inter_name == pack_cells[-1].replace(javaconstant.JAVA_END_MARK,''):
+                                if mtd_common_container_create == '':
+                                    mtd_common_container_create = '\n\t\t// Create the Container\n'
+                                mtd_common_container_create = mtd_common_container_create + javaconstant.JAVA_MTD_CONST_CONTAINER_CREATE_TEMP % (temp_container_inter_name,temp_container_name,temp_container_inter_name);
+                            if temp_container_qra_name == pack_cells[-1].replace(javaconstant.JAVA_END_MARK,''):
+                                if mtd_common_container_set == '':
+                                    mtd_common_container_set = '// Assign the Container\n'
+                                mtd_common_container_set = mtd_common_container_set + javaconstant.JAVA_MTD_CONST_CONTAINER_ASSIGN_TEMP % (temp_container_qra_name,temp_container_name,param.get_parameter_name());
+                        
+                        temp_holder_assign = temp_container_name + 'Entity'
+                    
+                    # holder creator
                     if mtd_common_holder_create == '':
                         mtd_common_holder_create = javaconstant.JAVA_MTD_CONST_HOLDER_CREATE_TEMP % (param.get_parameter_type(),temp_common_param_name,param.get_parameter_type()) + '\n'
                         mtd_common_param_add_hashset = javaconstant.JAVA_MTD_ADD_HASHSET_TEMP % temp_common_param_name.upper() + '\n'
-                        mtd_common_param_add_attr = javaconstant.JAVA_MTD_ADD_ATTRIBUTE_TEMP % (temp_common_param_name.upper(),temp_common_param_name) + '\n'
+                        mtd_common_param_add_attr = javaconstant.JAVA_MTD_ADD_ATTRIBUTE_TEMP % (temp_common_param_name.upper(),temp_holder_assign) + '\n'
                     else:
                         mtd_common_holder_create = mtd_common_holder_create + javaconstant.JAVA_TAB + javaconstant.JAVA_TAB + javaconstant.JAVA_MTD_CONST_HOLDER_CREATE_TEMP % (param.get_parameter_type(),temp_common_param_name,param.get_parameter_type()) + '\n'
                         mtd_common_param_add_hashset = mtd_common_param_add_hashset + javaconstant.JAVA_TAB + javaconstant.JAVA_TAB + javaconstant.JAVA_MTD_ADD_HASHSET_TEMP % temp_common_param_name.upper() + '\n'
-                        mtd_common_param_add_attr = mtd_common_param_add_attr + javaconstant.JAVA_TAB + javaconstant.JAVA_TAB + javaconstant.JAVA_MTD_ADD_ATTRIBUTE_TEMP % (temp_common_param_name.upper(),temp_common_param_name) + '\n'
-
+                        mtd_common_param_add_attr = mtd_common_param_add_attr + javaconstant.JAVA_TAB + javaconstant.JAVA_TAB + javaconstant.JAVA_MTD_ADD_ATTRIBUTE_TEMP % (temp_common_param_name.upper(),temp_holder_assign) + '\n'
+                       
+                    
             # ---------- comment ----------
             for lines in javaconstant.JAVA_CONTROLLER_COMMON_COMMENT:
                 lines = javaconstant.JAVA_TAB + lines
@@ -1519,6 +1618,12 @@ class Java_processor(File_processor):
                 
                 if javaconstant.JAVA_MTD_CONST_ADD_ATTRIBUTE in lines:
                     lines = lines.replace(javaconstant.JAVA_MTD_CONST_ADD_ATTRIBUTE, mtd_common_param_add_attr)
+                
+                if javaconstant.JAVA_MTD_CONST_CONTAINER_CREATE in lines:
+                    lines = lines.replace(javaconstant.JAVA_MTD_CONST_CONTAINER_CREATE, mtd_common_container_create)
+                
+                if javaconstant.JAVA_MTD_CONST_CONTAINER_ASSIGN in lines:
+                    lines = lines.replace(javaconstant.JAVA_MTD_CONST_CONTAINER_ASSIGN, mtd_common_container_set)
                 
                 
                 if '\n' not in lines:
