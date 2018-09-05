@@ -66,6 +66,7 @@ class Java_constant(object):
         self.JAVA_FUNCTION_FETCH = 'fetch'
         self.JAVA_FUNCTION_CLEARINST = 'clearInstance'
         self.JAVA_FUNCTION_GET = 'get'
+        self.JAVA_FUNCTION_SET = 'set'
         self.JAVA_FUNCTION_ADD = 'add'
         self.JAVA_FUNCTION_INITIALIZE = 'initialize'
         
@@ -80,7 +81,7 @@ class Java_constant(object):
         # ----------------- types ------------------
         self.JAVA_TYPE_STRING = 'String'
         self.JAVA_TYPE_GREGORIANCALENDAR = 'GregorianCalendar'
-        self.JAVA_PROGRESS_TYPE_PREFIX = ['ii','it','ic','il','id','ig','oi','ot','oc','ol','od','og']
+        self.JAVA_PROGRESS_TYPE_PREFIX = ['ii','it','ic','il','id','ig']
         
         # ---------------------------------------------------------------- #
         #                  annotation                                      #
@@ -106,6 +107,8 @@ class Java_constant(object):
         self.JAVA_SERVICE_HEADER = 'public class %s extends FinQraEntityService<%s, %s> {'
         
         # ----------------- standard imports ------------------ #
+        self.JAVA_SERVICE_IMPORT_UTIL_ARRAYLIST = 'import java.util.ArrayList;'
+        self.JAVA_SERVICE_IMPORT_UTIL_LIST = 'import java.util.List;'
         self.JAVA_SERVICE_IMPORT_SPRING_FRAME = 'import org.springframework.stereotype.Service;'
         self.JAVA_SERVICE_IMPORT_PRO_DATAGRAPH = 'import com.progress.open4gl.ProDataGraph;'
         self.JAVA_SERVICE_IMPORT_FIN_QRA_ENTITYSERVICE = 'import com.qad.erp.financials.mvc.service.impl.FinQraEntityService;'
@@ -135,7 +138,7 @@ class Java_constant(object):
         self.JAVA_MTD_CONST_GET_SERVICE_INTER = '%MTD_GET_SERVICE_INTERFACE%'
         self.JAVA_MTD_CONST_INITIAL_ENTITY_DATASET = '%MTD_INITIAL_ENTITY_DATASET%'
         self.JAVA_MTD_CONST_GET_ENTITY_DATASET_LIST = '%MTD_GET_ENTITY_DATASET_LIST%'
-        self.JAVA_MTD_CONST_GET_SERVICEIMPL = '%MTD_GET_SERVICEIMPL%'
+        self.JAVA_MTD_CONST_SET_SERVICEIMPL = '%MTD_SET_SERVICEIMPL%'
         self.JAVA_MTD_CONST_ENTITY_DATASET = '%MTD_ENTITY_DATASET%'
         
         self.JAVA_MTD_CONST_FETCH_METHOD_PARAMS_VALUE = '%FETCH_MTD_PARAMETERS_VALUE%'
@@ -345,7 +348,7 @@ class Java_constant(object):
         # ------------------- Standard methods -------------------------- #
         # setServiceImpl()
         self.JAVA_CONTROLLER_OVERRIDE_INITIALIZE = [self.JAVA_ANNOTATION_AUTOWIRED,
-                                                    'public void ' + self.JAVA_MTD_CONST_GET_SERVICEIMPL + '(' + self.JAVA_ENTITY_CONST_SERVICEIMPL_NAME + ' service) {',
+                                                    'public void ' + self.JAVA_MTD_CONST_SET_SERVICEIMPL + '(' + self.JAVA_ENTITY_CONST_SERVICEIMPL_NAME + ' service) {',
                                                     self.JAVA_TAB + 'crudProviderService = service;',
                                                     self.JAVA_RIGHT_BRACE]
         

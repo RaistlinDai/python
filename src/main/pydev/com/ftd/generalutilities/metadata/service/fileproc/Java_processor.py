@@ -677,7 +677,7 @@ class Java_processor(File_processor):
                     else:
                         mtd_add_param_inputs = mtd_add_param_inputs + javaconstant.JAVA_SEPERATOR + ' ' + param.get_parameter_type() + ' ' + temp_param_name
                         mtd_add_param_calls = mtd_add_param_calls + javaconstant.JAVA_SEPERATOR + ' ' + temp_param_name
-                        if param_nbr % 5 == 0 and len(mtd.get_method_inputs()) > param_nbr % 5 * 5:
+                        if param_nbr % 5 == 0 and len(mtd.get_method_inputs()) > param_nbr:
                             mtd_add_param_inputs = mtd_add_param_inputs + '\n'
                             mtd_add_param_calls = mtd_add_param_calls + '\n'
                 
@@ -718,7 +718,7 @@ class Java_processor(File_processor):
                         mtd_fetch_param_values = mtd_fetch_param_values + javaconstant.JAVA_SEPERATOR + ' ' + temp_get
                         mtd_fetch_param_inputs = mtd_fetch_param_inputs + javaconstant.JAVA_SEPERATOR + ' ' + param.get_parameter_type() + ' ' + temp_param_name
                         mtd_fetch_param_calls = mtd_fetch_param_calls + javaconstant.JAVA_SEPERATOR + ' ' + temp_param_name
-                        if param_nbr % 5 == 0 and len(mtd.get_method_inputs()) > param_nbr % 5 * 5:
+                        if param_nbr % 5 == 0 and len(mtd.get_method_inputs()) > param_nbr:
                             mtd_fetch_param_values = mtd_fetch_param_values + '\n'
                             mtd_fetch_param_inputs = mtd_fetch_param_inputs + '\n'
                             mtd_fetch_param_calls = mtd_fetch_param_calls + '\n'
@@ -762,6 +762,12 @@ class Java_processor(File_processor):
             file.write(javaconstant.JAVA_KEY_IMPORT + ' ' + importcell + javaconstant.JAVA_END_MARK + '\n')
             import_list.append(javaconstant.JAVA_KEY_IMPORT + ' ' + importcell + javaconstant.JAVA_END_MARK)
         
+        if javaconstant.JAVA_SERVICE_IMPORT_UTIL_ARRAYLIST not in import_list:
+            file.write(javaconstant.JAVA_SERVICE_IMPORT_UTIL_ARRAYLIST + '\n')
+            import_list.append(javaconstant.JAVA_SERVICE_IMPORT_UTIL_ARRAYLIST)
+        if javaconstant.JAVA_SERVICE_IMPORT_UTIL_LIST not in import_list:
+            file.write(javaconstant.JAVA_SERVICE_IMPORT_UTIL_LIST + '\n')
+            import_list.append(javaconstant.JAVA_SERVICE_IMPORT_UTIL_LIST)
         if javaconstant.JAVA_SERVICE_IMPORT_SPRING_FRAME not in import_list:
             file.write(javaconstant.JAVA_SERVICE_IMPORT_SPRING_FRAME + '\n')
             import_list.append(javaconstant.JAVA_SERVICE_IMPORT_SPRING_FRAME)
@@ -1099,8 +1105,6 @@ class Java_processor(File_processor):
         container_mtd_list = entityDTO.get_entContInterDTO().get_class_methods()
         maintable_mtd_list = entityDTO.get_maintableInterDTO().get_class_methods()
         serviceQra_mtd_list = entityDTO.get_serviceQraDTO().get_class_methods()
-        containerQra_mtd_list = entityDTO.get_entContQraDTO().get_class_methods()
-        temp_func_list = []
         
         # ------------------------------------------------------- #
         #                    Creation option                      #
@@ -1141,6 +1145,8 @@ class Java_processor(File_processor):
         entity_holder = container_inter_name.replace(fileconstant.JAVA_CONTAINER_SUFFIX, '') + fileconstant.JAVA_HOLDER_SUFFIX
         # entity data resource
         data_resource = entityDTO.get_resourceDTO().get_view_parameters().get_data_resource()
+        # set service method
+        set_service_method = javaconstant.JAVA_FUNCTION_SET + serviceImpl_name[:-4]
         
         # get the additional implements
         implement_cells = ''
@@ -1148,6 +1154,7 @@ class Java_processor(File_processor):
         additional_properties = []
         # additional imports for method parameters/result
         additional_imports = []
+        additional_imports.append(entityDTO.get_entContInterDTO().get_class_package()[:-1] + javaconstant.JAVA_DOT_MARK + entityDTO.get_entContInterDTO().get_class_name())
         # entity key fields
         key_fields = []
         # data controller function list
@@ -1216,7 +1223,7 @@ class Java_processor(File_processor):
                         mtd_param_commt = ' * @param ' + temp_param_name + '\n'
                     else:
                         mtd_fetch_param_calls = mtd_fetch_param_calls + javaconstant.JAVA_SEPERATOR + ' ' + temp_param_name
-                        if param_nbr % 5 == 0 and len(mtd.get_method_inputs()) > param_nbr % 5 * 5:
+                        if param_nbr % 5 == 0 and len(mtd.get_method_inputs()) > param_nbr:
                             mtd_fetch_param_calls = mtd_fetch_param_calls + '\n'
                             
                         mtd_fetch_param_ajax = mtd_fetch_param_ajax + javaconstant.JAVA_SEPERATOR + '\n' + javaconstant.JAVA_TAB + javaconstant.JAVA_TAB + javaconstant.JAVA_TAB + temp_param_ajax
@@ -1357,6 +1364,9 @@ class Java_processor(File_processor):
                 # replace get main table list method
                 if javaconstant.JAVA_MTD_CONST_ENTITY_DATASET in lines:
                     lines = lines.replace(javaconstant.JAVA_MTD_CONST_ENTITY_DATASET, mtd_maintables)
+                # replace set serviceImpl method
+                if javaconstant.JAVA_MTD_CONST_SET_SERVICEIMPL in lines:
+                    lines = lines.replace(javaconstant.JAVA_MTD_CONST_SET_SERVICEIMPL, set_service_method)
                     
                 if '\n' not in lines:
                     file.write(lines + '\n')
@@ -1521,13 +1531,17 @@ class Java_processor(File_processor):
                         mtd_common_param_calls = mtd_common_param_calls + temp_common_param_name
                     else:
                         mtd_common_param_calls = mtd_common_param_calls + javaconstant.JAVA_SEPERATOR + ' ' + temp_common_param_name
-                    if param_nbr % 5 == 0 and len(mtd.get_method_inputs()) > param_nbr % 5 * 5:
+                    if param_nbr % 5 == 0 and len(mtd.get_method_inputs()) > param_nbr:
                         mtd_common_param_calls = mtd_common_param_calls + javaconstant.JAVA_SEPERATOR + '\n'
 
                     #  the Holder parameter for ajax request
                     if javaconstant.JAVA_COLLECTION_HOLDER not in param.get_parameter_type():
-                        mtd_common_param_ajax = mtd_common_param_ajax + javaconstant.JAVA_SEPERATOR + '\n' + javaconstant.JAVA_TAB + javaconstant.JAVA_TAB + javaconstant.JAVA_TAB + temp_common_param_ajax
-                        mtd_common_param_commt = mtd_common_param_commt + javaconstant.JAVA_TAB + ' * @param ' + temp_common_param_name + '\n'
+                        if mtd_common_param_ajax != '':
+                            mtd_common_param_ajax = mtd_common_param_ajax + javaconstant.JAVA_SEPERATOR + '\n' + javaconstant.JAVA_TAB + javaconstant.JAVA_TAB + javaconstant.JAVA_TAB + temp_common_param_ajax
+                            mtd_common_param_commt = mtd_common_param_commt + javaconstant.JAVA_TAB + ' * @param ' + temp_common_param_name + '\n'
+                        else:
+                            mtd_common_param_ajax = temp_common_param_ajax
+                            mtd_common_param_commt = ' * @param ' + temp_common_param_name + '\n'
                 
                 # holder & container creator
                 if javaconstant.JAVA_COLLECTION_HOLDER in param.get_parameter_type():
