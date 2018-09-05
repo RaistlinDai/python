@@ -502,6 +502,8 @@ class Java_constant(object):
                                                  self.JAVA_CONTROLLER_READ,
                                                  self.JAVA_CONTROLLER_DELETE]
         
+        # serviceImpl import template
+        self.JAVA_SERVICEIMPL_IMPORT_TEMP = 'com.qad.erp.financials.%s.service.impl.%s'
         # ajax parameters template
         self.JAVA_MTD_CONST_CONTROLLER_AJAX_PARAM_TEMP = '@RequestParam(value = "%s", required = false) %s %s'
         # holder creater template

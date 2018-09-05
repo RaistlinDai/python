@@ -1154,7 +1154,8 @@ class Java_processor(File_processor):
         additional_properties = []
         # additional imports for method parameters/result
         additional_imports = []
-        additional_imports.append(entityDTO.get_entContInterDTO().get_class_package()[:-1] + javaconstant.JAVA_DOT_MARK + entityDTO.get_entContInterDTO().get_class_name())
+        additional_imports.append(javaconstant.JAVA_SERVICEIMPL_IMPORT_TEMP % (parent_pack,serviceImpl_name))   # import serviceImpl
+        additional_imports.append(entityDTO.get_entContInterDTO().get_class_package()[:-1] + javaconstant.JAVA_DOT_MARK + entityDTO.get_entContInterDTO().get_class_name())   # import container
         # entity key fields
         key_fields = []
         # data controller function list
