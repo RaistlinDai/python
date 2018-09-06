@@ -69,9 +69,9 @@ class Frame_gene_selection(FormatableFrame):
         checkbut_frame3.pack(fill=X)
         Label(checkbut_frame3, text = 'TsHandler:', width=10).pack(side=LEFT)
         self.__checkvalues03 = {frame_constant.TS_CONSTANTS:IntVar(), 
-                                frame_constant.TS_HANDLER:IntVar(), 
                                 frame_constant.MOCK_DTO:IntVar(), 
-                                frame_constant.OBSERVABLE_OBJ:IntVar() }
+                                frame_constant.OBSERVABLE_OBJ:IntVar(), 
+                                frame_constant.TS_HANDLER:IntVar() }
         for chkv in self.__checkvalues03.keys():
             chk1 = Checkbutton(checkbut_frame3, text = chkv, variable = self.__checkvalues03[chkv], onvalue = 1, offvalue = 0)
             chk1.pack(side=LEFT)

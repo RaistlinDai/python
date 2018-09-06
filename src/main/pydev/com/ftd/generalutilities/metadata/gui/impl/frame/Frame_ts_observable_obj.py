@@ -7,7 +7,7 @@ from tkinter import *
 from src.main.pydev.com.ftd.generalutilities.metadata.gui.impl.frame.Frame_bottom import Frame_bottom
 from src.main.pydev.com.ftd.generalutilities.metadata.gui.impl.base.FormatableFrame import FormatableFrame
 
-class Frame_ts_gene(FormatableFrame):
+class Frame_ts_observable_obj(FormatableFrame):
     '''
     classdocs
     '''
