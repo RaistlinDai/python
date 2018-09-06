@@ -1155,7 +1155,6 @@ class Java_processor(File_processor):
         # additional imports for method parameters/result
         additional_imports = []
         additional_imports.append(javaconstant.JAVA_SERVICEIMPL_IMPORT_TEMP % (parent_pack,serviceImpl_name))   # import serviceImpl
-        additional_imports.append(entityDTO.get_entContInterDTO().get_class_package()[:-1] + javaconstant.JAVA_DOT_MARK + entityDTO.get_entContInterDTO().get_class_name())   # import container
         # entity key fields
         key_fields = []
         # data controller function list
@@ -1301,7 +1300,25 @@ class Java_processor(File_processor):
             file.write(importcell + '\n')
             import_list.append(importcell + '\n')
         
-        file.write('\n')
+        container_inter_package = javaconstant.JAVA_KEY_IMPORT + ' ' + entityDTO.get_entContInterDTO().get_class_package()[:-1] + javaconstant.JAVA_DOT_MARK + container_inter_name + javaconstant.JAVA_END_MARK
+        if container_inter_package not in import_list:
+            file.write(container_inter_package + '\n')   # import container interface
+            import_list.append(container_inter_package)
+        
+        factory_inter_package = javaconstant.JAVA_KEY_IMPORT + ' ' + entityDTO.get_factoryInterDTO().get_class_package()[:-1] + javaconstant.JAVA_DOT_MARK + factory_inter_name + javaconstant.JAVA_END_MARK
+        if factory_inter_package not in import_list:
+            file.write(factory_inter_package + '\n')   # import factory interface
+            import_list.append(factory_inter_package)
+            
+        factory_qra_package = javaconstant.JAVA_KEY_IMPORT + ' ' + entityDTO.get_factoryQraDTO().get_class_package()[:-1] + javaconstant.JAVA_DOT_MARK + factory_qra_name + javaconstant.JAVA_END_MARK
+        if factory_qra_package not in import_list:
+            file.write(factory_qra_package + '\n')   # import factory qra
+            import_list.append(factory_qra_package)
+            
+        mainttbl_inter_package = javaconstant.JAVA_KEY_IMPORT + ' ' + entityDTO.get_maintableInterDTO().get_class_package()[:-1] + javaconstant.JAVA_DOT_MARK + main_table_inter_name + javaconstant.JAVA_END_MARK
+        if mainttbl_inter_package not in import_list:
+            file.write(mainttbl_inter_package + '\n')   # import main table interface
+            import_list.append(mainttbl_inter_package)
         
         # additional imports
         for add_imp in additional_imports:
@@ -1559,14 +1576,17 @@ class Java_processor(File_processor):
                             pack_cells = packs.split(javaconstant.JAVA_DOT_MARK)
                             if temp_container_inter_name == pack_cells[-1].replace(javaconstant.JAVA_END_MARK,''):
                                 if mtd_common_container_create == '':
-                                    mtd_common_container_create = '\n\t\t// Create the Container\n'
-                                mtd_common_container_create = mtd_common_container_create + javaconstant.JAVA_MTD_CONST_CONTAINER_CREATE_TEMP % (temp_container_inter_name,temp_container_name,temp_container_inter_name);
+                                    mtd_common_container_create = '\n\t\t// Create the Container\n\t\t' + factory_qra_name + ' factory = \n\t\t\t(' + factory_qra_name + ')((' + serviceImpl_name + ') crudProviderService).getEntityFactory();\n'
+                                    
+                                mtd_common_container_create = mtd_common_container_create + javaconstant.JAVA_MTD_CONST_CONTAINER_CREATE_TEMP % (temp_container_inter_name,temp_container_name,temp_container_inter_name)
                             if temp_container_qra_name == pack_cells[-1].replace(javaconstant.JAVA_END_MARK,''):
                                 if mtd_common_container_set == '':
                                     mtd_common_container_set = '// Assign the Container\n'
-                                mtd_common_container_set = mtd_common_container_set + javaconstant.JAVA_MTD_CONST_CONTAINER_ASSIGN_TEMP % (temp_container_qra_name,temp_container_name,param.get_parameter_name());
+                                mtd_common_container_set = mtd_common_container_set + javaconstant.JAVA_MTD_CONST_CONTAINER_ASSIGN_TEMP % (temp_container_qra_name,temp_container_name,param.get_parameter_name())
                         
                         temp_holder_assign = temp_container_name + 'Entity'
+                    else:
+                        temp_holder_assign = temp_holder_assign + '.getValue()'
                     
                     # holder creator
                     if mtd_common_holder_create == '':

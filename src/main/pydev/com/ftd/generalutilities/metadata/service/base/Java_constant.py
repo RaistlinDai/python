@@ -308,11 +308,8 @@ class Java_constant(object):
         self.JAVA_CONTROLLER_HEADER = 'public class %s extends FinQraDataController<%s> %s{'
         
         # ----------------- standard imports ------------------ #
-        self.JAVA_CONTROLLER_IMPORTS = ['import java.util.Arrays;',
-                                        'import java.util.HashSet;',
-                                        'import java.util.Iterator;',
+        self.JAVA_CONTROLLER_IMPORTS = ['import java.util.HashSet;',
                                         'import java.util.List;',
-                                        'import java.util.Map.Entry;',
                                         'import java.util.Set;',
                                         'import org.slf4j.Logger;',
                                         'import org.slf4j.LoggerFactory;',
@@ -333,10 +330,8 @@ class Java_constant(object):
                                         'import com.qad.qra.Holder;',
                                         'import com.qad.qracore.util.QraWorkspaceUtil;',
                                         'import com.qad.qraview.dto.QueryParameters;',
-                                        'import com.qad.qraview.dto.SubmitResult;',
                                         'import com.qad.qraview.dto.SubmitResultAndData;',
-                                        'import com.qad.qraview.util.StringUtil;',
-                                        'import com.qad.webshell.util.JsonDataHolder;']
+                                        'import com.qad.qraview.util.StringUtil;']
         
         self.JAVA_CONTROLLER_CROSS_WORKSPACE_CONTROLLER = 'import com.qad.webshell.security.authorization.CrossWorkspaceController;'
         
@@ -468,7 +463,7 @@ class Java_constant(object):
                                      self.JAVA_TAB + '} else if (' + self.JAVA_MTD_CONST_PARAM_VERIFY_NON + ') {',
                                      '\n',
                                      self.JAVA_TAB + self.JAVA_TAB + '//Read',
-                                     self.JAVA_TAB + self.JAVA_TAB + 'CustPaymentContainer entity = ',
+                                     self.JAVA_TAB + self.JAVA_TAB + self.JAVA_ENTITY_CONST_CONTAINER_INTER + ' entity = ',
                                      self.JAVA_TAB + self.JAVA_TAB + self.JAVA_TAB + self.JAVA_TAB + '((' + self.JAVA_ENTITY_CONST_SERVICEIMPL_NAME + ') crudProviderService).read(' + self.JAVA_MTD_CONST_FETCH_METHOD_PARAMS_VALUE + ');',
                                      '\n',
                                      self.JAVA_TAB + self.JAVA_TAB + 'return getEntityReadView(model, entity);',
@@ -517,7 +512,7 @@ class Java_constant(object):
         # assign container template
         self.JAVA_MTD_CONST_CONTAINER_ASSIGN_TEMP = '\t\t((%s) %sEntity)\n\t\t\t\t.setProDataGraph((ProDataGraph) %s.getValue());\n\n'
         # add attribute template
-        self.JAVA_MTD_ADD_ATTRIBUTE_TEMP = 'model.addAttribute(%s, %s.getValue());'
+        self.JAVA_MTD_ADD_ATTRIBUTE_TEMP = 'model.addAttribute(%s, %s);'
         
         # datacontroller common function template
         self.JAVA_CONTROLLER_COMMON_FORMAT = ['@RequestMapping(value = "/api/erp/custPayments/' + self.JAVA_MTD_CONST_COMMON_MEHTOD_NAME + '", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)',
@@ -526,9 +521,6 @@ class Java_constant(object):
                                               '\n',
                                               self.JAVA_TAB + 'if (logger.isDebugEnabled())',
                                               self.JAVA_TAB + self.JAVA_TAB + 'logger.debug("' + self.JAVA_ENTITY_CONST_CONTROLLER_NAME + '.' + self.JAVA_MTD_CONST_COMMON_MEHTOD_NAME + '() invoked");',
-                                              '\n',
-                                              self.JAVA_TAB + self.JAVA_ENTITY_CONST_FACTORY_QRA + ' factory = ',
-                                              self.JAVA_TAB + self.JAVA_TAB + '(' + self.JAVA_ENTITY_CONST_FACTORY_QRA + ')((' + self.JAVA_ENTITY_CONST_SERVICEIMPL_NAME + ') crudProviderService).getEntityFactory();',
                                               '\n',
                                               self.JAVA_TAB + self.JAVA_MTD_CONST_HOLDER_CREATE,
                                               self.JAVA_TAB + self.JAVA_MTD_CONST_REQUEST_CONVERSION,
