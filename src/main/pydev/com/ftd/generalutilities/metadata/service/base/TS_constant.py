@@ -27,7 +27,7 @@ class TS_constant(object):
         self.TS_RIGHT_COMMENT = '*/'
         self.TS_LEFT_DASH = '<'
         self.TS_RIGHT_DASH = '>'
-        self.TS_TAB = '\t'
+        self.TS_TAB = '    '
         
         # common references
         self.TS_REFERENCE_COMMON_ANGULAR = '/// <reference path="../../../../../../Lib/DefinitelyTyped/angular/angular.d.ts" />'
@@ -43,6 +43,6 @@ class TS_constant(object):
                                                self.TS_REFERENCE_COMMON_QADTS]
         
         # observable object header
-        self.TS_OBSERVABLE_OBJ_HEADER = 'module com.qad.financials.%s.%s.TSHandler.%s.DTO.UI {\n\t\'use strict\';\n'
+        self.TS_OBSERVABLE_OBJ_HEADER = 'module com.qad.financials.%s.%s.TSHandler.%s.DTO.UI {\n' + self.TS_TAB + '\'use strict\';\n'
         
         

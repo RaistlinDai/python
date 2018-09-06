@@ -100,6 +100,7 @@ class EntityDTO(object):
     
     def set_dataControllerInfo(self, name, path, dataControllerDTO):
         if self.__dto:
+            self.__dto['DataControllerInfo'].clear()
             self.__dto['DataControllerInfo'].append(name)
             self.__dto['DataControllerInfo'].append(path)
             self.__dto['DataControllerInfo'].append(dataControllerDTO)
@@ -133,6 +134,7 @@ class EntityDTO(object):
     
     def set_serviceImplInfo(self, name, path, serviceImplDTO):
         if self.__dto:
+            self.__dto['ServiceImplInfo'].clear()
             self.__dto['ServiceImplInfo'].append(name)
             self.__dto['ServiceImplInfo'].append(path)
             self.__dto['ServiceImplInfo'].append(serviceImplDTO)
