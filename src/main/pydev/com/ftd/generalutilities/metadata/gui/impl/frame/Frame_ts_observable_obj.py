@@ -82,6 +82,8 @@ class Frame_ts_observable_obj(FormatableFrame):
                     #---- panel 02 ----------
                     self.__pack_errorpanel()
                     return
+                else:
+                    self.get_dtos().set_dataControllerInfo(business_entity_name + fileconstant.DATACONTROLLER_SUFFIX + fileconstant.JAVA_SUFFIX, dataController_path, dcJavaDTO)
         
         canv1.pack()
             

@@ -26,7 +26,7 @@ class TS_processor(File_processor):
         proj_path = transDto.get_projectpath()
         
         # get the parent package name
-        parent_pack = Java_processor.analysis_serviceImpl_package_name(entityDto.get_dataControllerDTO().get_class_package())
+        parent_pack = Java_processor.analysis_dataController_package_name(entityDto.get_dataControllerDTO().get_class_package())
         # get the file full path
         filefullpath = proj_path + fileconstant.RESOURCE_TS_MAIN_PATH + fileconstant.RESOURCE_TS_DTO_UI_FOLDER + filename
         
