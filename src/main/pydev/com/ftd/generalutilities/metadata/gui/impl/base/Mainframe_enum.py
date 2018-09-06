@@ -31,6 +31,6 @@ class Mainframe_enum(Enum):
     SERVICEIMPL_OPTION = [Frame_serviceimpl_option, 'ServiceImpl']
     PROJFILE_CHECK = [Frame_projfile_check, 'ProjFileCheck']
     TS_MAINT_OPTION = [Frame_ts_maint_option, 'TSMaintHandler']
-    TS_CONSTANT = [Frame_ts_constant_option, 'TSConstant']
+    TS_CONSTANT = [Frame_ts_constant_option, 'TSConstants']
     TS_MOCK_DTO = [Frame_ts_mock_dto, 'MockDTO']
     TS_OBSERVABLE_OBJ = [Frame_ts_observable_obj, 'ObservableObj']
