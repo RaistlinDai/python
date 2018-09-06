@@ -49,42 +49,6 @@ class Frame_ts_observable_obj(FormatableFrame):
         self.__dicinput = Entry(canv1, textvariable=self.__feet, borderwidth=3, bg='black', foreground='yellow', highlightcolor='red', insertbackground='red')
         self.__dicinput.place(height=20, width=250, relx=0.3, rely=0.2)
         
-        if self.get_dtos().get_businessentityname():
-            temp_name = self.get_dtos().get_businessentityname() + fileconstant.TS_OBSERVABLE_OBJECT_SUFFIX + fileconstant.TS_SUFFIX
-            self.__feet.set(temp_name)
-        else:
-            self.__result, self.__error, business_entity_name, temp_classlist = Java_processor.validate_lib_javas(self.get_trans(), self.get_dtos())
-            if not self.__result:
-                #---- panel 02 ----------
-                self.__pack_errorpanel()
-                return
-            if business_entity_name:
-                self.get_dtos().set_businessentityname(business_entity_name)
-                temp_name = self.get_dtos().get_businessentityname() + fileconstant.TS_OBSERVABLE_OBJECT_SUFFIX + fileconstant.TS_SUFFIX
-                self.__feet.set(temp_name)
-            
-            # --------- analysis the api service
-            if not self.get_dtos().get_serviceInterDTO().get_class_name():
-                self.__result, self.__error, serviceInterDTO = Java_processor.read_java_interface(temp_classlist[0])
-                if not self.__result:
-                    #---- panel 02 ----------
-                    self.__pack_errorpanel()
-                    return
-                else:
-                    self.get_dtos().set_serviceInterDTO(serviceInterDTO)
-                    
-            # analysis the data controller
-            if not self.get_dtos().get_dataControllerPath():
-                tempstr01, tempstr02, parent_pack, tempstr03 = Java_processor.analysis_jar_package_name(self.get_dtos().get_serviceInterDTO().get_class_package())
-                dataController_path = self.get_trans().get_projectpath() + fileconstant.JAVA_DATACONTROLLER_PATH % (parent_pack, business_entity_name + fileconstant.DATACONTROLLER_SUFFIX + fileconstant.JAVA_SUFFIX)
-                self.__result, self.__error, dcJavaDTO = Java_processor.analysis_dataController(business_entity_name + fileconstant.DATACONTROLLER_SUFFIX, dataController_path, self.get_dtos())
-                if not self.__result:
-                    #---- panel 02 ----------
-                    self.__pack_errorpanel()
-                    return
-                else:
-                    self.get_dtos().set_dataControllerInfo(business_entity_name + fileconstant.DATACONTROLLER_SUFFIX + fileconstant.JAVA_SUFFIX, dataController_path, dcJavaDTO)
-        
         canv1.pack()
             
         #---- panel 02 ----------
@@ -105,7 +69,10 @@ class Frame_ts_observable_obj(FormatableFrame):
         self.__rad3.deselect()
         canv2.pack()
         
-        
+        if self.get_dtos().get_businessentityname():
+            temp_name = self.get_dtos().get_businessentityname() + fileconstant.TS_OBSERVABLE_OBJECT_SUFFIX + fileconstant.TS_SUFFIX
+            self.__feet.set(temp_name)
+    
      
     #overwrite create_widges   
     def add_bottom(self, parent):

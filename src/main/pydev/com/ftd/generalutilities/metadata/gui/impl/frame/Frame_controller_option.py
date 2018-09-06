@@ -24,15 +24,12 @@ class Frame_controller_option(FormatableFrame):
         self.__funclists = []       #functions list backup
         self.__result = None
         self.__error = None
-        self.__classlist = []       # 0:service interface, 1:factory interface, 2:qra service class, 3:qra factory class
-                                    # 4:entity container interface, 5:entity container impl, 6:main table interface,
         FormatableFrame.__init__(self, parent.get_mainframe(), dtos, trans, **configs)
         
         
     #overwrite create_widges
     def create_widges(self):
         javaconstant = Java_constant()
-        fileconstant = File_constant()
         #frame
         self.__frame1 = FormatableFrame(self)
         self.__frame1.pack(side=TOP)
@@ -56,108 +53,21 @@ class Frame_controller_option(FormatableFrame):
         
         canv1.pack()
         
-        #analysis the lib
-        self.__result, self.__error, business_entity_name, self.__classlist = Java_processor.validate_lib_javas(self.get_trans(), self.get_dtos())
-        if not self.__result:
-            #---- panel 02 ----------
+        #---- panel 02 ----------
+        serviceInterDTO = self.get_dtos().get_serviceInterDTO()
+        if not serviceInterDTO:
             self.__pack_errorpanel()
             return
-        # ---- set dataController name
-        if business_entity_name:
-            self.get_dtos().set_businessentityname(business_entity_name)
-            dataController_name = business_entity_name + fileconstant.DATACONTROLLER_SUFFIX + fileconstant.JAVA_SUFFIX
-            self.__feet.set(dataController_name)
-        
-        # --------- analysis the api service
-        if not self.get_dtos().get_serviceInterDTO().get_class_name():
-            self.__result, self.__error, serviceInterDTO = Java_processor.read_java_interface(self.__classlist[0])
-            if not self.__result:
-                #---- panel 02 ----------
-                self.__pack_errorpanel()
-                return
-            else:
-                self.get_dtos().set_serviceInterDTO(serviceInterDTO)
-                
-        if not self.get_dtos().get_serviceQraDTO().get_class_name():
-            self.__result, self.__error, serviceQraDTO = Java_processor.read_java_class(self.__classlist[2])
-            if not self.__result:
-                #---- panel 02 ----------
-                self.__pack_errorpanel()
-                return
-            else:
-                self.get_dtos().set_serviceQraDTO(serviceQraDTO)
-        
-        
-        # --------- analysis the factory
-        if not self.get_dtos().get_factoryInterDTO().get_class_name():
-            self.__result, self.__error, factoryInterDTO = Java_processor.read_java_interface(self.__classlist[1])
-            if not self.__result:
-                #---- panel 02 ----------
-                self.__pack_errorpanel()
-                return
-            else:
-                self.get_dtos().set_factoryInterDTO(factoryInterDTO)
-        
-        if not self.get_dtos().get_factoryQraDTO().get_class_name():
-            self.__result, self.__error, factoryQraDTO = Java_processor.read_java_class(self.__classlist[3])
-            if not self.__result:
-                #---- panel 02 ----------
-                self.__pack_errorpanel()
-                return
-            else:
-                self.get_dtos().set_factoryQraDTO(factoryQraDTO)
-
-            
-        # --------- analysis the container
-        if not self.get_dtos().get_entContInterDTO().get_class_name():
-            self.__result, self.__error, containerInterDTO = Java_processor.read_java_interface(self.__classlist[4])
-            if not self.__result:
-                #---- panel 02 ----------
-                self.__pack_errorpanel()
-                return
-            else:
-                self.get_dtos().set_entContInterDTO(containerInterDTO)
-            
-        if not self.get_dtos().get_entContQraDTO().get_class_name():
-            self.__result, self.__error, containerQraDTO = Java_processor.read_java_class(self.__classlist[5])
-            if not self.__result:
-                #---- panel 02 ----------
-                self.__pack_errorpanel()
-                return
-            else:
-                self.get_dtos().set_entContQraDTO(containerQraDTO)
-            
-        
-        # --------- analysis the maintable interface
-        if not self.get_dtos().get_maintableInterDTO().get_class_name():
-            self.__result, self.__error, maintableInterDTO = Java_processor.read_java_interface(self.__classlist[6])
-            if not self.__result:
-                #---- panel 02 ----------
-                self.__pack_errorpanel()
-                return
-            else:
-                self.get_dtos().set_maintableInterDTO(maintableInterDTO)
-        
         
         # get the function list from serviceImpl
         func_list = [] 
         if self.get_dtos().get_serviceImplPath():
-            serviceImpl_path = self.get_dtos().get_serviceImplPath()
             for temp_mtd in self.get_dtos().get_serviceImplDTO().get_class_methods():
                 func_list.append(temp_mtd.get_method_name())
         else:
-            tempstr01, tempstr02, parent_pack, tempstr03 = Java_processor.analysis_jar_package_name(self.get_dtos().get_serviceInterDTO().get_class_package())
-            serviceImpl_path = self.get_trans().get_projectpath() + fileconstant.JAVA_SERVICEIMPL_PATH % (parent_pack, business_entity_name + fileconstant.SERVICEIMPL_SUFFIX + fileconstant.JAVA_SUFFIX)
-            self.__result, self.__error, dcJavaDTO = Java_processor.analysis_serviceImpl(business_entity_name + fileconstant.SERVICEIMPL_SUFFIX, serviceImpl_path, self.get_dtos())
-            if not self.__result:
-                #---- panel 02 ----------
-                self.__pack_errorpanel()
-                return
-            
-            #set the serviceImpl info into dtos
-            self.get_dtos().set_serviceImplInfo(business_entity_name + fileconstant.SERVICEIMPL_SUFFIX + fileconstant.JAVA_SUFFIX, serviceImpl_path, dcJavaDTO)
-            for temp_mtd in dcJavaDTO.get_class_methods():
-                func_list.append(temp_mtd.get_method_name())
+            self.__error = 'ServiceImpl cannot analysis, please check!'
+            self.__pack_errorpanel()
+            return
         
         #---- panel 02 ----------
         canv2 = Canvas(self, height=150, width=550)
@@ -216,6 +126,11 @@ class Frame_controller_option(FormatableFrame):
         self.__rad3.place(height=20, width=220, relx= 0.1, rely=0.7)
         self.__rad3.deselect()
         canv3.pack()
+        
+        # ---- set dataController name
+        fileconstant = File_constant()
+        dataController_name = self.get_dtos().get_businessentityname() + fileconstant.DATACONTROLLER_SUFFIX + fileconstant.JAVA_SUFFIX
+        self.__feet.set(dataController_name)
         
         # set the functions into left box
         if func_list:
@@ -351,7 +266,7 @@ class Frame_controller_option(FormatableFrame):
                     crud_nbr = crud_nbr + 1
                     continue
                 select_items.append(select_item)
-            self.__listboxright.delete(crud_nbr -1, END)
+            self.__listboxright.delete(crud_nbr, END)
             
             for select_item in select_items:
                 #add into right
