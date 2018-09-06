@@ -561,7 +561,7 @@ class Java_processor(File_processor):
         
         
     @staticmethod
-    def create_service_impl(filename, transDTO, entityDTO, funcList, createOpt):
+    def create_serviceImpl(filename, transDTO, entityDTO, funcList, createOpt):
         '''
         create the serviceImpl file
         @param filename: the serviceImpl file name
@@ -582,7 +582,7 @@ class Java_processor(File_processor):
         #                    Creation option                      #
         # ------------------------------------------------------- #
         # get the package name
-        serviceImpl_pack_name, tempstr01, parent_pack, tempstr02 = Java_processor.analysis_package_name(entityDTO.get_serviceInterDTO().get_class_package())
+        serviceImpl_pack_name, tempstr01, parent_pack, tempstr02 = Java_processor.analysis_jar_package_name(entityDTO.get_serviceInterDTO().get_class_package())
         filefullpath = transDTO.get_projectpath() + fileconstant.JAVA_SERVICEIMPL_PATH % (parent_pack, filename)
         if not Java_processor.verify_dir_existing(filefullpath):
             return False, '%s does not exist in your project, please check!' % filename, None
@@ -1107,7 +1107,7 @@ class Java_processor(File_processor):
         # ------------------------------------------------------- #
         #                    Creation option                      #
         # ------------------------------------------------------- #
-        tempstr01, dataController_pack_name, parent_pack, tempstr03 = Java_processor.analysis_package_name(entityDTO.get_serviceInterDTO().get_class_package())
+        tempstr01, dataController_pack_name, parent_pack, tempstr03 = Java_processor.analysis_jar_package_name(entityDTO.get_serviceInterDTO().get_class_package())
         filefullpath = transDTO.get_projectpath() + fileconstant.JAVA_DATACONTROLLER_PATH % (parent_pack, filename)
         if not Java_processor.verify_dir_existing(filefullpath):
             return False, '%s does not exist in your project, please check!' % filename, None, None
@@ -1701,7 +1701,7 @@ class Java_processor(File_processor):
     
     
     @staticmethod
-    def analysis_package_name(api_package_name):
+    def analysis_jar_package_name(api_package_name):
         '''
         analysis the api package name, to generate the serviceImpl & dataController package name, and also the parent package folder name. e.g. paymentinstruments
         @return: serviceImpl_folder
@@ -1709,8 +1709,8 @@ class Java_processor(File_processor):
         javaconstant = Java_constant()
         package_parent_name = None    # package parent name
         package_sub_name = None       # package self name
-        if javaconstant.JAVA_IMPL_PACKAGE_PREFIX in api_package_name:
-            temp_str = api_package_name[len(javaconstant.JAVA_IMPL_PACKAGE_PREFIX):]
+        if javaconstant.JAVA_JAR_IMPL_PACKAGE_PREFIX in api_package_name:
+            temp_str = api_package_name[len(javaconstant.JAVA_JAR_IMPL_PACKAGE_PREFIX):]
             package_parent_name = temp_str[:temp_str.index('.')]
             package_sub_name = temp_str[temp_str.index('.')+1:].replace(javaconstant.JAVA_END_MARK,'')
         
@@ -1721,7 +1721,21 @@ class Java_processor(File_processor):
     
     
     @staticmethod
-    def analysis_service_impl(filename, filefullpath, entityDTO):
+    def analysis_serviceImpl_package_name(api_package_name):
+        '''
+        analysis the api serviceImpl package name, and return back the parent package name
+        '''
+        javaconstant = Java_constant()
+        package_parent_name = None    # package parent name
+        if javaconstant.JAVA_SERVICEIMPL_PACKAGE_PREFIX in api_package_name:
+            temp_str = api_package_name[len(javaconstant.JAVA_SERVICEIMPL_PACKAGE_PREFIX):]
+            package_parent_name = temp_str[:temp_str.index('.')]
+        
+        return package_parent_name
+    
+    
+    @staticmethod
+    def analysis_serviceImpl(filename, filefullpath, entityDTO):
         '''
         analysis the serviceImpl to get the service functions
         '''
@@ -1762,3 +1776,46 @@ class Java_processor(File_processor):
                     javaDTO.push_class_methods(methodDTO)
                     
         return True, None, javaDTO
+    
+    
+    @staticmethod
+    def analysis_dataController(filename, filefullpath, entityDTO):
+        '''
+        analysis the dataController to get the ajax functions
+        '''
+        javaconstant = Java_constant()
+        # verify if file is existing
+        if not File_processor.verify_dir_existing(filefullpath):
+            return False, 'The dataController is not exist, please check.', None
+        
+        javaDTO = JavaDTO()
+        javaDTO.set_class_name(filename)   # dataController name
+        
+        # create file
+        with open(filefullpath, 'r') as file:
+            lines = file.readlines()
+        
+        mtd_start_flag = False
+        mtd_end_flag = True
+        mtd_header_array = []
+        
+        for line in lines:
+            line = line.lstrip()
+            # ajax method start
+            if line[:13] == javaconstant.JAVA_CONTROLLER_AJAX_METHOD_PREFIX:
+                mtd_start_flag = True
+                mtd_end_flag = False
+                mtd_header_array.clear()
+                mtd_header_array.append(line)
+            if mtd_start_flag and not mtd_end_flag:
+                mtd_header_array.append(line)
+                
+                if javaconstant.JAVA_LEFT_BRACE in line:
+                    mtd_start_flag = False
+                    mtd_end_flag = True
+            
+            print(mtd_header_array)
+                    
+        return True, None, javaDTO
+    
+    

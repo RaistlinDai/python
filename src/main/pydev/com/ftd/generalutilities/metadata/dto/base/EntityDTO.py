@@ -25,6 +25,7 @@ class EntityDTO(object):
         maintableInterDTO = JavaDTO()
         
         self.__dto = {'Entity':None,                      # entity name
+                      'BusinessEntity':None,              # business entity name
                       'ViewFullPath':None,                # view metadata path
                       'ResourceFullPath':None,            # resource metadata path
                       'ServiceImplInfo':[],               # generated serviceImpl
@@ -60,6 +61,18 @@ class EntityDTO(object):
         else:
             return None
 
+    
+    def set_businessentityname(self, value):
+        if self.__dto:
+            self.__dto['BusinessEntity'] = value
+            
+            
+    def get_businessentityname(self):
+        if self.__dto:
+            return self.__dto['BusinessEntity']
+        else:
+            return None
+        
 
     def set_viewfullpath(self, fullpath):
         if self.__dto:

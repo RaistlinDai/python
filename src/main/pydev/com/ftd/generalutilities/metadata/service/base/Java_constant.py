@@ -95,13 +95,14 @@ class Java_constant(object):
         #                  serviceImpl.java                                #
         # ---------------------------------------------------------------- #
         # ------------------ impl jar service
-        self.JAVA_IMPL_PACKAGE_PREFIX = 'com.qad.financials.'
+        self.JAVA_JAR_IMPL_PACKAGE_PREFIX = 'com.qad.financials.'
         
         # ----------------- serviceImpl title comments ------------------ #
         self.JAVA_ENTITY_TITLE = '/*******************************************************************************\n * Copyright 2015 QAD Inc. All rights reserved.\n ******************************************************************************/\n'
         
         # ----------------- serviceImpl package ------------------ #
         self.JAVA_ENTITY_SERVICEIMPL_PACKAGE = 'com.qad.erp.financials.%s.service.impl'
+        self.JAVA_SERVICEIMPL_PACKAGE_PREFIX = 'com.qad.erp.financials.'
         
         # ----------------- serviceImpl header ------------------ #
         self.JAVA_SERVICE_HEADER = 'public class %s extends FinQraEntityService<%s, %s> {'
@@ -301,10 +302,14 @@ class Java_constant(object):
         # ---------------------------------------------------------------- #
         #                  dataController.java                             #
         # ---------------------------------------------------------------- #
+        # ----------------- dataController ajax method ------------------ #
+        self.JAVA_CONTROLLER_AJAX_METHOD_PREFIX = 'public View '
+        self.JAVA_CONTROLLER_AJAX_REQUEST_PREFIX = '@RequestParam'
+        
         # ----------------- dataController package ------------------ #
         self.JAVA_ENTITY_DATACONTROLLER_PACKAGE = 'com.qad.erp.financials.%s.mvc.controller.data'
         
-        # ----------------- serviceImpl header ------------------ #
+        # ----------------- dataController header ------------------ #
         self.JAVA_CONTROLLER_HEADER = 'public class %s extends FinQraDataController<%s> %s{'
         
         # ----------------- standard imports ------------------ #

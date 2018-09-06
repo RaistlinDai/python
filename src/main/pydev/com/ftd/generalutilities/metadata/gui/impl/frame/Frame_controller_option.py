@@ -56,16 +56,17 @@ class Frame_controller_option(FormatableFrame):
         
         canv1.pack()
         
-        #analysis the dataController
+        #analysis the lib
         self.__result, self.__error, business_entity_name, self.__classlist = Java_processor.validate_lib_javas(self.get_trans(), self.get_dtos())
-        # ---- set dataController name
-        if business_entity_name:
-            dataController_name = business_entity_name + fileconstant.DATACONTROLLER_SUFFIX + fileconstant.JAVA_SUFFIX
-            self.__feet.set(dataController_name)
         if not self.__result:
             #---- panel 02 ----------
             self.__pack_errorpanel()
             return
+        # ---- set dataController name
+        if business_entity_name:
+            self.get_dtos().set_businessentityname(business_entity_name)
+            dataController_name = business_entity_name + fileconstant.DATACONTROLLER_SUFFIX + fileconstant.JAVA_SUFFIX
+            self.__feet.set(dataController_name)
         
         # --------- analysis the api service
         if not self.get_dtos().get_serviceInterDTO().get_class_name():
@@ -145,9 +146,9 @@ class Frame_controller_option(FormatableFrame):
             for temp_mtd in self.get_dtos().get_serviceImplDTO().get_class_methods():
                 func_list.append(temp_mtd.get_method_name())
         else:
-            tempstr01, tempstr02, parent_pack, tempstr03 = Java_processor.analysis_package_name(self.get_dtos().get_serviceInterDTO().get_class_package())
+            tempstr01, tempstr02, parent_pack, tempstr03 = Java_processor.analysis_jar_package_name(self.get_dtos().get_serviceInterDTO().get_class_package())
             serviceImpl_path = self.get_trans().get_projectpath() + fileconstant.JAVA_SERVICEIMPL_PATH % (parent_pack, business_entity_name + fileconstant.SERVICEIMPL_SUFFIX + fileconstant.JAVA_SUFFIX)
-            self.__result, self.__error, dcJavaDTO = Java_processor.analysis_service_impl(business_entity_name + fileconstant.SERVICEIMPL_SUFFIX, serviceImpl_path, self.get_dtos())
+            self.__result, self.__error, dcJavaDTO = Java_processor.analysis_serviceImpl(business_entity_name + fileconstant.SERVICEIMPL_SUFFIX, serviceImpl_path, self.get_dtos())
             if not self.__result:
                 #---- panel 02 ----------
                 self.__pack_errorpanel()
