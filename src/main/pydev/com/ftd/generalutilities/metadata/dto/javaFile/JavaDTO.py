@@ -108,6 +108,11 @@ class JavaDTO(object):
         self.__class_methods = value
         
         
+    def push_class_properties(self, value):
+        if isinstance(value, JavaMethodDTO):
+            self.__class_methods.append(value)
+            
+            
     def push_class_methods(self, value):
         if isinstance(value, JavaMethodDTO):
             self.__class_methods.append(value)
@@ -293,6 +298,43 @@ class JavaParameterDTO(object):
     parameter_type = property(get_parameter_type, set_parameter_type, del_parameter_type, "parameter_type's docstring")
         
         
-        
-        
+class JavaPropertyDTO(object):
+    '''
+    classdocs
+    '''
+    
+    
+    def __init__(self):
+        '''
+        Constructor
+        '''
+        self.__property_name = None
+        self.__property_type = None
+
+
+    def get_property_name(self):
+        return self.__property_name
+
+
+    def get_property_type(self):
+        return self.__property_type
+
+
+    def set_property_name(self, value):
+        self.__property_name = value
+
+
+    def set_property_type(self, value):
+        self.__property_type = value
+
+
+    def del_property_name(self):
+        del self.__property_name
+
+
+    def del_property_type(self):
+        del self.__property_type
+
+    property_name = property(get_property_name, set_property_name, del_property_name, "property_name's docstring")
+    property_type = property(get_property_type, set_property_type, del_property_type, "property_type's docstring")
         

@@ -59,7 +59,7 @@ class Frame_serviceimpl_option(FormatableFrame):
         canv1.pack()
         
         #analysis the serviceImpl
-        self.__result, self.__error, business_entity_name, self.__classlist = Java_processor.validate_javas(self.get_trans(), self.get_dtos())
+        self.__result, self.__error, business_entity_name, self.__classlist = Java_processor.validate_lib_javas(self.get_trans(), self.get_dtos())
         # ---- set serviceImpl name
         if business_entity_name:
             serviceImpl_name = business_entity_name + fileconstant.SERVICEIMPL_SUFFIX + fileconstant.JAVA_SUFFIX
@@ -224,13 +224,13 @@ class Frame_serviceimpl_option(FormatableFrame):
             return
         
         # write serviceImpl
-        result, message, filefullpath = Java_processor.create_service_impl(self.__feet.get(), self.get_trans(), self.get_dtos(), self.__listboxright.get(0, END), self.__vari1.get())
+        result, message, filefullpath, javaDTO = Java_processor.create_service_impl(self.__feet.get(), self.get_trans(), self.get_dtos(), self.__listboxright.get(0, END), self.__vari1.get())
         if not result:
             showerror('Error', message)
             return False
         
         # store the serviceImpl full path
-        self.get_dtos().set_serviceImplInfo(self.__feet.get(), filefullpath)
+        self.get_dtos().set_serviceImplInfo(self.__feet.get(), filefullpath, javaDTO)
         return True
         
         

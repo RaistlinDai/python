@@ -57,7 +57,7 @@ class Frame_controller_option(FormatableFrame):
         canv1.pack()
         
         #analysis the dataController
-        self.__result, self.__error, business_entity_name, self.__classlist = Java_processor.validate_javas(self.get_trans(), self.get_dtos())
+        self.__result, self.__error, business_entity_name, self.__classlist = Java_processor.validate_lib_javas(self.get_trans(), self.get_dtos())
         # ---- set dataController name
         if business_entity_name:
             dataController_name = business_entity_name + fileconstant.DATACONTROLLER_SUFFIX + fileconstant.JAVA_SUFFIX
@@ -138,21 +138,25 @@ class Frame_controller_option(FormatableFrame):
                 self.get_dtos().set_maintableInterDTO(maintableInterDTO)
         
         
-        #get the function list from serviceImpl
+        # get the function list from serviceImpl
+        func_list = [] 
         if self.get_dtos().get_serviceImplPath():
             serviceImpl_path = self.get_dtos().get_serviceImplPath()
+            for temp_mtd in self.get_dtos().get_serviceImplDTO().get_class_methods():
+                func_list.append(temp_mtd.get_method_name())
         else:
             tempstr01, tempstr02, parent_pack, tempstr03 = Java_processor.analysis_package_name(self.get_dtos().get_serviceInterDTO().get_class_package())
             serviceImpl_path = self.get_trans().get_projectpath() + fileconstant.JAVA_SERVICEIMPL_PATH % (parent_pack, business_entity_name + fileconstant.SERVICEIMPL_SUFFIX + fileconstant.JAVA_SUFFIX)
+            self.__result, self.__error, dcJavaDTO = Java_processor.analysis_service_impl(business_entity_name + fileconstant.SERVICEIMPL_SUFFIX, serviceImpl_path, self.get_dtos())
+            if not self.__result:
+                #---- panel 02 ----------
+                self.__pack_errorpanel()
+                return
+            
             #set the serviceImpl info into dtos
-            self.get_dtos().set_serviceImplInfo(business_entity_name + fileconstant.SERVICEIMPL_SUFFIX + fileconstant.JAVA_SUFFIX, serviceImpl_path)
-            
-        self.__result, self.__error, func_list = Java_processor.analysis_service_impl(serviceImpl_path, self.get_dtos())
-        if not self.__result:
-            #---- panel 02 ----------
-            self.__pack_errorpanel()
-            return
-            
+            self.get_dtos().set_serviceImplInfo(business_entity_name + fileconstant.SERVICEIMPL_SUFFIX + fileconstant.JAVA_SUFFIX, serviceImpl_path, dcJavaDTO)
+            for temp_mtd in dcJavaDTO.get_class_methods():
+                func_list.append(temp_mtd.get_method_name())
         
         #---- panel 02 ----------
         canv2 = Canvas(self, height=150, width=550)
@@ -224,7 +228,6 @@ class Frame_controller_option(FormatableFrame):
                 self.__listboxleft.insert(END, func_name)
                 self.__funclists.append(func_name)
             
-            
     
     #overwrite create_widges
     def add_bottom(self, parent):
@@ -245,13 +248,13 @@ class Frame_controller_option(FormatableFrame):
             return
         
         # write dataController
-        result, message, filefullpath = Java_processor.create_data_controller(self.__feet.get(), self.get_trans(), self.get_dtos(), self.__listboxright.get(0, END), self.__vari1.get())
+        result, message, filefullpath, dcJavaDTO = Java_processor.create_data_controller(self.__feet.get(), self.get_trans(), self.get_dtos(), self.__listboxright.get(0, END), self.__vari1.get())
         if not result:
             showerror('Error', message)
             return False
         
         # store the serviceImpl full path
-        self.get_dtos().set_dataControllerInfo(self.__feet.get(), filefullpath)
+        self.get_dtos().set_dataControllerInfo(self.__feet.get(), filefullpath, dcJavaDTO)
         return True
     
     

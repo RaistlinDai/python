@@ -11,7 +11,7 @@ from src.main.pydev.com.ftd.generalutilities.metadata.service.base.File_constant
 from src.main.pydev.com.ftd.generalutilities.metadata.service.base.File_processor import File_processor
 from src.main.pydev.com.ftd.generalutilities.metadata.service.base.Java_constant import Java_constant
 from src.main.pydev.com.ftd.generalutilities.metadata.dto.javaFile.JavaDTO import JavaDTO,\
-    JavaMethodDTO, JavaParameterDTO
+    JavaMethodDTO, JavaParameterDTO, JavaPropertyDTO
 from pathlib import Path
 
 class Java_processor(File_processor):
@@ -184,7 +184,7 @@ class Java_processor(File_processor):
     
     
     @staticmethod
-    def validate_javas(transDto, entityDto):
+    def validate_lib_javas(transDto, entityDto):
         '''
         validate the jar files, return back the serviceImpl/dataController name and jar file list
         '''
@@ -576,6 +576,7 @@ class Java_processor(File_processor):
         serviceQra_mtd_list = entityDTO.get_serviceQraDTO().get_class_methods()
         containerQra_mtd_list = entityDTO.get_entContQraDTO().get_class_methods()
         temp_func_list = []
+        javaDTO = JavaDTO()   # serviceImpl java DTO
         
         # ------------------------------------------------------- #
         #                    Creation option                      #
@@ -597,6 +598,7 @@ class Java_processor(File_processor):
         # ------------------------------------------------------- #
         # get the serviceImpl name
         serviceimpl_name = filename.replace(fileconstant.JAVA_SUFFIX, '')
+        javaDTO.set_class_name(serviceimpl_name)
         # get the container interface name
         container_inter_name = entityDTO.get_entContInterDTO().get_class_name()
         # get the service interface name
@@ -617,7 +619,7 @@ class Java_processor(File_processor):
         imports = entityDTO.get_serviceInterDTO().get_class_imports()
         # additional imports for method parameters/result
         additional_imports = []
-                        
+        
         # createEntityContainer()
         mtd_create_entity_container = javaconstant.JAVA_FUNCTION_CREATE + container_inter_name
         valid_flag = False
@@ -625,7 +627,7 @@ class Java_processor(File_processor):
             if mtd_create_entity_container == mtd.get_method_name() and container_inter_name == mtd.get_method_output():
                 valid_flag = True
         if not valid_flag:
-            return False, '%s analysis failed, please verify your jar!' % container_inter_name, None
+            return False, '%s analysis failed, please verify your jar!' % container_inter_name, None, None
         
         # getEntityService()
         mtd_get_entity_service = javaconstant.JAVA_FUNCTION_GET + service_inter_name
@@ -634,7 +636,7 @@ class Java_processor(File_processor):
             if mtd_get_entity_service == mtd.get_method_name() and service_inter_name == mtd.get_method_output():
                 valid_flag = True
         if not valid_flag:
-            return False, '%s analysis failed, please verify your jar!' % service_inter_name, None
+            return False, '%s analysis failed, please verify your jar!' % service_inter_name, None, None
         
         # initializeEntityDataset()
         entity_dataset_name = entityDTO.get_resourceDTO().get_view_parameters().get_table()
@@ -644,7 +646,7 @@ class Java_processor(File_processor):
             if mtd_initialize_entityDS == mtd.get_method_name():
                 valid_flag = True
         if not valid_flag:
-            return False, '%s analysis failed, please verify your jar!' % entity_dataset_name, None
+            return False, '%s analysis failed, please verify your jar!' % entity_dataset_name, None, None
         
         # getMainTables()
         mtd_get_maintables = javaconstant.JAVA_FUNCTION_GET + main_table_inter_name + 's'
@@ -653,7 +655,7 @@ class Java_processor(File_processor):
             if mtd_get_maintables == mtd.get_method_name() and main_table_inter_name in mtd.get_method_output():
                 valid_flag = True
         if not valid_flag:
-            return False, '%s analysis failed, please verify your jar!' % main_table_inter_name, None
+            return False, '%s analysis failed, please verify your jar!' % main_table_inter_name, None, None
         
         # addMainTable()
         mtd_add_maintables = javaconstant.JAVA_FUNCTION_ADD + main_table_inter_name
@@ -682,7 +684,7 @@ class Java_processor(File_processor):
                             mtd_add_param_calls = mtd_add_param_calls + '\n'
                 
         if not valid_flag:
-            return False, '%s analysis failed, please verify your jar!' % main_table_inter_name, None
+            return False, '%s analysis failed, please verify your jar!' % main_table_inter_name, None, None
         
         # fetch parameters
         mtd_fetch_param_values = ''      # e.g. entity.getParam1(), entity.getParam2(), entity.getParam3()
@@ -753,6 +755,7 @@ class Java_processor(File_processor):
         # ------------------------------------------------------- #
         file.write(javaconstant.JAVA_KEY_PACKAGE + ' ' + serviceImpl_pack_name + javaconstant.JAVA_END_MARK + '\n')
         file.write('\n')
+        javaDTO.set_class_package(serviceImpl_pack_name)
         
         # ------------------------------------------------------- #
         # ----- write the imports -----
@@ -953,21 +956,42 @@ class Java_processor(File_processor):
                     file.write(lines)
             
             file.write('\n')
-            
+        
+        # CRUD are mandatory
+        createDTO = JavaMethodDTO()
+        createDTO.set_method_name(javaconstant.JAVA_FUNCTION_CREATE)
+        javaDTO.push_class_methods(createDTO)
+        updateDTO = JavaMethodDTO()
+        updateDTO.set_method_name(javaconstant.JAVA_FUNCTION_UPDATE)
+        javaDTO.push_class_methods(updateDTO)
+        deleteDTO = JavaMethodDTO()
+        deleteDTO.set_method_name(javaconstant.JAVA_FUNCTION_DELETE)
+        javaDTO.push_class_methods(deleteDTO)
+        fetchDTO = JavaMethodDTO()
+        fetchDTO.set_method_name(javaconstant.JAVA_FUNCTION_FETCH)
+        javaDTO.push_class_methods(fetchDTO)
         
         # ------------------------------------------------------- #
         # ----- write the selected methods -----
         # ------------------------------------------------------- #
         for temp_func in temp_func_list:
             
+            mtdDTO = JavaMethodDTO()
+            mtdDTO.set_method_name(temp_func.get_method_name())
+            
             param_nbr = 1
             mtd_param_input = ''
             mtd_param_call = ''
             mtd_param_commt = ''
             line_tab_count = 1
+            
             for param in temp_func.get_method_inputs():
                 
                 temp_param_name = param.get_parameter_name()
+                paramDTO = JavaParameterDTO()
+                paramDTO.set_parameter_name(temp_param_name)
+                paramDTO.set_parameter_type(param.get_parameter_type())
+                mtdDTO.push_method_inputs(paramDTO)
                 
                 if param_nbr == 1:
                     mtd_param_commt = ' * @param ' + temp_param_name + '\n'
@@ -1049,6 +1073,9 @@ class Java_processor(File_processor):
                     file.write(lines)
                 
             file.write('\n')
+            
+            # add method info
+            javaDTO.push_class_methods(mtdDTO)
         
         
         # ------------------------------------------------------- #
@@ -1057,38 +1084,7 @@ class Java_processor(File_processor):
         file.write('\n' + javaconstant.JAVA_RIGHT_BRACE)
         file.close()
         
-        return True, None, filefullpath
-    
-    
-    @staticmethod
-    def analysis_service_impl(filefullpath, entityDTO):
-        '''
-        analysis the serviceImpl to get the service functions
-        '''
-        javaconstant = Java_constant()
-        # verify if file is existing
-        if not File_processor.verify_dir_existing(filefullpath):
-            return False, 'The serviceImpl is not exist, please check.', None
-        
-        service_funcs = []
-        
-        # create file
-        with open(filefullpath, 'r') as file:
-            lines = file.readlines()
-    
-        # get the service interface name
-        service_inter_name = entityDTO.get_serviceInterDTO().get_class_name()
-        # getEntityService()
-        mtd_get_entity_service = javaconstant.JAVA_FUNCTION_GET + service_inter_name + javaconstant.JAVA_LEFT_BRACKET + javaconstant.JAVA_RIGHT_BRACKET
-        for eachline in lines:
-            if mtd_get_entity_service in eachline:
-                sub_cells = eachline.split(javaconstant.JAVA_DOT_MARK)
-                if len(sub_cells) > 2 and sub_cells[1] == mtd_get_entity_service and javaconstant.JAVA_LEFT_BRACKET in sub_cells[2]:
-                    func_name = sub_cells[2][:sub_cells[2].index(javaconstant.JAVA_LEFT_BRACKET)]
-                    service_funcs.append(func_name)
-                    
-        return True, None, service_funcs
-    
+        return True, None, filefullpath, javaDTO
     
             
     @staticmethod
@@ -1106,13 +1102,15 @@ class Java_processor(File_processor):
         maintable_mtd_list = entityDTO.get_maintableInterDTO().get_class_methods()
         serviceQra_mtd_list = entityDTO.get_serviceQraDTO().get_class_methods()
         
+        javaDTO = JavaDTO()   # data controller DTO
+        
         # ------------------------------------------------------- #
         #                    Creation option                      #
         # ------------------------------------------------------- #
         tempstr01, dataController_pack_name, parent_pack, tempstr03 = Java_processor.analysis_package_name(entityDTO.get_serviceInterDTO().get_class_package())
         filefullpath = transDTO.get_projectpath() + fileconstant.JAVA_DATACONTROLLER_PATH % (parent_pack, filename)
         if not Java_processor.verify_dir_existing(filefullpath):
-            return False, '%s does not exist in your project, please check!' % filename, None
+            return False, '%s does not exist in your project, please check!' % filename, None, None
         
         if createOpt == 3:     # backup previous file
             backup_path = transDTO.get_workspacepath() + fileconstant.BACKUP_JAVA_FOLDER
@@ -1125,6 +1123,7 @@ class Java_processor(File_processor):
         # ------------------------------------------------------- #
         # get the dataController name
         datacontroller_name = filename.replace(fileconstant.JAVA_SUFFIX, '')
+        javaDTO.set_class_name(datacontroller_name)
         # get the serviceImpl name
         serviceImpl_name = entityDTO.get_serviceImplName().replace(fileconstant.JAVA_SUFFIX,'')
         # get the container interface name
@@ -1267,7 +1266,7 @@ class Java_processor(File_processor):
                             # verify container
                             result, message, temp_container_inter, temp_container_qra = Java_processor.validate_containers(transDTO, entityDTO, temp_container_name)
                             if not result:
-                                return False, message, None
+                                return False, message, None, None
                             else:
                                 temp_package = temp_container_inter.get_class_package()[:-1] + javaconstant.JAVA_DOT_MARK + temp_container_inter.get_class_name()
                                 if temp_package not in additional_imports:
@@ -1291,6 +1290,7 @@ class Java_processor(File_processor):
         # ------------------------------------------------------- #
         file.write(javaconstant.JAVA_KEY_PACKAGE + ' ' + dataController_pack_name + javaconstant.JAVA_END_MARK + '\n')
         file.write('\n')
+        javaDTO.set_class_package(dataController_pack_name)
         
         # ------------------------------------------------------- #
         # ----- write the imports -----
@@ -1347,6 +1347,12 @@ class Java_processor(File_processor):
         file.write(javaconstant.JAVA_TAB + javaconstant.JAVA_CONTROLLER_STATIC_FINAL_PROP_LOGGER % datacontroller_name + '\n')
         for prop_cell in additional_properties:
             file.write(javaconstant.JAVA_TAB + javaconstant.JAVA_CONTROLLER_STATIC_FINAL_PROP_SUFFIX % (prop_cell.upper(),prop_cell) + '\n')
+            
+            propertyDTO = JavaPropertyDTO()
+            propertyDTO.set_property_name(prop_cell)
+            propertyDTO.set_property_type(javaconstant.JAVA_TYPE_STRING)
+            javaDTO.push_class_properties(propertyDTO)
+            
         file.write('\n')
         
         # ------------------------------------------------------- #
@@ -1517,9 +1523,15 @@ class Java_processor(File_processor):
             
             line_tab_count = 1
             
+            mtdDTO = JavaMethodDTO()
+            mtdDTO.set_method_name(mtd.get_method_name())
+            
             for param in mtd.get_method_inputs():
                 param_nbr = param_nbr + 1
                 temp_common_param_name = param.get_parameter_name()
+                
+                # add parameter info
+                paramDTO = JavaParameterDTO()
                 
                 # trim parameter name
                 if temp_common_param_name[0:1] == 'p' and temp_common_param_name[1:2].isupper():
@@ -1542,8 +1554,13 @@ class Java_processor(File_processor):
                     mtd_common_param_calls = temp_common_param_name
                     #  the Holder parameter for ajax request
                     if javaconstant.JAVA_COLLECTION_HOLDER not in param.get_parameter_type():
+                        paramDTO.set_parameter_name(param.get_parameter_name())
+                        paramDTO.set_parameter_type(param.get_parameter_type())
+                        mtdDTO.push_method_inputs(paramDTO)
+                        
                         mtd_common_param_ajax = temp_common_param_ajax
                         mtd_common_param_commt = ' * @param ' + temp_common_param_name + '\n'
+                        
                 else:
                     if mtd_common_param_calls[-1] == '\n':
                         mtd_common_param_calls = mtd_common_param_calls + temp_common_param_name
@@ -1554,6 +1571,10 @@ class Java_processor(File_processor):
 
                     #  the Holder parameter for ajax request
                     if javaconstant.JAVA_COLLECTION_HOLDER not in param.get_parameter_type():
+                        paramDTO.set_parameter_name(param.get_parameter_name())
+                        paramDTO.set_parameter_type(param.get_parameter_type())
+                        mtdDTO.push_method_inputs(paramDTO)
+                        
                         if mtd_common_param_ajax != '':
                             mtd_common_param_ajax = mtd_common_param_ajax + javaconstant.JAVA_SEPERATOR + '\n' + javaconstant.JAVA_TAB + javaconstant.JAVA_TAB + javaconstant.JAVA_TAB + temp_common_param_ajax
                             mtd_common_param_commt = mtd_common_param_commt + javaconstant.JAVA_TAB + ' * @param ' + temp_common_param_name + '\n'
@@ -1597,7 +1618,9 @@ class Java_processor(File_processor):
                         mtd_common_holder_create = mtd_common_holder_create + javaconstant.JAVA_TAB + javaconstant.JAVA_TAB + javaconstant.JAVA_MTD_CONST_HOLDER_CREATE_TEMP % (param.get_parameter_type(),temp_common_param_name,param.get_parameter_type()) + '\n'
                         mtd_common_param_add_hashset = mtd_common_param_add_hashset + javaconstant.JAVA_TAB + javaconstant.JAVA_TAB + javaconstant.JAVA_MTD_ADD_HASHSET_TEMP % temp_common_param_name.upper() + '\n'
                         mtd_common_param_add_attr = mtd_common_param_add_attr + javaconstant.JAVA_TAB + javaconstant.JAVA_TAB + javaconstant.JAVA_MTD_ADD_ATTRIBUTE_TEMP % (temp_common_param_name.upper(),temp_holder_assign) + '\n'
-                       
+            
+            # add method info
+            javaDTO.push_class_methods(mtdDTO)
                     
             # ---------- comment ----------
             for lines in javaconstant.JAVA_CONTROLLER_COMMON_COMMENT:
@@ -1674,7 +1697,7 @@ class Java_processor(File_processor):
         file.write('\n' + javaconstant.JAVA_RIGHT_BRACE)
         file.close()
         
-        return True, None, filefullpath
+        return True, None, filefullpath, javaDTO
     
     
     @staticmethod
@@ -1696,3 +1719,46 @@ class Java_processor(File_processor):
         
         return serviceImpl_folder, dataController_folder, package_parent_name, package_sub_name
     
+    
+    @staticmethod
+    def analysis_service_impl(filename, filefullpath, entityDTO):
+        '''
+        analysis the serviceImpl to get the service functions
+        '''
+        javaconstant = Java_constant()
+        # verify if file is existing
+        if not File_processor.verify_dir_existing(filefullpath):
+            return False, 'The serviceImpl is not exist, please check.', None
+        
+        javaDTO = JavaDTO()
+        javaDTO.set_class_name(filename)   # serviceImpl name
+        serviceQra_mtd_list = entityDTO.get_serviceQraDTO().get_class_methods()
+        
+        # create file
+        with open(filefullpath, 'r') as file:
+            lines = file.readlines()
+    
+        # get the service interface name
+        service_inter_name = entityDTO.get_serviceInterDTO().get_class_name()
+        # getEntityService()
+        mtd_get_entity_service = javaconstant.JAVA_FUNCTION_GET + service_inter_name + javaconstant.JAVA_LEFT_BRACKET + javaconstant.JAVA_RIGHT_BRACKET
+        for eachline in lines:
+            if mtd_get_entity_service in eachline:
+                sub_cells = eachline.split(javaconstant.JAVA_DOT_MARK)
+                if len(sub_cells) > 2 and sub_cells[1] == mtd_get_entity_service and javaconstant.JAVA_LEFT_BRACKET in sub_cells[2]:
+                    func_name = sub_cells[2][:sub_cells[2].index(javaconstant.JAVA_LEFT_BRACKET)]
+                    methodDTO = JavaMethodDTO()
+                    methodDTO.set_method_name(func_name)
+                    
+                    for mtd in serviceQra_mtd_list:
+                        # fetch method in qra service
+                        if func_name == mtd.get_method_name():
+                            for param in mtd.get_method_inputs():
+                                paramDTO = JavaParameterDTO()
+                                paramDTO.set_parameter_name(param.get_parameter_name())
+                                paramDTO.set_parameter_type(param.get_parameter_type())
+                                methodDTO.push_method_inputs(paramDTO)
+                                
+                    javaDTO.push_class_methods(methodDTO)
+                    
+        return True, None, javaDTO
