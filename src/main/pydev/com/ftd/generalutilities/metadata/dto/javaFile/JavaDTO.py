@@ -165,6 +165,44 @@ class JavaMethodDTO(object):
         self.__method_output = None
         self.__method_related_imports = []
         self.__method_annotations = []
+        self.__method_ajax_type = None
+        self.__method_ajax_url = None
+        self.__method_ajax_resp = []
+
+    def get_method_ajax_type(self):
+        return self.__method_ajax_type
+
+
+    def get_method_ajax_url(self):
+        return self.__method_ajax_url
+
+
+    def set_method_ajax_type(self, value):
+        self.__method_ajax_type = value
+
+
+    def set_method_ajax_url(self, value):
+        self.__method_ajax_url = value
+
+
+    def get_method_ajax_resp(self):
+        return self.__method_ajax_resp
+
+
+    def set_method_ajax_resp(self, value):
+        self.__method_ajax_resp = value
+
+
+    def push_method_ajax_resp(self, value):
+        self.__method_ajax_resp.append(value)
+        
+
+    def del_method_ajax_type(self):
+        del self.__method_ajax_type
+
+
+    def del_method_ajax_url(self):
+        del self.__method_ajax_url
 
 
     def get_method_annotations(self):
@@ -256,6 +294,8 @@ class JavaMethodDTO(object):
     method_output = property(get_method_output, set_method_output, del_method_output, "method_output's docstring")
     method_related_imports = property(get_method_related_imports, set_method_related_imports, del_method_related_imports, "method_related_imports's docstring")
     method_annotations = property(get_method_annotations, set_method_annotations, del_method_annotations, "method_annotations's docstring")
+    method_ajax_type = property(get_method_ajax_type, set_method_ajax_type, del_method_ajax_type, "method_ajax_type's docstring")
+    method_ajax_url = property(get_method_ajax_url, set_method_ajax_url, del_method_ajax_url, "method_ajax_url's docstring")
         
 
 class JavaParameterDTO(object):

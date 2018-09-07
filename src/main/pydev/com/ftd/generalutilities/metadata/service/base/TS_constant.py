@@ -29,6 +29,16 @@ class TS_constant(object):
         self.TS_RIGHT_DASH = '>'
         self.TS_TAB = '    '
         
+        # ----------------- types ------------------
+        self.TS_TYPE_STRING = 'string'
+        self.TS_TYPE_BOOLEAN = 'boolean'
+        self.TS_TYPE_NUMBER = 'number'
+        self.TS_TYPE_DATE = 'Date'
+        
+        # ----------------- function prefix ------------------
+        self.TS_HTTPRESPONSE_PREFIX = 'HttpResponse'
+        
+        
         # common references
         self.TS_REFERENCE_COMMON_ANGULAR = '/// <reference path="../../../../../../Lib/DefinitelyTyped/angular/angular.d.ts" />'
         self.TS_REFERENCE_COMMON_JQUERY = '/// <reference path="../../../../../../Lib/DefinitelyTyped/jquery/jquery.d.ts" />'
@@ -44,5 +54,11 @@ class TS_constant(object):
         
         # observable object header
         self.TS_OBSERVABLE_OBJ_HEADER = 'module com.qad.financials.%s.%s.TSHandler.%s.DTO.UI {\n' + self.TS_TAB + '\'use strict\';\n'
+        
+        
+        # observable object template
+        self.TS_OBSERVABLE_OBJ_RESPONSE_TEMPLATE = 'export interface HttpResponse%s {\n%s \n    }\n'
+        
+        
         
         

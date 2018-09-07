@@ -8,6 +8,7 @@ from src.main.pydev.com.ftd.generalutilities.metadata.service.base.File_constant
 from pathlib import Path
 from src.main.pydev.com.ftd.generalutilities.metadata.service.base.TS_constant import TS_constant
 from src.main.pydev.com.ftd.generalutilities.metadata.service.fileproc.Java_processor import Java_processor
+from src.main.pydev.com.ftd.generalutilities.metadata.service.base.Java_constant import Java_constant
 
 class TS_processor(File_processor):
     '''
@@ -24,11 +25,21 @@ class TS_processor(File_processor):
         tsconstant = TS_constant()
         business_entity_name = entityDto.get_businessentityname()
         proj_path = transDto.get_projectpath()
+        controller_dto = entityDto.get_dataControllerDTO()
         
         # get the parent package name
-        parent_pack = Java_processor.analysis_dataController_package_name(entityDto.get_dataControllerDTO().get_class_package())
+        parent_pack = Java_processor.analysis_dataController_package_name(controller_dto.get_class_package())
         # get the file full path
         filefullpath = proj_path + fileconstant.RESOURCE_TS_MAIN_PATH + fileconstant.RESOURCE_TS_DTO_UI_FOLDER + filename
+        # additional references
+        additional_reference = []
+        
+        # ------------------------------------------------------- #
+        # ----- preparation -----
+        # ------------------------------------------------------- #
+        
+            
+        
         
         if not File_processor.verify_dir_existing(filefullpath):
             # create file
@@ -46,6 +57,15 @@ class TS_processor(File_processor):
             file.write(temp_ref)
             file.write('\n')
         
+        # ------------------------------------------------------- #
+        # ----- write the common references -----
+        # ------------------------------------------------------- # 
+        for temp_ref in additional_reference:
+            file.write(temp_ref)
+            file.write('\n')
+        
+        file.write('\n')
+        
         
         # ------------------------------------------------------- #
         # ----- write the observable object header -----
@@ -54,6 +74,23 @@ class TS_processor(File_processor):
         file.write(temp_header)
         file.write('\n')
         
+        # ------------------------------------------------------- #
+        # ----- write the observable object header -----
+        # ------------------------------------------------------- # 
+        for ajaxMtd in controller_dto.get_class_methods():
+            # get the response parameters
+            ajax_temp = ''
+            for ajaxResp in ajaxMtd.get_method_ajax_resp():
+                # convert the java type to TS type
+                ajax_para_type_temp = TS_processor.convertJavaTypeToTSType(ajaxResp.get_parameter_type())
+                ajax_temp = ajax_temp + '\n' + tsconstant.TS_TAB + tsconstant.TS_TAB + ajaxResp.get_parameter_name() + ': ' + ajax_para_type_temp + tsconstant.TS_END_MARK
+            
+            ajaxMtd_name = ajaxMtd.get_method_name()
+            ajaxMtd_name = ajaxMtd_name[:1].upper() + ajaxMtd_name[1:]
+            line = tsconstant.TS_TAB + tsconstant.TS_OBSERVABLE_OBJ_RESPONSE_TEMPLATE % (ajaxMtd_name,ajax_temp)
+            
+            file.write(line)
+            file.write('\n')
         
         
         file.write(tsconstant.TS_RIGHT_BRACE)
@@ -62,3 +99,30 @@ class TS_processor(File_processor):
         
         
         return True, None
+    
+    
+    @staticmethod
+    def convertJavaTypeToTSType(javaType):
+        '''
+        convert the java type to TS type
+        '''
+        javaconstant = Java_constant()
+        tsconstant = TS_constant()
+        
+        if not javaType:
+            return None
+        # string
+        if javaType == javaconstant.JAVA_TYPE_STRING:
+            return tsconstant.TS_TYPE_STRING
+        # number
+        elif javaType in [javaconstant.JAVA_TYPE_INTEGER,javaconstant.JAVA_TYPE_BIGDECIMAL,javaconstant.JAVA_TYPE_LONG]:
+            return tsconstant.TS_TYPE_NUMBER
+        # boolean
+        elif javaType == javaconstant.JAVA_TYPE_BOOLEAN:
+            return tsconstant.TS_TYPE_BOOLEAN
+        # date
+        elif javaType == javaconstant.JAVA_TYPE_GREGORIANCALENDAR:
+            return tsconstant.TS_TYPE_BOOLEAN
+        else:
+            return javaType
+        

@@ -39,7 +39,9 @@ class Java_constant(object):
         self.JAVA_RIGHT_COMMENT = '*/'
         self.JAVA_LEFT_DASH = '<'
         self.JAVA_RIGHT_DASH = '>'
+        self.JAVA_EQUALS = '='
         self.JAVA_TAB = '\t'
+        self.JAVA_COMMA = '\"'
         
         # java processing flag
         self.JAVA_AND_MARK = '&&'
@@ -80,6 +82,10 @@ class Java_constant(object):
         
         # ----------------- types ------------------
         self.JAVA_TYPE_STRING = 'String'
+        self.JAVA_TYPE_INTEGER = 'Integer'
+        self.JAVA_TYPE_BIGDECIMAL = 'BigDecimal'
+        self.JAVA_TYPE_BOOLEAN = 'Boolean'
+        self.JAVA_TYPE_LONG = 'Long'
         self.JAVA_TYPE_GREGORIANCALENDAR = 'GregorianCalendar'
         self.JAVA_PROGRESS_TYPE_PREFIX = ['ii','it','ic','il','id','ig']
         
@@ -90,6 +96,15 @@ class Java_constant(object):
         self.JAVA_ANNOTATION_OVERRIDE = '@Override'
         self.JAVA_ANNOTATION_CONTROLLER = '@Controller(\"%s\")'
         self.JAVA_ANNOTATION_AUTOWIRED = '@Autowired'
+        self.JAVA_ANNOTATION_REQUESTMAPPING = '@RequestMapping'
+        self.JAVA_ANNOTATION_REQUESTPARAM = '@RequestParam'
+        
+        # ---------------------------------------------------------------- #
+        #                  ajax request                                    #
+        # ---------------------------------------------------------------- #
+        self.JAVA_AJAX_REQUEST_TYPE_GET = 'RequestMethod.GET'
+        self.JAVA_AJAX_REQUEST_TYPE_POST = 'RequestMethod.POST'
+        self.JAVA_AJAX_REQUEST_TYPE_DELETE = 'RequestMethod.DELETE'
         
         # ---------------------------------------------------------------- #
         #                  serviceImpl.java                                #
@@ -304,7 +319,8 @@ class Java_constant(object):
         # ---------------------------------------------------------------- #
         # ----------------- dataController ajax method ------------------ #
         self.JAVA_CONTROLLER_AJAX_METHOD_PREFIX = 'public View '
-        self.JAVA_CONTROLLER_AJAX_REQUEST_PREFIX = '@RequestParam'
+        self.JAVA_CONTROLLER_AJAX_CELL_VALUE = 'value'
+        self.JAVA_CONTROLLER_AJAX_CELL_METHOD = 'method'
         
         # ----------------- dataController package ------------------ #
         self.JAVA_ENTITY_DATACONTROLLER_PACKAGE = 'com.qad.erp.financials.%s.mvc.controller.data'
@@ -518,9 +534,11 @@ class Java_constant(object):
         self.JAVA_MTD_CONST_CONTAINER_ASSIGN_TEMP = '\t\t((%s) %sEntity)\n\t\t\t\t.setProDataGraph((ProDataGraph) %s.getValue());\n\n'
         # add attribute template
         self.JAVA_MTD_ADD_ATTRIBUTE_TEMP = 'model.addAttribute(%s, %s);'
+        # ajax url template
+        self.JAVA_CONTROLLER_AJAX_TEMP = '/api/erp/%s/%s'
         
         # datacontroller common function template
-        self.JAVA_CONTROLLER_COMMON_FORMAT = ['@RequestMapping(value = "/api/erp/custPayments/' + self.JAVA_MTD_CONST_COMMON_MEHTOD_NAME + '", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)',
+        self.JAVA_CONTROLLER_COMMON_FORMAT = ['@RequestMapping(value = "/api/erp/' + self.JAVA_ENTITY_CONST_DATARESOURCE + '/' + self.JAVA_MTD_CONST_COMMON_MEHTOD_NAME + '", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)',
                                               'public View ' + self.JAVA_MTD_CONST_COMMON_MEHTOD_NAME + '(Model model,',
                                               self.JAVA_TAB + self.JAVA_TAB + self.JAVA_MTD_CONST_CONTROLLER_AJAX_PARAM + ') {',
                                               '\n',

@@ -1525,6 +1525,8 @@ class Java_processor(File_processor):
             
             mtdDTO = JavaMethodDTO()
             mtdDTO.set_method_name(mtd.get_method_name())
+            mtdDTO.set_method_ajax_url(javaconstant.JAVA_CONTROLLER_AJAX_TEMP % (data_resource, mtd.get_method_name()))
+            mtdDTO.set_method_ajax_type(javaconstant.JAVA_AJAX_REQUEST_TYPE_GET)
             
             for param in mtd.get_method_inputs():
                 param_nbr = param_nbr + 1
@@ -1586,6 +1588,9 @@ class Java_processor(File_processor):
                 if javaconstant.JAVA_COLLECTION_HOLDER in param.get_parameter_type():
                     
                     temp_holder_assign = temp_common_param_name
+                    # ajax response set
+                    ajax_param_dto = JavaParameterDTO()
+                    ajax_param_type = param.get_parameter_type().replace(javaconstant.JAVA_COLLECTION_HOLDER,'').replace(javaconstant.JAVA_LEFT_DASH,'').replace(javaconstant.JAVA_RIGHT_DASH,'')
                     
                     # container creator
                     if javaconstant.JAVA_COLLECTION_HOLDER_DATAGRAPH == param.get_parameter_type() and param.get_parameter_name()[:2] == 'ds':
@@ -1606,6 +1611,7 @@ class Java_processor(File_processor):
                                 mtd_common_container_set = mtd_common_container_set + javaconstant.JAVA_MTD_CONST_CONTAINER_ASSIGN_TEMP % (temp_container_qra_name,temp_container_name,param.get_parameter_name())
                         
                         temp_holder_assign = temp_container_name + 'Entity'
+                        ajax_param_type = temp_container_qra_name
                     else:
                         temp_holder_assign = temp_holder_assign + '.getValue()'
                     
@@ -1619,6 +1625,10 @@ class Java_processor(File_processor):
                         mtd_common_param_add_hashset = mtd_common_param_add_hashset + javaconstant.JAVA_TAB + javaconstant.JAVA_TAB + javaconstant.JAVA_MTD_ADD_HASHSET_TEMP % temp_common_param_name.upper() + '\n'
                         mtd_common_param_add_attr = mtd_common_param_add_attr + javaconstant.JAVA_TAB + javaconstant.JAVA_TAB + javaconstant.JAVA_MTD_ADD_ATTRIBUTE_TEMP % (temp_common_param_name.upper(),temp_holder_assign) + '\n'
             
+                    ajax_param_dto.set_parameter_name(temp_common_param_name)
+                    ajax_param_dto.set_parameter_type(ajax_param_type)
+                    mtdDTO.push_method_ajax_resp(ajax_param_dto)
+
             # add method info
             javaDTO.push_class_methods(mtdDTO)
                     
@@ -1641,6 +1651,8 @@ class Java_processor(File_processor):
                 # replace method name
                 if javaconstant.JAVA_MTD_CONST_COMMON_MEHTOD_NAME in lines:
                     lines = lines.replace(javaconstant.JAVA_MTD_CONST_COMMON_MEHTOD_NAME, mtd.get_method_name())
+                if javaconstant.JAVA_ENTITY_CONST_DATARESOURCE in lines:
+                    lines = lines.replace(javaconstant.JAVA_ENTITY_CONST_DATARESOURCE, data_resource)
                 if javaconstant.JAVA_MTD_CONST_CONTROLLER_AJAX_PARAM in lines:
                     lines = lines.replace(javaconstant.JAVA_MTD_CONST_CONTROLLER_AJAX_PARAM, mtd_common_param_ajax)
                 if javaconstant.JAVA_ENTITY_CONST_CONTROLLER_NAME in lines:
@@ -1800,22 +1812,65 @@ class Java_processor(File_processor):
         mtd_header_array = []
         
         for line in lines:
-            line = line.lstrip()
+            line = line.lstrip().replace('\n','')
+            
+            # class package
+            if line[:7] == javaconstant.JAVA_KEY_PACKAGE:
+                javaDTO.set_class_package(line.replace(javaconstant.JAVA_KEY_PACKAGE,'').replace(javaconstant.JAVA_END_MARK,'').lstrip())
+            
             # ajax method start
-            if line[:13] == javaconstant.JAVA_CONTROLLER_AJAX_METHOD_PREFIX:
-                mtd_start_flag = True
-                mtd_end_flag = False
-                mtd_header_array.clear()
-                mtd_header_array.append(line)
             if mtd_start_flag and not mtd_end_flag:
                 mtd_header_array.append(line)
                 
                 if javaconstant.JAVA_LEFT_BRACE in line:
                     mtd_start_flag = False
                     mtd_end_flag = True
-            
-                print(mtd_header_array)
                     
+                    methodDTO = JavaMethodDTO()
+                    #process the method title
+                    for tit_line in mtd_header_array:
+                        # ajax url and type
+                        if javaconstant.JAVA_ANNOTATION_REQUESTMAPPING in tit_line:
+                            sidx = tit_line.index(javaconstant.JAVA_LEFT_BRACKET)
+                            temp_ajax_str = tit_line[sidx:-1].replace(javaconstant.JAVA_LEFT_BRACKET, '').replace(javaconstant.JAVA_RIGHT_BRACKET, '').lstrip()
+                            sub_cells = temp_ajax_str.split(javaconstant.JAVA_SEPERATOR)
+                            for sub_cell in sub_cells:
+                                sub_cell_pix = sub_cell.split(javaconstant.JAVA_EQUALS)
+                                if javaconstant.JAVA_CONTROLLER_AJAX_CELL_VALUE == sub_cell_pix[0].lstrip():
+                                    methodDTO.set_method_ajax_url(sub_cell_pix[1].lstrip())
+                                if javaconstant.JAVA_CONTROLLER_AJAX_CELL_METHOD == sub_cell_pix[0].lstrip():
+                                    methodDTO.set_method_ajax_type(sub_cell_pix[1].lstrip()) 
+                        
+                        # ajax method name
+                        if javaconstant.JAVA_CONTROLLER_AJAX_METHOD_PREFIX in tit_line:
+                            sidx = tit_line.index(javaconstant.JAVA_LEFT_BRACKET)
+                            temp_name_str = tit_line[len(javaconstant.JAVA_CONTROLLER_AJAX_METHOD_PREFIX):sidx]
+                            methodDTO.set_method_name(temp_name_str)
+                        
+                        # ajax method parameters
+                        if javaconstant.JAVA_ANNOTATION_REQUESTPARAM in tit_line:
+                            paramDTO = JavaParameterDTO()
+                            sidx = tit_line.index(javaconstant.JAVA_LEFT_BRACKET)
+                            eidx = tit_line.index(javaconstant.JAVA_RIGHT_BRACKET)
+                            # parameter name
+                            temp_param_str1 = tit_line[sidx+1:eidx]
+                            sub_cells1 = temp_param_str1.split(javaconstant.JAVA_SEPERATOR)
+                            comma_idx = sub_cells1[0].index(javaconstant.JAVA_COMMA)
+                            temp_param_str1 = sub_cells1[0][comma_idx:]
+                            paramDTO.set_parameter_name(temp_param_str1.replace(javaconstant.JAVA_COMMA,'').lstrip())
+                            # parameter type
+                            temp_param_str2 = tit_line[eidx+1:].lstrip()
+                            sub_cells2 = temp_param_str2.split(' ')
+                            paramDTO.set_parameter_type(sub_cells2[0].lstrip())
+                            
+                            methodDTO.push_method_inputs(paramDTO)
+                    
+            if line[:15] == javaconstant.JAVA_ANNOTATION_REQUESTMAPPING:
+                mtd_start_flag = True
+                mtd_end_flag = False
+                mtd_header_array.clear()
+                mtd_header_array.append(line)
+                 
         return True, None, javaDTO
     
     
