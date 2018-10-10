@@ -14,6 +14,9 @@ from tkinter.messagebox import showwarning, showerror
 class Frame_controller_option(FormatableFrame):
     '''
     classdocs
+    
+    TODO: implements CrossWorkspaceController for cross company
+    
     '''
 
 

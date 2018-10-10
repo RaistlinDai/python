@@ -34,11 +34,30 @@ class TS_processor(File_processor):
         # additional references
         additional_reference = []
         
+        # temp lines
+        temp_lines = []
+        
         # ------------------------------------------------------- #
         # ----- preparation -----
         # ------------------------------------------------------- #
-        
+        for ajaxMtd in controller_dto.get_class_methods():
+            # get the response parameters
+            ajax_temp = ''
+            for ajaxResp in ajaxMtd.get_method_ajax_resp():
+                # convert the java type to TS type
+                ajax_para_type_temp = TS_processor.convertJavaTypeToTSType(ajaxResp.get_parameter_type())
+                # verify and convert container type
+                if ajax_para_type_temp.startswith(File_constant.JAVA_QRA_PREFIX) and ajax_para_type_temp.endswith(File_constant.JAVA_CONTAINER_SUFFIX):
+                    print(ajax_para_type_temp)
+                
+                ajax_temp = ajax_temp + '\n' + tsconstant.TS_TAB + tsconstant.TS_TAB + ajaxResp.get_parameter_name() + ': ' + ajax_para_type_temp + tsconstant.TS_END_MARK
             
+            ajaxMtd_name = ajaxMtd.get_method_name()
+            ajaxMtd_name = ajaxMtd_name[:1].upper() + ajaxMtd_name[1:]
+            line = tsconstant.TS_TAB + tsconstant.TS_OBSERVABLE_OBJ_RESPONSE_TEMPLATE % (ajaxMtd_name,ajax_temp)
+            
+            temp_lines.append(line)
+            temp_lines.append('\n')
         
         
         if not File_processor.verify_dir_existing(filefullpath):
@@ -77,26 +96,12 @@ class TS_processor(File_processor):
         # ------------------------------------------------------- #
         # ----- write the observable object header -----
         # ------------------------------------------------------- # 
-        for ajaxMtd in controller_dto.get_class_methods():
-            # get the response parameters
-            ajax_temp = ''
-            for ajaxResp in ajaxMtd.get_method_ajax_resp():
-                # convert the java type to TS type
-                ajax_para_type_temp = TS_processor.convertJavaTypeToTSType(ajaxResp.get_parameter_type())
-                ajax_temp = ajax_temp + '\n' + tsconstant.TS_TAB + tsconstant.TS_TAB + ajaxResp.get_parameter_name() + ': ' + ajax_para_type_temp + tsconstant.TS_END_MARK
-            
-            ajaxMtd_name = ajaxMtd.get_method_name()
-            ajaxMtd_name = ajaxMtd_name[:1].upper() + ajaxMtd_name[1:]
-            line = tsconstant.TS_TAB + tsconstant.TS_OBSERVABLE_OBJ_RESPONSE_TEMPLATE % (ajaxMtd_name,ajax_temp)
-            
-            file.write(line)
-            file.write('\n')
-        
+        for sub_line in temp_lines:
+            file.write(sub_line)
         
         file.write(tsconstant.TS_RIGHT_BRACE)
     
         file.close()
-        
         
         return True, None
     
@@ -125,4 +130,12 @@ class TS_processor(File_processor):
             return tsconstant.TS_TYPE_BOOLEAN
         else:
             return javaType
+    
+    
+    @staticmethod
+    def convertContainerTypeToTSType(containerType):
+        '''
+        
+        
+        '''
         

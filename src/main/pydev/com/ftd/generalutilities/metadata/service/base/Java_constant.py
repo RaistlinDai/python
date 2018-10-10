@@ -176,6 +176,7 @@ class Java_constant(object):
         self.JAVA_MTD_CONST_CURRENT_ENTITY_DOMAIN = '%CURRENT_ENTITY_DOMAIN%'
         self.JAVA_MTD_CONST_HOLDER_CREATE = '%HOLDER_CREATE%'
         self.JAVA_MTD_CONST_REQUEST_CONVERSION = '%REQUEST_CONVERSION%'
+        self.JAVA_MTD_CONST_REQUEST_BIGDEC_INIT = '%REQUEST_BIGDEC_INIT%'
         self.JAVA_MTD_CONST_ADD_HASHSET = '%ADD_HASHSET%'
         self.JAVA_MTD_CONST_ADD_ATTRIBUTE = '%ADD_ATTRIBUTE%'
         self.JAVA_MTD_CONST_CONTAINER_CREATE = '%CONTAINER_CREATE%'
@@ -526,6 +527,8 @@ class Java_constant(object):
         self.JAVA_MTD_CONST_HOLDER_CREATE_TEMP = '%s %s = new %s();'
         # data conversion template
         self.JAVA_MTD_CONST_DATE_CONVERT_TEMP = self.JAVA_TAB + self.JAVA_TAB + 'GregorianCalendar trans%s = new GregorianCalendar();\n\t\tif (%s == null || %s.isEmpty())\n\t\t\ttrans%s = null;\n\t\telse\n\t\t\tFinancialsDataSetUtil.convertDateFromStringToDate(%s, trans%s);\n'
+        # BigDecimal initial template
+        self.JAVA_MTD_CONST_BIGDECIMAL_INIT_TEMP = self.JAVA_TAB + self.JAVA_TAB + '%s = %s == null? new BigDecimal(0):%s;\n'
         # hashset add template
         self.JAVA_MTD_ADD_HASHSET_TEMP = 'set.add(%s);'
         # create container template
@@ -547,6 +550,7 @@ class Java_constant(object):
                                               '\n',
                                               self.JAVA_TAB + self.JAVA_MTD_CONST_HOLDER_CREATE,
                                               self.JAVA_TAB + self.JAVA_MTD_CONST_REQUEST_CONVERSION,
+                                              self.JAVA_TAB + self.JAVA_MTD_CONST_REQUEST_BIGDEC_INIT,
                                               self.JAVA_TAB + self.JAVA_MTD_CONST_CONTAINER_CREATE,
                                               '\n',
                                               self.JAVA_TAB + '((' + self.JAVA_ENTITY_CONST_SERVICEIMPL_NAME + ') crudProviderService).' + self.JAVA_MTD_CONST_COMMON_MEHTOD_NAME + '(' + self.JAVA_MTD_CONST_COMMON_METHOD_PARAM_CALL + ');\n',

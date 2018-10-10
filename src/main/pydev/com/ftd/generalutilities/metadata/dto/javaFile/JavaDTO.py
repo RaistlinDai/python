@@ -310,6 +310,7 @@ class JavaParameterDTO(object):
         '''
         self.__parameter_name = None
         self.__parameter_type = None
+        self.__parameter_import = None
 
     def get_parameter_name(self):
         return self.__parameter_name
@@ -319,6 +320,10 @@ class JavaParameterDTO(object):
         return self.__parameter_type
 
 
+    def get_parameter_import(self):
+        return self.__parameter_import
+    
+
     def set_parameter_name(self, value):
         self.__parameter_name = value
 
@@ -327,6 +332,10 @@ class JavaParameterDTO(object):
         self.__parameter_type = value
 
 
+    def set_parameter_import(self, value):
+        self.__parameter_import = value
+        
+        
     def del_parameter_name(self):
         del self.__parameter_name
 
@@ -334,8 +343,14 @@ class JavaParameterDTO(object):
     def del_parameter_type(self):
         del self.__parameter_type
 
+
+    def del_parameter_import(self):
+        del self.__parameter_import
+        
+        
     parameter_name = property(get_parameter_name, set_parameter_name, del_parameter_name, "parameter_name's docstring")
     parameter_type = property(get_parameter_type, set_parameter_type, del_parameter_type, "parameter_type's docstring")
+    parameter_import = property(get_parameter_import, set_parameter_import, del_parameter_import, "parameter_import's docstring")
         
         
 class JavaPropertyDTO(object):

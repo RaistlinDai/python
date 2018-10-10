@@ -53,7 +53,7 @@ class TS_constant(object):
                                                self.TS_REFERENCE_COMMON_QADTS]
         
         # observable object header
-        self.TS_OBSERVABLE_OBJ_HEADER = 'module com.qad.financials.%s.%s.TSHandler.%s.DTO.UI {\n' + self.TS_TAB + '\'use strict\';\n'
+        self.TS_OBSERVABLE_OBJ_HEADER = 'namespace com.qad.financials.%s.%s.TSHandler.%s.DTO.UI {\n' + self.TS_TAB + '\'use strict\';\n'
         
         
         # observable object template
