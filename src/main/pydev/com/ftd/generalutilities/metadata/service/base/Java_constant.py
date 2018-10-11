@@ -319,7 +319,7 @@ class Java_constant(object):
         #                  dataController.java                             #
         # ---------------------------------------------------------------- #
         # ----------------- dataController ajax method ------------------ #
-        self.JAVA_CONTROLLER_AJAX_METHOD_PREFIX = 'public View '
+        self.JAVA_CONTROLLER_AJAX_METHOD_PREFIX = 'View '
         self.JAVA_CONTROLLER_AJAX_CELL_VALUE = 'value'
         self.JAVA_CONTROLLER_AJAX_CELL_METHOD = 'method'
         

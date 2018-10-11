@@ -1827,7 +1827,7 @@ class Java_processor(File_processor):
         import_list = []
         
         for line in lines:
-            line = line.lstrip().replace('\n','')
+            line = line.lstrip().replace('\n',' ')
             
             # class package
             if line[:7] == javaconstant.JAVA_KEY_PACKAGE:
@@ -1838,11 +1838,15 @@ class Java_processor(File_processor):
                 temp_import = line.replace(javaconstant.JAVA_KEY_IMPORT,'').replace(javaconstant.JAVA_END_MARK,'').lstrip()
                 import_list.append(temp_import)
             
-            # ajax method start
+            # ajax method start       
+            if line[:15] == javaconstant.JAVA_ANNOTATION_REQUESTMAPPING:
+                mtd_start_flag = True
+                mtd_end_flag = False
+                
             if mtd_start_flag and not mtd_end_flag:
                 
                 if temp_header_line == '':
-                    temp_header_line = line.replace('\n',' ').replace('\t', '')
+                    temp_header_line = line.replace('\t', '')
                 else:
                     temp_header_line = temp_header_line + line.replace('\n',' ').replace('\t', '')
                 
@@ -1851,67 +1855,62 @@ class Java_processor(File_processor):
                     mtd_end_flag = True
                     mtd_header_array.append(temp_header_line)
                     temp_header_line = ''
-                   
-            if line[:15] == javaconstant.JAVA_ANNOTATION_REQUESTMAPPING:
-                mtd_start_flag = True
-                mtd_end_flag = False
         
         # read methods
         for mtd_header in mtd_header_array:
-            print(mtd_header)
-            
-            # skip the CRUD methods
-            
             '''
             TODO:
             '''
-            
+
             methodDTO = JavaMethodDTO()
-            #process the method title
-            for tit_line in mtd_header_array:
+                        
+            key_public = ' ' + javaconstant.JAVA_KEY_PUBLIC + ' '
+            if key_public in mtd_header:
+                header_cells = mtd_header.split(key_public)
+                
                 # ajax url and type
-                if javaconstant.JAVA_ANNOTATION_REQUESTMAPPING in tit_line:
-                    sidx = tit_line.index(javaconstant.JAVA_LEFT_BRACKET)
-                    temp_ajax_str = tit_line[sidx:-1].replace(javaconstant.JAVA_LEFT_BRACKET, '').replace(javaconstant.JAVA_RIGHT_BRACKET, '').lstrip()
+                if javaconstant.JAVA_ANNOTATION_REQUESTMAPPING in header_cells[0]:
+                    sidx = header_cells[0].index(javaconstant.JAVA_LEFT_BRACKET)
+                    temp_ajax_str = header_cells[0][sidx:-1].replace(javaconstant.JAVA_LEFT_BRACKET, '').replace(javaconstant.JAVA_RIGHT_BRACKET, '').lstrip()
                     sub_cells = temp_ajax_str.split(javaconstant.JAVA_SEPERATOR)
                     for sub_cell in sub_cells:
                         sub_cell_pix = sub_cell.split(javaconstant.JAVA_EQUALS)
-                        if javaconstant.JAVA_CONTROLLER_AJAX_CELL_VALUE == sub_cell_pix[0].lstrip():
+                        if javaconstant.JAVA_CONTROLLER_AJAX_CELL_VALUE == sub_cell_pix[0].strip():
                             methodDTO.set_method_ajax_url(sub_cell_pix[1].lstrip())
-                        if javaconstant.JAVA_CONTROLLER_AJAX_CELL_METHOD == sub_cell_pix[0].lstrip():
+                        if javaconstant.JAVA_CONTROLLER_AJAX_CELL_METHOD == sub_cell_pix[0].strip():
                             methodDTO.set_method_ajax_type(sub_cell_pix[1].lstrip()) 
                 
                 # ajax method name
-                if javaconstant.JAVA_CONTROLLER_AJAX_METHOD_PREFIX in tit_line:
-                    sidx = tit_line.index(javaconstant.JAVA_LEFT_BRACKET)
-                    temp_name_str = tit_line[len(javaconstant.JAVA_CONTROLLER_AJAX_METHOD_PREFIX):sidx]
+                if javaconstant.JAVA_CONTROLLER_AJAX_METHOD_PREFIX in header_cells[1]:
+                    sidx = header_cells[1].index(javaconstant.JAVA_LEFT_BRACKET)
+                    temp_name_str = header_cells[1][len(javaconstant.JAVA_CONTROLLER_AJAX_METHOD_PREFIX):sidx]
                     methodDTO.set_method_name(temp_name_str)
+                    
+                    # ajax method parameters
+                    param_list = header_cells[1][sidx:].replace(javaconstant.JAVA_LEFT_BRACE, '').strip()
+                    if param_list[:1] == javaconstant.JAVA_LEFT_BRACKET and param_list[-1] == javaconstant.JAVA_RIGHT_BRACKET:
+                        param_list = param_list[1:-1]
+                    else:
+                        # TODO: format incorrect 
+                        continue
+                    
+                    if javaconstant.JAVA_ANNOTATION_REQUESTPARAM in header_cells[1]:
+                        rpidx = param_list.index(javaconstant.JAVA_ANNOTATION_REQUESTPARAM)
+                        param_list = param_list[rpidx:]
+                        
+                        param_cells = param_list.split(javaconstant.JAVA_ANNOTATION_REQUESTPARAM)
+                        print(param_cells)
+                    
+                    # skip the CRUD methods
                 
-                # ajax method parameters
-                if javaconstant.JAVA_ANNOTATION_REQUESTPARAM in tit_line:
-                    paramDTO = JavaParameterDTO()
-                    sidx = tit_line.index(javaconstant.JAVA_LEFT_BRACKET)
-                    eidx = tit_line.index(javaconstant.JAVA_RIGHT_BRACKET)
-                    # parameter name
-                    temp_param_str1 = tit_line[sidx+1:eidx]
-                    sub_cells1 = temp_param_str1.split(javaconstant.JAVA_SEPERATOR)
-                    comma_idx = sub_cells1[0].index(javaconstant.JAVA_COMMA)
-                    temp_param_str1 = sub_cells1[0][comma_idx:]
-                    paramDTO.set_parameter_name(temp_param_str1.replace(javaconstant.JAVA_COMMA,'').lstrip())
-                    # parameter type
-                    temp_param_str2 = tit_line[eidx+1:].lstrip()
-                    sub_cells2 = temp_param_str2.split(' ')
-                    paramDTO.set_parameter_type(sub_cells2[0].lstrip())
 
-                    methodDTO.push_method_inputs(paramDTO)
-        
+                else:
+                    continue    
+                
             # add method info
             if methodDTO.get_method_name():
-                print(methodDTO.get_method_name())
-                print(methodDTO.get_method_ajax_type())
-                print(methodDTO.get_method_ajax_url())
                 javaDTO.push_class_methods(methodDTO)
-                
+            
         return True, None, javaDTO
     
     
