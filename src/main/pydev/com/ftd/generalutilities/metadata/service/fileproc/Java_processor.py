@@ -1809,6 +1809,7 @@ class Java_processor(File_processor):
         analysis the dataController to get the ajax functions
         '''
         javaconstant = Java_constant()
+        fileconstant = File_constant()
         # verify if file is existing
         if not File_processor.verify_dir_existing(filefullpath):
             return False, 'The dataController is not exist, please check.', None
@@ -1820,15 +1821,20 @@ class Java_processor(File_processor):
         with open(filefullpath, 'r') as file:
             lines = file.readlines()
         
-        mtd_start_flag = False
-        mtd_end_flag = True
+        mtd_header_start_flag = False
+        mtd_header_end_flag = True
         mtd_header_array = []
         temp_header_line = ''
         import_list = []
+        mtd_body_count = 0
+        mtd_body_array = []
+        mtd_body_lines = []
         
         for line in lines:
             line = line.lstrip().replace('\n',' ')
-            
+            if line.strip() == '':
+                continue
+                
             # class package
             if line[:7] == javaconstant.JAVA_KEY_PACKAGE:
                 javaDTO.set_class_package(line.replace(javaconstant.JAVA_KEY_PACKAGE,'').replace(javaconstant.JAVA_END_MARK,'').lstrip())
@@ -1838,12 +1844,12 @@ class Java_processor(File_processor):
                 temp_import = line.replace(javaconstant.JAVA_KEY_IMPORT,'').replace(javaconstant.JAVA_END_MARK,'').lstrip()
                 import_list.append(temp_import)
             
-            # ajax method start       
+            # ajax method header start       
             if line[:15] == javaconstant.JAVA_ANNOTATION_REQUESTMAPPING:
-                mtd_start_flag = True
-                mtd_end_flag = False
+                mtd_header_start_flag = True
+                mtd_header_end_flag = False
                 
-            if mtd_start_flag and not mtd_end_flag:
+            if mtd_header_start_flag and not mtd_header_end_flag:
                 
                 if temp_header_line == '':
                     temp_header_line = line.replace('\t', '')
@@ -1851,19 +1857,38 @@ class Java_processor(File_processor):
                     temp_header_line = temp_header_line + line.replace('\n',' ').replace('\t', '')
                 
                 if javaconstant.JAVA_LEFT_BRACE in line:
-                    mtd_start_flag = False
-                    mtd_end_flag = True
+                    # method header finished
+                    mtd_header_start_flag = False
+                    mtd_header_end_flag = True
                     mtd_header_array.append(temp_header_line)
                     temp_header_line = ''
+                    # method body start up
+                    mtd_body_count = 1
+                    
+                    continue
+            
+            # ajax method body start
+            if mtd_body_count > 0:
+                # calculate the count of '}' to find the end of method
+                lcount = line.count(javaconstant.JAVA_LEFT_BRACE)
+                rcount = line.count(javaconstant.JAVA_RIGHT_BRACE)
+                mtd_body_count = mtd_body_count + lcount - rcount
+
+                # make sure the '}' in a single line
+                if mtd_body_count == 0:
+                    mtd_body_array.append(mtd_body_lines)
+                    mtd_body_lines = []
+                else:
+                    mtd_body_lines.append(line)
         
         # read methods
+        mtd_idx = 0
         for mtd_header in mtd_header_array:
-            '''
-            TODO:
-            '''
 
             methodDTO = JavaMethodDTO()
-                        
+            
+            # TODO: skip the CRUD methods
+            
             key_public = ' ' + javaconstant.JAVA_KEY_PUBLIC + ' '
             if key_public in mtd_header:
                 header_cells = mtd_header.split(key_public)
@@ -1894,22 +1919,111 @@ class Java_processor(File_processor):
                         # TODO: format incorrect 
                         continue
                     
+                    # analysis parameters
                     if javaconstant.JAVA_ANNOTATION_REQUESTPARAM in header_cells[1]:
                         rpidx = param_list.index(javaconstant.JAVA_ANNOTATION_REQUESTPARAM)
                         param_list = param_list[rpidx:]
                         
                         param_cells = param_list.split(javaconstant.JAVA_ANNOTATION_REQUESTPARAM)
-                        print(param_cells)
-                    
-                    # skip the CRUD methods
-                
+                        
+                        for param_single in param_cells:
+                            # (value = "xxx", required = false) String entityCode,
+                            if javaconstant.JAVA_CONTROLLER_AJAX_CELL_VALUE in param_single:
+                                # value = "xxx", required = false
+                                sidx1 = param_single.index(javaconstant.JAVA_LEFT_BRACKET)
+                                sidx2 = param_single.index(javaconstant.JAVA_RIGHT_BRACKET)
+                                param_single_left = param_single[sidx1+1:sidx2]
+                                
+                                # value = "xxx"
+                                lidx1 = param_single_left.index(javaconstant.JAVA_CONTROLLER_AJAX_CELL_VALUE)
+                                if javaconstant.JAVA_SEPERATOR in param_single_left:
+                                    lidx2 = param_single_left.index(javaconstant.JAVA_SEPERATOR)
+                                else:
+                                    lidx2 = -1
+                                param_single_left = param_single_left[lidx1+5:lidx2]
+                                # xxx
+                                param_single_left = param_single_left.replace(javaconstant.JAVA_EQUALS,'').replace(javaconstant.JAVA_COMMA,'').strip()
+                                
+                                # String entityCode
+                                param_single_right = param_single[sidx2+1:].replace(javaconstant.JAVA_SEPERATOR,'').strip()
+                                if javaconstant.JAVA_BLANK in param_single_right:
+                                    param_single_right = param_single_right.split(javaconstant.JAVA_BLANK)[0]
+                                
+                                # create paramDTO
+                                paramDTO = JavaParameterDTO()
+                                paramDTO.set_parameter_name(param_single_left)
+                                paramDTO.set_parameter_type(param_single_right)
 
+                                methodDTO.push_method_inputs(paramDTO)
+                    # no param    
+                    else:
+                        print('No parameters, TODO')
+                        pass
                 else:
                     continue    
                 
+            # method body analysis
+            mtd_body = mtd_body_array[mtd_idx]
+            buffer_mtd_body = mtd_body_array[mtd_idx]
+            for mtd_line in mtd_body:
+                mtd_line = mtd_line.strip()
+                
+                # model.addAttribute(BCGLCODE, bcGLCode.getValue());
+                if javaconstant.JAVA_MTD_ADD_ATTRIBUTE_PREFIX in mtd_line and mtd_line[-2:] == javaconstant.JAVA_MTD_ADD_ATTRIBUTE_SUFFIX:
+                    
+                    # create responseDTO
+                    respDTO = JavaParameterDTO()
+                    
+                    attr_prams = mtd_line[19:-2]
+                    # bcGLCode.getValue() or EntityContainer
+                    response_param = attr_prams.split(javaconstant.JAVA_SEPERATOR)[1].strip()
+                    
+                    # normal response parameter
+                    if javaconstant.JAVA_GET_VALUE_SUFFIX in response_param:
+                        # bcGLCode.getValue()
+                        resp_name = response_param[:-11]
+                        respDTO.set_parameter_name(resp_name)
+                        
+                        # find the defination of this parameter
+                        for buff_line in buffer_mtd_body:
+                            # Holder<String> bcGLCode = new Holder<String>();
+                            if (javaconstant.JAVA_RIGHT_DASH + javaconstant.JAVA_BLANK + resp_name) in buff_line:
+                                pidx = buff_line.index(javaconstant.JAVA_RIGHT_DASH + javaconstant.JAVA_BLANK + resp_name)
+                                fidx = buff_line.index(javaconstant.JAVA_LEFT_DASH)
+                                resp_type = buff_line[fidx+1:pidx]
+                                respDTO.set_parameter_type(resp_type)
+                                break
+                        
+                    # container response parameter    
+                    else:
+                        # EntityContainer
+                        respDTO.set_parameter_name(response_param)
+                        
+                        # find the defination of this container
+                        for buff_line in buffer_mtd_body:
+                            # EntityContainer Entity = factory.createEntityContainer();
+                            if (fileconstant.JAVA_CONTAINER_SUFFIX + javaconstant.JAVA_BLANK + response_param) in buff_line:
+                                pidx = buff_line.index(javaconstant.JAVA_BLANK + response_param)
+                                resp_type = buff_line[:pidx]
+                                respDTO.set_parameter_type(resp_type)
+                                break
+                        
+                        # find the import of container
+                        if respDTO.get_parameter_type():
+                            for class_imp in import_list:
+                                if (javaconstant.JAVA_DOT_MARK + respDTO.get_parameter_type()) in class_imp:
+                                    respDTO.set_parameter_import(class_imp)
+                                    break
+                    
+                    # push response dto
+                    if respDTO.get_parameter_name():
+                        methodDTO.push_method_ajax_resp(respDTO)
+                                    
             # add method info
             if methodDTO.get_method_name():
                 javaDTO.push_class_methods(methodDTO)
+            
+            mtd_idx = mtd_idx + 1
             
         return True, None, javaDTO
     

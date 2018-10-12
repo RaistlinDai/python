@@ -47,7 +47,7 @@ class TS_processor(File_processor):
                 # convert the java type to TS type
                 ajax_para_type_temp = TS_processor.convertJavaTypeToTSType(ajaxResp.get_parameter_type())
                 # verify and convert container type
-                if ajax_para_type_temp.startswith(File_constant.JAVA_QRA_PREFIX) and ajax_para_type_temp.endswith(File_constant.JAVA_CONTAINER_SUFFIX):
+                if ajax_para_type_temp.endswith(fileconstant.JAVA_CONTAINER_SUFFIX):
                     print(ajax_para_type_temp)
                 
                 ajax_temp = ajax_temp + '\n' + tsconstant.TS_TAB + tsconstant.TS_TAB + ajaxResp.get_parameter_name() + ': ' + ajax_para_type_temp + tsconstant.TS_END_MARK

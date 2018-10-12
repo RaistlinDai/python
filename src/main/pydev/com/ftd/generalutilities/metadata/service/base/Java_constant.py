@@ -42,6 +42,7 @@ class Java_constant(object):
         self.JAVA_EQUALS = '='
         self.JAVA_TAB = '\t'
         self.JAVA_COMMA = '\"'
+        self.JAVA_BLANK = ' '
         
         # java processing flag
         self.JAVA_AND_MARK = '&&'
@@ -537,8 +538,12 @@ class Java_constant(object):
         self.JAVA_MTD_CONST_CONTAINER_ASSIGN_TEMP = '\t\t((%s) %sEntity)\n\t\t\t\t.setProDataGraph((ProDataGraph) %s.getValue());\n\n'
         # add attribute template
         self.JAVA_MTD_ADD_ATTRIBUTE_TEMP = 'model.addAttribute(%s, %s);'
+        self.JAVA_MTD_ADD_ATTRIBUTE_PREFIX = 'model.addAttribute('
+        self.JAVA_MTD_ADD_ATTRIBUTE_SUFFIX = ');'
         # ajax url template
         self.JAVA_CONTROLLER_AJAX_TEMP = '/api/erp/%s/%s'
+        # get value
+        self.JAVA_GET_VALUE_SUFFIX = '.getValue()'
         
         # datacontroller common function template
         self.JAVA_CONTROLLER_COMMON_FORMAT = ['@RequestMapping(value = "/api/erp/' + self.JAVA_ENTITY_CONST_DATARESOURCE + '/' + self.JAVA_MTD_CONST_COMMON_MEHTOD_NAME + '", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)',
