@@ -166,12 +166,65 @@ class TS_processor(File_processor):
     
     
     @staticmethod
-    def convertContainerTypeToTSType(containerType):
+    def createMockDTO(entityDto, transDto, filename, isCopy):
         '''
-        
-        
+        create Observable Object
+        @param copyFromBlDto: if the mock DTO is copied from the generated one
         '''
+        #path constant
+        fileconstant = File_constant()
+        tsconstant = TS_constant()
+        proj_path = transDto.get_projectpath()
+        controller_dto = entityDto.get_dataControllerDTO()
         
+        # get the main table interface name
+        main_tb_name = entityDto.get_maintableInterDTO().get_class_name()
+        # get the mock ds name
+        mock_ds_name = fileconstant.TS_DATASET_PREFIX + main_tb_name + fileconstant.TS_MOCK_DS_SUFFIX + fileconstant.TS_SUFFIX
         
+        # get the parent package name
+        parent_pack = Java_processor.analysis_dataController_package_name(controller_dto.get_class_package())
         
+        # copy from the generated ds
+        if isCopy == 1:
+            # get the generated ds name
+            gene_ds_name = fileconstant.TS_DATASET_PREFIX + main_tb_name + fileconstant.TS_SUFFIX
+            
+            # get the generated ds full path
+            gene_ds_filefullpath = proj_path + fileconstant.RESOURCE_TS_MAIN_PATH + fileconstant.RESOURCE_TS_DTO_BL_FOLDER + gene_ds_name
+            # get the mock ds full path
+            mock_ds_filefullpath = proj_path + fileconstant.RESOURCE_TS_MAIN_PATH + fileconstant.RESOURCE_TS_DTO_UI_FOLDER + mock_ds_name
+            
+            if not File_processor.verify_dir_existing(gene_ds_filefullpath):
+                # throw error
+                return False, 'The DTO %s does not generated in bl folder, please check.' % gene_ds_name
+            
+            # buffer the content of generated ds
+            with open(gene_ds_filefullpath, 'r') as file:
+                lines = file.readlines()
+            
+            # write the mock ds
+            if not File_processor.verify_dir_existing(mock_ds_filefullpath):
+                # create file
+                Path(mock_ds_filefullpath).touch()
+            
+            # ------------------------------------------------------- #
+            # ----- open the mock ds file -----
+            # ------------------------------------------------------- #
+            newfile = open(mock_ds_filefullpath, 'w')
+            
+            comment_flag = False
+            for line in lines:
+                if tsconstant.TS_LEFT_COMMENT in line:
+                    comment_flag = True
+                elif tsconstant.TS_RIGHT_COMMENT in line:
+                    comment_flag = False
+                    
+                if not comment_flag and tsconstant.TS_COLON in line:
+                    line = line.replace(tsconstant.TS_COLON, tsconstant.TS_QUESTION_MARK + tsconstant.TS_COLON)
+                    newfile.write('\n')
+                    
+            newfile.close()
+            
+        return True, None
         

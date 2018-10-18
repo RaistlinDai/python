@@ -82,8 +82,10 @@ class File_constant(object):
         self.JAR_SUFFIX = ".jar"
         self.JAVA_SUFFIX = ".java"
         self.TS_SUFFIX = ".ts"
+        self.TS_MOCK_DS_SUFFIX = "Mock"
         self.DEPOMPILE_JAVA_SUFFIX = "._java"
         self.RESOURCE_METADATA_SUFFIX = "-ViewResourceMeta.xml"
+        self.TS_DATASET_PREFIX = "ds"
         
         self.FILE_TYPE = {'FFD8FF':'jpg', 
                           '89504E47':'png', 

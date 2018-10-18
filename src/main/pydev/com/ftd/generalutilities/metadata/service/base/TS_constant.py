@@ -28,6 +28,8 @@ class TS_constant(object):
         self.TS_LEFT_DASH = '<'
         self.TS_RIGHT_DASH = '>'
         self.TS_TAB = '    '
+        self.TS_COLON = ':'
+        self.TS_QUESTION_MARK = '?'
         
         # ----------------- types ------------------
         self.TS_TYPE_STRING = 'string'
