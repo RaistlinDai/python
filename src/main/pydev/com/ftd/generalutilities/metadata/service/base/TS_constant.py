@@ -38,7 +38,6 @@ class TS_constant(object):
         # ----------------- function prefix ------------------
         self.TS_HTTPRESPONSE_PREFIX = 'HttpResponse'
         
-        
         # common references
         self.TS_REFERENCE_COMMON_ANGULAR = '/// <reference path="../../../../../../Lib/DefinitelyTyped/angular/angular.d.ts" />'
         self.TS_REFERENCE_COMMON_JQUERY = '/// <reference path="../../../../../../Lib/DefinitelyTyped/jquery/jquery.d.ts" />'
@@ -59,6 +58,9 @@ class TS_constant(object):
         # observable object template
         self.TS_OBSERVABLE_OBJ_RESPONSE_TEMPLATE = 'export interface HttpResponse%s {\n%s \n    }\n'
         
+        # observable object import template
+        self.TS_OBSERVABLE_OBJ_NAMESPACE_TEMP = 'import %s = %sTSHandler.%s.DTO.%s;'
         
-        
+        # observable object reference template
+        self.TS_OBSERVABLE_OBJ_REFERENCE_TEMP = '/// <reference path="../%s/ds%s.ts" />'
         

@@ -33,14 +33,21 @@ class TS_processor(File_processor):
         filefullpath = proj_path + fileconstant.RESOURCE_TS_MAIN_PATH + fileconstant.RESOURCE_TS_DTO_UI_FOLDER + filename
         # additional references
         additional_reference = []
+        # imports
+        import_list = []
         
         # temp lines
         temp_lines = []
         
         # ------------------------------------------------------- #
         # ----- preparation -----
+        # TODO: grid obj
         # ------------------------------------------------------- #
         for ajaxMtd in controller_dto.get_class_methods():
+            # skip the method without parameters
+            if len(ajaxMtd.get_method_ajax_resp()) == 0:
+                continue;
+            
             # get the response parameters
             ajax_temp = ''
             for ajaxResp in ajaxMtd.get_method_ajax_resp():
@@ -48,7 +55,25 @@ class TS_processor(File_processor):
                 ajax_para_type_temp = TS_processor.convertJavaTypeToTSType(ajaxResp.get_parameter_type())
                 # verify and convert container type
                 if ajax_para_type_temp.endswith(fileconstant.JAVA_CONTAINER_SUFFIX):
-                    print(ajax_para_type_temp)
+                    # add import
+                    import_name = ajax_para_type_temp[:-9]
+                    import_prefix_part = ''
+                    import_cells = ajaxResp.get_parameter_import().split(tsconstant.TS_DOT_MARK)
+                    idx = 0
+                    while idx < len(import_cells):
+                        if idx != len(import_cells) -1:
+                            import_prefix_part = import_prefix_part + import_cells[idx] + tsconstant.TS_DOT_MARK
+                        idx = idx + 1
+                        
+                    import_temp = tsconstant.TS_OBSERVABLE_OBJ_NAMESPACE_TEMP % (import_name, import_prefix_part, business_entity_name, import_name+'s')
+                    import_list.append(tsconstant.TS_TAB + import_temp)
+                    
+                    # add additional references
+                    reference_temp = tsconstant.TS_OBSERVABLE_OBJ_REFERENCE_TEMP % ('bl', import_name)
+                    additional_reference.append(reference_temp)
+                    
+                    # convert the Container type to import name
+                    ajax_para_type_temp = import_name
                 
                 ajax_temp = ajax_temp + '\n' + tsconstant.TS_TAB + tsconstant.TS_TAB + ajaxResp.get_parameter_name() + ': ' + ajax_para_type_temp + tsconstant.TS_END_MARK
             
@@ -85,7 +110,6 @@ class TS_processor(File_processor):
         
         file.write('\n')
         
-        
         # ------------------------------------------------------- #
         # ----- write the observable object header -----
         # ------------------------------------------------------- # 
@@ -94,7 +118,16 @@ class TS_processor(File_processor):
         file.write('\n')
         
         # ------------------------------------------------------- #
-        # ----- write the observable object header -----
+        # ----- write the imports -----
+        # ------------------------------------------------------- # 
+        for temp_ref in import_list:
+            file.write(temp_ref)
+            file.write('\n')
+        
+        file.write('\n')
+        
+        # ------------------------------------------------------- #
+        # ----- write the observable object content -----
         # ------------------------------------------------------- # 
         for sub_line in temp_lines:
             file.write(sub_line)
@@ -138,4 +171,7 @@ class TS_processor(File_processor):
         
         
         '''
+        
+        
+        
         
