@@ -166,7 +166,7 @@ class TS_processor(File_processor):
     
     
     @staticmethod
-    def createMockDTO(entityDto, transDto, filename, isCopy):
+    def createMockDTO(entityDto, transDto, mock_ds_name, isCopy):
         '''
         create Observable Object
         @param copyFromBlDto: if the mock DTO is copied from the generated one
@@ -179,9 +179,6 @@ class TS_processor(File_processor):
         
         # get the main table interface name
         main_tb_name = entityDto.get_maintableInterDTO().get_class_name()
-        # get the mock ds name
-        mock_ds_name = fileconstant.TS_DATASET_PREFIX + main_tb_name + fileconstant.TS_MOCK_DS_SUFFIX + fileconstant.TS_SUFFIX
-        
         # get the parent package name
         parent_pack = Java_processor.analysis_dataController_package_name(controller_dto.get_class_package())
         
@@ -219,10 +216,14 @@ class TS_processor(File_processor):
                     comment_flag = True
                 elif tsconstant.TS_RIGHT_COMMENT in line:
                     comment_flag = False
+                
+                if line[:6] == tsconstant.TS_KEYWORD_MODULE:
+                    line = line.replace(tsconstant.TS_DTO_MODULE, tsconstant.TS_DTO_UI_MODULE)
                     
                 if not comment_flag and tsconstant.TS_COLON in line:
                     line = line.replace(tsconstant.TS_COLON, tsconstant.TS_QUESTION_MARK + tsconstant.TS_COLON)
-                    newfile.write('\n')
+
+                newfile.write(line)
                     
             newfile.close()
             

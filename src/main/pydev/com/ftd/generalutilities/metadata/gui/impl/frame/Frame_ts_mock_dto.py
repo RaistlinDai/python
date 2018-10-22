@@ -65,8 +65,11 @@ class Frame_ts_mock_dto(FormatableFrame):
         canv2.pack()
         
         if self.get_dtos().get_businessentityname():
-            temp_name = self.get_dtos().get_businessentityname() + fileconstant.TS_OBSERVABLE_OBJECT_SUFFIX + fileconstant.TS_SUFFIX
-            self.__feet.set(temp_name)
+            # get the main table interface name
+            main_tb_name = self.get_dtos().get_maintableInterDTO().get_class_name()
+            # get the mock ds name
+            mock_ds_name = fileconstant.TS_DATASET_PREFIX + main_tb_name + fileconstant.TS_MOCK_DS_SUFFIX + fileconstant.TS_SUFFIX
+            self.__feet.set(mock_ds_name)
     
      
     #overwrite create_widges   

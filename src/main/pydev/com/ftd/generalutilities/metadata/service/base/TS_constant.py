@@ -40,6 +40,9 @@ class TS_constant(object):
         # ----------------- function prefix ------------------
         self.TS_HTTPRESPONSE_PREFIX = 'HttpResponse'
         
+        # ----------------- TS module key word ---------------
+        self.TS_KEYWORD_MODULE = 'module'
+        
         # common references
         self.TS_REFERENCE_COMMON_ANGULAR = '/// <reference path="../../../../../../Lib/DefinitelyTyped/angular/angular.d.ts" />'
         self.TS_REFERENCE_COMMON_JQUERY = '/// <reference path="../../../../../../Lib/DefinitelyTyped/jquery/jquery.d.ts" />'
@@ -65,4 +68,8 @@ class TS_constant(object):
         
         # observable object reference template
         self.TS_OBSERVABLE_OBJ_REFERENCE_TEMP = '/// <reference path="../%s/ds%s.ts" />'
+        
+        # ts module suffix
+        self.TS_DTO_MODULE = '.DTO'
+        self.TS_DTO_UI_MODULE = '.DTO.UI'
         
