@@ -95,7 +95,7 @@ class Frame_ts_mock_dto(FormatableFrame):
             pass
         
         # create the observable object
-        self.__result, self.__message = TS_processor.createMockDTO(self.get_dtos(), self.get_trans(), self.__feet.get(), self.__vari1.get())
+        self.__result, self.__message = TS_processor.create_MockDTO(self.get_dtos(), self.get_trans(), self.__feet.get(), self.__vari1.get())
         if not self.__result:
             showerror('Error', self.__message)
             return False

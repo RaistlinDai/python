@@ -73,3 +73,14 @@ class TS_constant(object):
         self.TS_DTO_MODULE = '.DTO'
         self.TS_DTO_UI_MODULE = '.DTO.UI'
         
+        # constant file header
+        self.TS_CONSTANT_HEADER = 'namespace com.qad.financials.%s.%s {\n' + self.TS_TAB + '\'use strict\';\n'
+        
+        # constant file field template
+        self.TS_CONSTANT_FIELD_LINE_TEMP = self.TS_TAB + self.TS_TAB + '%s: "%s",\n'
+        
+        # constant field interface template
+        self.TS_CONSTANT_FIELDS_TEMP = self.TS_TAB + 'export const %sControls = {\n%s\n' + self.TS_TAB + '};\n'
+        
+        # constant grid interface template
+        self.TS_CONSTANT_GRIDS_TEMP = self.TS_TAB + 'export const %sDataGrids = {\n%s\n' + self.TS_TAB + '};\n'

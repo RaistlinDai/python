@@ -10,18 +10,9 @@ class ViewMetadataDTO(object):
         '''
         Constructor
         '''
-        self.__datafields = {}
-        self.__datalabels = {}
-        self.__datagrids = {}
-        
-        if isinstance(datafields, dict):
-            self.__datafields = datafields
-            
-        if isinstance(datalabels, dict):
-            self.__datalabels = datalabels
-        
-        if isinstance(datagrids, dict):
-            self.__datagrids = datagrids
+        self.__datafields = []
+        self.__datalabels = []
+        self.__datagrids = []
 
 
     def get_datafields(self):
@@ -46,6 +37,18 @@ class ViewMetadataDTO(object):
 
     def set_datagrids(self, value):
         self.__datagrids = value
+        
+    
+    def push_datafields(self, value):
+        self.__datafields.append(value)
+
+
+    def push_datalabels(self, value):
+        self.__datalabels.append(value)
+
+
+    def push_datagrids(self, value):
+        self.__datagrids.append(value)
 
 
     def del_datafields(self):

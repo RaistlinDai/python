@@ -35,7 +35,6 @@ class TS_processor(File_processor):
         additional_reference = []
         # imports
         import_list = []
-        
         # temp lines
         temp_lines = []
         
@@ -166,7 +165,7 @@ class TS_processor(File_processor):
     
     
     @staticmethod
-    def createMockDTO(entityDto, transDto, mock_ds_name, isCopy):
+    def create_MockDTO(entityDto, transDto, mock_ds_name, isCopy):
         '''
         create Observable Object
         @param copyFromBlDto: if the mock DTO is copied from the generated one
@@ -175,12 +174,9 @@ class TS_processor(File_processor):
         fileconstant = File_constant()
         tsconstant = TS_constant()
         proj_path = transDto.get_projectpath()
-        controller_dto = entityDto.get_dataControllerDTO()
         
         # get the main table interface name
         main_tb_name = entityDto.get_maintableInterDTO().get_class_name()
-        # get the parent package name
-        parent_pack = Java_processor.analysis_dataController_package_name(controller_dto.get_class_package())
         
         # copy from the generated ds
         if isCopy == 1:
@@ -228,4 +224,93 @@ class TS_processor(File_processor):
             newfile.close()
             
         return True, None
+
+
+    @staticmethod
+    def create_TS_Constant(entityDto, transDto, tsConstant_name):
+        '''
+        create TS Constant
+        '''
+         
+        #path constant
+        fileconstant = File_constant()
+        tsconstant = TS_constant()
+        proj_path = transDto.get_projectpath()
         
+        # get the main table interface name
+        controller_dto = entityDto.get_dataControllerDTO()
+        business_entity_name = entityDto.get_businessentityname()
+        # get the parent package name
+        parent_pack = Java_processor.analysis_dataController_package_name(controller_dto.get_class_package())
+        business_entity_name = entityDto.get_businessentityname()
+        
+        # get the generated constant full path
+        const_filefullpath = proj_path + fileconstant.RESOURCE_TS_MAIN_PATH + fileconstant.RESOURCE_TS_DTO_UI_FOLDER + tsConstant_name
+        
+        # create the header for constant file
+        tempLines = []
+        fieldLines = []
+        gridLines = []
+        
+        tempStr = tsconstant.TS_CONSTANT_HEADER % (parent_pack,business_entity_name.lower())
+        tempLines.append(tempStr)
+        tempLines.append('\n')
+        
+        viewMetaDataDTO = entityDto.get_viewDTO()
+        
+        if not viewMetaDataDTO:
+            return False, 'The View Metadata has not been analyzed, please do it first.'
+        
+        for datafield in viewMetaDataDTO.get_datafields():
+            if datafield.get_name():
+                tempName = datafield.get_name()
+                constName = TS_processor.convertConstName(tempName)
+                
+                # add fields into const file
+                fieldLines.append(tsconstant.TS_CONSTANT_FIELD_LINE_TEMP % (constName, tempName))
+        
+        for datalabels in viewMetaDataDTO.get_datalabels():
+            if datalabels.get_name():
+                tempName = datalabels.get_name()
+                constName = TS_processor.convertConstName(tempName)
+                
+                # add fields into const file
+                fieldLines.append(tsconstant.TS_CONSTANT_FIELD_LINE_TEMP % (constName, tempName))
+        
+        if len(fieldLines) > 0:
+            fieldContent = ''
+            for fieldLine in fieldLines:
+                fieldContent = fieldContent + fieldLine
+            
+            tempLines.append(tsconstant.TS_CONSTANT_FIELDS_TEMP % (business_entity_name, fieldContent))
+            
+        
+        # write the constant file
+        if not File_processor.verify_dir_existing(const_filefullpath):
+            # create file
+            Path(const_filefullpath).touch()
+            
+        # ------------------------------------------------------- #
+        # ----- open the constant file -----
+        # ------------------------------------------------------- #
+        newfile = open(const_filefullpath, 'w')
+            
+        for line in tempLines:
+            newfile.write(line)
+        
+        
+        newfile.write(tsconstant.TS_RIGHT_BRACE)
+        
+        newfile.close()
+          
+        return True, None
+    
+    
+    @staticmethod
+    def convertConstName(prevName):
+        '''
+        This method will convert the general field name to the const name (Upper case)
+        '''
+        constName = prevName.upper()
+        
+        return constName

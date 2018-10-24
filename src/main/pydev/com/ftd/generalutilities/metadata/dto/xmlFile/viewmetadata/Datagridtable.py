@@ -11,15 +11,17 @@ class Datagridtable(object):
     '''
 
 
-    def __init__(self, name, datagridfields=[]):
+    def __init__(self, name=None, datagridfields=[]):
         '''
         Constructor
         '''
         self.__name = name
+        self.__datagridfields = []
         
         for f in datagridfields:
             if isinstance(f, Datagridfield):
                 self.__datagridfields.append(f)
+                
 
     def get_name(self):
         return self.__name
@@ -27,6 +29,10 @@ class Datagridtable(object):
 
     def set_name(self, value):
         self.__name = value
+        
+        
+    def push_datagridfield(self, field):
+        self.__datagridfields.append(field)
 
 
     def del_name(self):

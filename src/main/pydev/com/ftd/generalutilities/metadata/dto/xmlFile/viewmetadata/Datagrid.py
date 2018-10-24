@@ -11,12 +11,13 @@ class Datagrid(UiObject):
     classdocs
     '''
     
-    def __init__(self, row, column, tablename, datagridtable, parent=None):
+    def __init__(self, row=None, column=None, tablename=None, datagridtable=None, name=None, parent=None):
         '''
         Constructor
         '''
         UiObject.__init__(self, row, column, parent)
         self.__tablename = tablename
+        self.__name = name 
         
         if isinstance(datagridtable, Datagridtable):
             self.__datagridtable = datagridtable
@@ -26,6 +27,10 @@ class Datagrid(UiObject):
 
     def get_tablename(self):
         return self.__tablename
+    
+    
+    def get_name(self):
+        return self.__name
 
 
     def get_datagridtable(self):
@@ -35,6 +40,10 @@ class Datagrid(UiObject):
     def set_tablename(self, value):
         self.__tablename = value
 
+
+    def set_name(self, value):
+        self.__name = value
+        
 
     def set_datagridtable(self, value):
         if isinstance(value, Datagridtable):

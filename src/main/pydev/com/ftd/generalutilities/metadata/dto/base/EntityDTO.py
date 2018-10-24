@@ -248,6 +248,20 @@ class EntityDTO(object):
             return self.__dto['MaintableInterDTO']
         else:
             return None
+        
+        
+#-------------------- resource metadata dto ---------
+    def get_viewDTO(self):
+        if self.__dto:
+            return self.__dto['ViewMetaData']
+        else:
+            return None
+    
+    
+    def set_viewDTO(self, viewDto):
+        self.__dto['ViewMetaData'] = viewDto
+        
+        
 #-------------------- resource metadata dto ---------
     def get_resourceDTO(self):
         if self.__dto:

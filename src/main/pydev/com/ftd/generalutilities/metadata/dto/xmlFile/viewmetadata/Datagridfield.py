@@ -10,7 +10,7 @@ class Datagridfield(object):
     '''
 
 
-    def __init__(self, fieldname, readonly):
+    def __init__(self, fieldname=None, readonly=False):
         '''
         Constructor
         '''
@@ -20,6 +20,7 @@ class Datagridfield(object):
             self.__readonly = readonly
         else:
             self.__readonly = False
+            
 
     def get_fieldname(self):
         return self.__fieldname

@@ -8,6 +8,12 @@ import xml.dom.minidom
 from src.main.pydev.com.ftd.generalutilities.metadata.service.base.File_constant import File_constant
 from src.main.pydev.com.ftd.generalutilities.metadata.dto.xmlFile.resourcemetadata.ResourceMetadataDTO import ResourceMetadataDTO,\
     ViewParametersDTO, KeyField
+from src.main.pydev.com.ftd.generalutilities.metadata.dto.xmlFile.viewmetadata.ViewMetadataDTO import ViewMetadataDTO
+from src.main.pydev.com.ftd.generalutilities.metadata.dto.xmlFile.viewmetadata.Datafield import Datafield
+from src.main.pydev.com.ftd.generalutilities.metadata.dto.xmlFile.viewmetadata.Datalabel import Datalabel
+from src.main.pydev.com.ftd.generalutilities.metadata.dto.xmlFile.viewmetadata.Datagrid import Datagrid
+from src.main.pydev.com.ftd.generalutilities.metadata.dto.xmlFile.viewmetadata.Datagridtable import Datagridtable
+from src.main.pydev.com.ftd.generalutilities.metadata.dto.xmlFile.viewmetadata.Datagridfield import Datagridfield
 from src.main.pydev.com.ftd.generalutilities.metadata.dto.xmlFile.beanappcontext.BeansAppContextDTO import BeansAppContextDTO
 from src.main.pydev.com.ftd.generalutilities.metadata.service.base.File_processor import File_processor
 import xml.etree.ElementTree as ElementTree
@@ -15,6 +21,7 @@ from src.main.pydev.com.ftd.generalutilities.metadata.dto.xmlFile.entitymap.Enti
     EntityMap
 from src.main.pydev.com.ftd.generalutilities.metadata.dto.xmlFile.pom.PomDTO import PomDTO
 from pyexpat import ExpatError
+from src.main.pydev.com.ftd.generalutilities.metadata.service.base.Xml_constant import Xml_constant
 
 class Xmlfile_processor(File_processor):
     '''
@@ -112,6 +119,93 @@ class Xmlfile_processor(File_processor):
                 return False, 'This is not a valid view metadata, please check.'
         except ExpatError:
             return False, 'This is not a valid xml file, please check.'
+            
+        return True, None
+        
+        
+    @staticmethod
+    def read_view_metadata(file_dto):
+        '''
+        read the target view metadata xml file by dom, and load the details into ViewMetadataDTO
+        @param dir_path: the full path of view metadata
+        @return: return status
+        @return: message if validation failed
+        '''
+        Xmlconstant = Xml_constant()
+        
+        # verify if file is existing
+        if not File_processor.verify_dir_existing(file_dto.get_viewfullpath()):
+            return False, "The view metadata is not exist, please check."
+        
+        #get the root of view metadata
+        dom = xml.dom.minidom.parse(file_dto.get_viewfullpath())
+        
+        #create new resource dto
+        viewDto = ViewMetadataDTO()
+        
+        # add field node into ViewMetadata DTO
+        fields = dom.getElementsByTagName(Xmlconstant.XML_NODE_FIELD)
+        for field in fields:
+            dtField = Datafield()
+            
+            if field.getAttribute(Xmlconstant.XML_NODE_PROP_NAME):
+                dtField.set_name(field.getAttribute(Xmlconstant.XML_NODE_PROP_NAME))
+            
+            if field.getAttribute(Xmlconstant.XML_NODE_PROP_TABLENAME):
+                dtField.set_tablename(field.getAttribute(Xmlconstant.XML_NODE_PROP_TABLENAME))
+            
+            viewDto.push_datafields(dtField)
+        
+        # add label node into ViewMetadata DTO
+        labels = dom.getElementsByTagName(Xmlconstant.XML_NODE_LABEL)
+        for label in labels:
+            dtLabel = Datalabel()
+            
+            if label.getAttribute(Xmlconstant.XML_NODE_PROP_NAME):
+                dtLabel.set_name(label.getAttribute(Xmlconstant.XML_NODE_PROP_NAME))
+            
+            viewDto.push_datalabels(dtLabel)
+        
+        # add label node into ViewMetadata DTO
+        datagrids = dom.getElementsByTagName(Xmlconstant.XML_NODE_DATAGRID)
+        for datagrid in datagrids:
+            dtGrid = Datagrid()
+            
+            if datagrid.getAttribute(Xmlconstant.XML_NODE_PROP_NAME):
+                dtGrid.set_name(datagrid.getAttribute(Xmlconstant.XML_NODE_PROP_NAME))
+            
+            if datagrid.getAttribute(Xmlconstant.XML_NODE_PROP_TABLENAME):
+                dtGrid.set_tablename(datagrid.getAttribute(Xmlconstant.XML_NODE_PROP_TABLENAME))
+            
+            # add DataGridTable into DataTable node
+            datagridtables = datagrid.getElementsByTagName(Xmlconstant.XML_NODE_DATAGRIDTABLE)
+            if len(datagridtables) == 0:
+                return False, 'The DataGrid structure is incorrect without table!'
+            
+            dtGridTable = Datagridtable()
+            
+            if datagridtables[0].getAttribute(Xmlconstant.XML_NODE_PROP_NAME):
+                dtGridTable.set_name(datagridtables[0].getAttribute(Xmlconstant.XML_NODE_PROP_NAME))
+                    
+            # add DataGridField into DataGridTable
+            datagridfields = datagrid.getElementsByTagName(Xmlconstant.XML_NODE_DATAGRIDFIELD)
+            for datagridfield in datagridfields:
+                dtGridfield = Datagridfield()
+                
+                if datagridfield.getAttribute(Xmlconstant.XML_NODE_PROP_NAME):
+                    dtGridfield.set_name(datagridfield.getAttribute(Xmlconstant.XML_NODE_PROP_FIELDNAME)) 
+                
+                if datagridfield.getAttribute(Xmlconstant.XML_NODE_PROP_READONLY):
+                    dtGridfield.set_readonly(datagridfield.getAttribute(Xmlconstant.XML_NODE_PROP_READONLY))
+                    
+                dtGridTable.push_datagridfield(dtGridfield)
+            
+            dtGrid.set_datagridtable(dtGridTable)    
+            viewDto.push_datagrids(dtGrid)
+        
+        #update the ViewMetadataDTO in FileDTOSet
+        if file_dto:
+            file_dto.set_viewDTO(viewDto)
             
         return True, None
         

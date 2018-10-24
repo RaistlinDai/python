@@ -6,10 +6,11 @@ Created on Jun 27, 2018
 from tkinter import *
 from src.main.pydev.com.ftd.generalutilities.metadata.gui.impl.frame.Frame_bottom import Frame_bottom
 from src.main.pydev.com.ftd.generalutilities.metadata.gui.impl.base.FormatableFrame import FormatableFrame
-from src.main.pydev.com.ftd.generalutilities.metadata.gui.impl.base.Frame_constant import Frame_constant
 from src.main.pydev.com.ftd.generalutilities.metadata.service.base.File_constant import File_constant
 from src.main.pydev.com.ftd.generalutilities.metadata.service.fileproc.Java_processor import Java_processor
-from tkinter.messagebox import showwarning
+from tkinter.messagebox import showwarning, showerror
+from src.main.pydev.com.ftd.generalutilities.metadata.service.fileproc.TS_processor import TS_processor
+from src.main.pydev.com.ftd.generalutilities.metadata.service.fileproc.Xmlfile_processor import Xmlfile_processor
 
 class Frame_ts_constant_option(FormatableFrame):
     '''
@@ -21,7 +22,7 @@ class Frame_ts_constant_option(FormatableFrame):
         '''
         Constructor
         '''
-        self.__result = None
+        self.__result = True
         
         FormatableFrame.__init__(self, parent.get_mainframe(), dtos, trans, **configs)
         
@@ -100,6 +101,18 @@ class Frame_ts_constant_option(FormatableFrame):
         if not self.__result:
             showwarning('Warning', 'There are error existing, the TSConstant cannot be generated.')
             return
+        
+        # read the view metadata
+        self.__result, self.__message = Xmlfile_processor.read_view_metadata(self.get_dtos())
+        if not self.__result:
+            showerror('Error', self.__message)
+            return False
+        
+        # create the observable object
+        self.__result, self.__message = TS_processor.create_TS_Constant(self.get_dtos(), self.get_trans(), self.__feet.get())
+        if not self.__result:
+            showerror('Error', self.__message)
+            return False
         
         return True
     

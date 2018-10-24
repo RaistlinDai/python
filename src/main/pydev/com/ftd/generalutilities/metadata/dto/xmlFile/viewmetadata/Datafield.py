@@ -10,13 +10,14 @@ class Datafield(UiObject):
     classdocs
     '''
     
-    def __init__(self, row, column, tablename, name, parent=None):
+    def __init__(self, row=None, column=None, tablename=None, name=None, parent=None):
         '''
         Constructor
         '''
         UiObject.__init__(self, row, column, parent)
         self.__tablename = tablename
         self.__name = name
+        
 
     def get_tablename(self):
         return self.__tablename
