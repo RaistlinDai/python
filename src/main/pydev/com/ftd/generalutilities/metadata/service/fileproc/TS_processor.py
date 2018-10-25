@@ -242,7 +242,6 @@ class TS_processor(File_processor):
         business_entity_name = entityDto.get_businessentityname()
         # get the parent package name
         parent_pack = Java_processor.analysis_dataController_package_name(controller_dto.get_class_package())
-        business_entity_name = entityDto.get_businessentityname()
         
         # get the generated constant full path
         const_filefullpath = proj_path + fileconstant.RESOURCE_TS_MAIN_PATH + fileconstant.RESOURCE_TS_DTO_UI_FOLDER + tsConstant_name
@@ -251,6 +250,7 @@ class TS_processor(File_processor):
         tempLines = []
         fieldLines = []
         gridLines = []
+        gridfieldLines = {}
         
         tempStr = tsconstant.TS_CONSTANT_HEADER % (parent_pack,business_entity_name.lower())
         tempLines.append(tempStr)
@@ -261,6 +261,9 @@ class TS_processor(File_processor):
         if not viewMetaDataDTO:
             return False, 'The View Metadata has not been analyzed, please do it first.'
         
+        # ------------------------------------------------------- #
+        # ----- prepare the field & labels -----
+        # ------------------------------------------------------- #
         for datafield in viewMetaDataDTO.get_datafields():
             if datafield.get_name():
                 tempName = datafield.get_name()
@@ -277,13 +280,59 @@ class TS_processor(File_processor):
                 # add fields into const file
                 fieldLines.append(tsconstant.TS_CONSTANT_FIELD_LINE_TEMP % (constName, tempName))
         
+        # create field&label constant
         if len(fieldLines) > 0:
             fieldContent = ''
             for fieldLine in fieldLines:
                 fieldContent = fieldContent + fieldLine
             
             tempLines.append(tsconstant.TS_CONSTANT_FIELDS_TEMP % (business_entity_name, fieldContent))
+        
+        # ------------------------------------------------------- #
+        # ----- prepare the grids -----
+        # ------------------------------------------------------- #
+        for datagrids in viewMetaDataDTO.get_datagrids():
+            if datagrids.get_name():
+                tempGridName = datagrids.get_name()
+                constGridName = TS_processor.convertConstName(tempGridName)
+                
+                # add fields into const file
+                gridLines.append(tsconstant.TS_CONSTANT_FIELD_LINE_TEMP % (constGridName, tempGridName))
+                
+                # ------------------------------------------------------- #
+                # ----- prepare the grid fields -----
+                # ------------------------------------------------------- #
+                if datagrids.get_datagridtable() and datagrids.get_datagridtable().get_datagridfields() and len(datagrids.get_datagridtable().get_datagridfields()) > 0:
+                    
+                    tempGridFieldList = []
+                    
+                    for datagridfield in datagrids.get_datagridtable().get_datagridfields():
+                        print(datagridfield.get_fieldname())
+                        if datagridfield.get_fieldname():
+                            tempFieldName = datagridfield.get_fieldname()
+                            constFieldName = TS_processor.convertConstName(tempFieldName)
+                            
+                            # add grid fields into const file
+                            tempGridFieldList.append(tsconstant.TS_CONSTANT_FIELD_LINE_TEMP % (constFieldName, tempFieldName))
+                    
+                    gridfieldLines[tempGridName] = tempGridFieldList
+        
+        # create grid constant    
+        if len(gridLines) > 0:
+            gridContent = ''
+            for gridLine in gridLines:
+                gridContent = gridContent + gridLine
             
+            tempLines.append(tsconstant.TS_CONSTANT_GRIDS_TEMP % (business_entity_name, gridContent))
+            
+        # create gridfield constant
+        for key,value in gridfieldLines.items():
+            gridFieldContent = ''
+            for gridFieldLine in value:
+                gridFieldContent = gridFieldContent + gridFieldLine
+                
+            tempLines.append(tsconstant.TS_CONSTANT_GRIDFIELD_TEMP % (key, gridFieldContent))
+        
         
         # write the constant file
         if not File_processor.verify_dir_existing(const_filefullpath):
@@ -311,6 +360,30 @@ class TS_processor(File_processor):
         '''
         This method will convert the general field name to the const name (Upper case)
         '''
-        constName = prevName.upper()
+        tsconstant = TS_constant()
+        constName = ''
+        idx = 0
+        upperCaseFlag = False
+        
+        for innerStr in prevName:
+            
+            if innerStr.isupper() and idx != 0:
+                
+                if idx + 1 < len(prevName) and prevName[idx + 1].islower():
+                    constName = constName + tsconstant.TS_UNDERLINE + innerStr.upper()
+                elif not upperCaseFlag and innerStr.isupper():
+                    constName = constName + tsconstant.TS_UNDERLINE + innerStr.upper()
+                else:
+                    constName = constName + innerStr.upper() 
+            else:
+                constName = constName + innerStr.upper()
+            
+            if innerStr.isupper():
+                upperCaseFlag = True
+            else:
+                upperCaseFlag = False
+            idx = idx + 1
         
         return constName
+    
+        

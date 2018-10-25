@@ -19,6 +19,7 @@ class TS_constant(object):
         self.TS_END_MARK = ';'
         self.TS_SEPERATOR = ','
         self.TS_DOT_MARK = '.'
+        self.TS_UNDERLINE = '_'
         self.TS_RIGHT_BRACKET = ')'
         self.TS_LEFT_BRACKET = '('
         self.TS_RIGHT_BRACE = '}'
@@ -80,7 +81,11 @@ class TS_constant(object):
         self.TS_CONSTANT_FIELD_LINE_TEMP = self.TS_TAB + self.TS_TAB + '%s: "%s",\n'
         
         # constant field interface template
-        self.TS_CONSTANT_FIELDS_TEMP = self.TS_TAB + 'export const %sControls = {\n%s\n' + self.TS_TAB + '};\n'
+        self.TS_CONSTANT_FIELDS_TEMP = self.TS_TAB + 'export const %sControls = {\n%s\n' + self.TS_TAB + '};\n\n'
         
         # constant grid interface template
-        self.TS_CONSTANT_GRIDS_TEMP = self.TS_TAB + 'export const %sDataGrids = {\n%s\n' + self.TS_TAB + '};\n'
+        self.TS_CONSTANT_GRIDS_TEMP = self.TS_TAB + 'export const %sDataGrids = {\n%s\n' + self.TS_TAB + '};\n\n'
+        
+        # constant grid field interface template
+        self.TS_CONSTANT_GRIDFIELD_TEMP = self.TS_TAB + 'export const %sFields = {\n%s\n' + self.TS_TAB + '};\n\n'
+        

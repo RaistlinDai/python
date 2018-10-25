@@ -190,10 +190,11 @@ class Xmlfile_processor(File_processor):
             # add DataGridField into DataGridTable
             datagridfields = datagrid.getElementsByTagName(Xmlconstant.XML_NODE_DATAGRIDFIELD)
             for datagridfield in datagridfields:
+                
                 dtGridfield = Datagridfield()
                 
-                if datagridfield.getAttribute(Xmlconstant.XML_NODE_PROP_NAME):
-                    dtGridfield.set_name(datagridfield.getAttribute(Xmlconstant.XML_NODE_PROP_FIELDNAME)) 
+                if datagridfield.getAttribute(Xmlconstant.XML_NODE_PROP_FIELDNAME):
+                    dtGridfield.set_fieldname(datagridfield.getAttribute(Xmlconstant.XML_NODE_PROP_FIELDNAME)) 
                 
                 if datagridfield.getAttribute(Xmlconstant.XML_NODE_PROP_READONLY):
                     dtGridfield.set_readonly(datagridfield.getAttribute(Xmlconstant.XML_NODE_PROP_READONLY))
@@ -209,7 +210,7 @@ class Xmlfile_processor(File_processor):
             
         return True, None
         
-        
+
 #---------------- resource metadata.xml --------------------------
     @staticmethod
     def veriy_resource_metadata(dir_path):

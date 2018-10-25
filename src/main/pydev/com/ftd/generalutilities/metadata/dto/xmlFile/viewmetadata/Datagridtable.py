@@ -33,7 +33,11 @@ class Datagridtable(object):
         
     def push_datagridfield(self, field):
         self.__datagridfields.append(field)
-
+        
+    
+    def get_datagridfields(self):
+        return self.__datagridfields
+    
 
     def del_name(self):
         del self.__name
