@@ -11,7 +11,7 @@ from src.main.pydev.com.ftd.generalutilities.metadata.gui.impl.frame.Frame_contr
 from src.main.pydev.com.ftd.generalutilities.metadata.gui.impl.frame.Frame_serviceimpl_option import Frame_serviceimpl_option
 from src.main.pydev.com.ftd.generalutilities.metadata.gui.impl.frame.Frame_startup import Frame_startup
 from src.main.pydev.com.ftd.generalutilities.metadata.gui.impl.frame.Frame_projfile_check import Frame_projfile_check
-from src.main.pydev.com.ftd.generalutilities.metadata.gui.impl.frame.Frame_ts_maint_option import Frame_ts_maint_option
+from src.main.pydev.com.ftd.generalutilities.metadata.gui.impl.frame.Frame_ts_handler_option import Frame_ts_handler_option
 from src.main.pydev.com.ftd.generalutilities.metadata.gui.impl.frame.Frame_ts_constant_option import Frame_ts_constant_option
 from src.main.pydev.com.ftd.generalutilities.metadata.gui.impl.frame.Frame_ts_mock_dto import Frame_ts_mock_dto
 from src.main.pydev.com.ftd.generalutilities.metadata.gui.impl.frame.Frame_ts_observable_obj import Frame_ts_observable_obj
@@ -30,7 +30,7 @@ class Mainframe_enum(Enum):
     CONTROLLER_OPTION = [Frame_controller_option, 'DataController']
     SERVICEIMPL_OPTION = [Frame_serviceimpl_option, 'ServiceImpl']
     PROJFILE_CHECK = [Frame_projfile_check, 'ProjFileCheck']
-    TS_MAINT_OPTION = [Frame_ts_maint_option, 'TSMaintHandler']
+    TS_MAINT_OPTION = [Frame_ts_handler_option, 'TSHandler']
     TS_CONSTANT = [Frame_ts_constant_option, 'TSConstants']
     TS_MOCK_DTO = [Frame_ts_mock_dto, 'MockDTO']
     TS_OBSERVABLE_OBJ = [Frame_ts_observable_obj, 'ObservableObj']
