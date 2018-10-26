@@ -58,7 +58,7 @@ class TS_constant(object):
                                                self.TS_REFERENCE_COMMON_QADTS]
         
         # observable object header
-        self.TS_OBSERVABLE_OBJ_HEADER = 'namespace com.qad.financials.%s.%s.TSHandler.%s.DTO.UI {\n' + self.TS_TAB + '\'use strict\';\n'
+        self.TS_OBSERVABLE_OBJ_HEADER = 'namespace com.qad.financials.%s.%s.TSHandler.%s.DTO.UI {\n' + self.TS_TAB + '\"use strict\";\n'
         
         
         # observable object template
@@ -75,7 +75,7 @@ class TS_constant(object):
         self.TS_DTO_UI_MODULE = '.DTO.UI'
         
         # constant file header
-        self.TS_CONSTANT_HEADER = 'namespace com.qad.financials.%s.%s {\n' + self.TS_TAB + '\'use strict\';\n'
+        self.TS_CONSTANT_HEADER = 'namespace com.qad.erp.financials.%s.%s {\n' + self.TS_TAB + '\"use strict\";\n'
         
         # constant file field template
         self.TS_CONSTANT_FIELD_LINE_TEMP = self.TS_TAB + self.TS_TAB + '%s: "%s",\n'

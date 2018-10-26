@@ -187,8 +187,8 @@ class Xmlfile_processor(File_processor):
             if datagridtables[0].getAttribute(Xmlconstant.XML_NODE_PROP_NAME):
                 dtGridTable.set_name(datagridtables[0].getAttribute(Xmlconstant.XML_NODE_PROP_NAME))
                     
-            # add DataGridField into DataGridTable
-            datagridfields = datagrid.getElementsByTagName(Xmlconstant.XML_NODE_DATAGRIDFIELD)
+            # add DataGridField into DataGridTable            
+            datagridfields = datagridtables[0].getElementsByTagName(Xmlconstant.XML_NODE_DATAGRIDFIELD)
             for datagridfield in datagridfields:
                 
                 dtGridfield = Datagridfield()

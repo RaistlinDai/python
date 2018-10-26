@@ -244,7 +244,7 @@ class TS_processor(File_processor):
         parent_pack = Java_processor.analysis_dataController_package_name(controller_dto.get_class_package())
         
         # get the generated constant full path
-        const_filefullpath = proj_path + fileconstant.RESOURCE_TS_MAIN_PATH + fileconstant.RESOURCE_TS_DTO_UI_FOLDER + tsConstant_name
+        const_filefullpath = proj_path + fileconstant.RESOURCE_TS_MAIN_PATH + parent_pack + '\\' + business_entity_name.lower() + '\\' + tsConstant_name
         
         # create the header for constant file
         tempLines = []
@@ -307,7 +307,6 @@ class TS_processor(File_processor):
                     tempGridFieldList = []
                     
                     for datagridfield in datagrids.get_datagridtable().get_datagridfields():
-                        print(datagridfield.get_fieldname())
                         if datagridfield.get_fieldname():
                             tempFieldName = datagridfield.get_fieldname()
                             constFieldName = TS_processor.convertConstName(tempFieldName)
