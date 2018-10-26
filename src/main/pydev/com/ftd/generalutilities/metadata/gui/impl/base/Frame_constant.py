@@ -35,6 +35,10 @@ class Frame_constant:
         self.TS_HANDLER = 'TSHandler'
         self.MOCK_DTO = 'MockDTO'
         self.OBSERVABLE_OBJ = 'ObservableObj'
+        self.TS_HANDLER_MAINT = 'TSMaint'
+        self.TS_HANDLER_VIEWFORM = 'TSViewForm'
+        self.TS_HANDLER_GRID = 'TSGrid'
+        self.TS_HANDLER_COMMON = 'TSCommonService'
         
         #----------------- action ------------
         self.ACTION_UPDATE = 'update'

@@ -16,6 +16,11 @@ from src.main.pydev.com.ftd.generalutilities.metadata.gui.impl.frame.Frame_ts_co
 from src.main.pydev.com.ftd.generalutilities.metadata.gui.impl.frame.Frame_ts_mock_dto import Frame_ts_mock_dto
 from src.main.pydev.com.ftd.generalutilities.metadata.gui.impl.frame.Frame_ts_observable_obj import Frame_ts_observable_obj
 
+from src.main.pydev.com.ftd.generalutilities.metadata.gui.impl.frame.Frame_ts_handler_maint import Frame_ts_handler_maint
+from src.main.pydev.com.ftd.generalutilities.metadata.gui.impl.frame.Frame_ts_handler_viewform import Frame_ts_handler_viewform
+from src.main.pydev.com.ftd.generalutilities.metadata.gui.impl.frame.Frame_ts_handler_grid import Frame_ts_handler_grid
+from src.main.pydev.com.ftd.generalutilities.metadata.gui.impl.frame.Frame_ts_handler_commonservice import Frame_ts_handler_commonservice
+
 @unique
 class Mainframe_enum(Enum):
     '''
@@ -34,3 +39,7 @@ class Mainframe_enum(Enum):
     TS_CONSTANT = [Frame_ts_constant_option, 'TSConstants']
     TS_MOCK_DTO = [Frame_ts_mock_dto, 'MockDTO']
     TS_OBSERVABLE_OBJ = [Frame_ts_observable_obj, 'ObservableObj']
+    TS_HANDLER_MAINT = [Frame_ts_handler_maint, 'TSMaint']
+    TS_HANDLER_VIEWFORM = [Frame_ts_handler_viewform, 'TSViewForm']
+    TS_HANDLER_GRID = [Frame_ts_handler_grid, 'TSGrid']
+    TS_HANDLER_COMMON = [Frame_ts_handler_commonservice, 'TSCommonService']
