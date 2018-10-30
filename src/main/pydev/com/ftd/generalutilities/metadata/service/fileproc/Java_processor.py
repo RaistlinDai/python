@@ -585,8 +585,12 @@ class Java_processor(File_processor):
         serviceImpl_pack_name, tempstr01, parent_pack, tempstr02 = Java_processor.analysis_jar_package_name(entityDTO.get_serviceInterDTO().get_class_package())
         filefullpath = transDTO.get_projectpath() + fileconstant.JAVA_SERVICEIMPL_PATH % (parent_pack, filename)
         if not Java_processor.verify_dir_existing(filefullpath):
-            return False, '%s does not exist in your project, please check!' % filename, None
-        
+            if createOpt == 3:     # backup previous file
+                return False, '%s does not exist in your project, please check!' % filename, None, None
+            else:
+                # create serviceImpl file
+                Path(filefullpath).touch()
+            
         if createOpt == 3:     # backup previous file
             backup_path = transDTO.get_workspacepath() + fileconstant.BACKUP_JAVA_FOLDER
             if not File_processor.verify_dir_existing(backup_path):
@@ -740,8 +744,7 @@ class Java_processor(File_processor):
                         for rel_imp in mtd.get_method_related_imports():
                             additional_imports.append(rel_imp)
         
-        # create file
-        Path(filefullpath).touch()
+        # open file
         file = open(filefullpath, 'w')
         
         # ------------------------------------------------------- #

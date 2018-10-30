@@ -103,6 +103,7 @@ class Frame_gene_selection(FormatableFrame):
         generating the next frames according to the selections
         '''
         #check box flag
+        frame_constant = Frame_constant()
         checkFlag = False
         selections = dict(self.__checkvalues01, **self.__checkvalues02, **self.__checkvalues03)
         
@@ -114,7 +115,37 @@ class Frame_gene_selection(FormatableFrame):
         if checkFlag:
             #merge the selections into process flow
             self.get_trans().update_process_flow_by_gene_selection(selections)
-            self.get_trans().print_processflow()
+            
+            # --------- analysis the serviceImpl and datacontroller class
+            fileconstant = File_constant()
+            tempstr01, tempstr02, parent_pack, tempstr03 = Java_processor.analysis_jar_package_name(self.get_dtos().get_serviceInterDTO().get_class_package())
+            self.__result, self.__error, business_entity_name, self.__classlist = Java_processor.validate_lib_javas(self.get_trans(), self.get_dtos())
+            
+            proc = self.get_trans().get_processflow()
+            if self.__checkvalues02[frame_constant.DATA_CONTROLLER].get() == 1 and self.__checkvalues02[frame_constant.SERVICE_IMPL].get() != 1 in proc:
+                if not self.get_dtos().get_serviceImplPath():
+                    serviceImpl_path = self.get_trans().get_projectpath() + fileconstant.JAVA_SERVICEIMPL_PATH % (parent_pack, business_entity_name + fileconstant.SERVICEIMPL_SUFFIX + fileconstant.JAVA_SUFFIX)
+                    self.__result, self.__error, dcJavaDTO = Java_processor.analysis_serviceImpl(business_entity_name + fileconstant.SERVICEIMPL_SUFFIX, serviceImpl_path, self.get_dtos())
+                    if not self.__result:
+                        #---- panel 02 ----------
+                        self.__pack_errorpanel()
+                        return
+                    else:
+                        self.get_dtos().set_serviceImplInfo(business_entity_name + fileconstant.SERVICEIMPL_SUFFIX + fileconstant.JAVA_SUFFIX, serviceImpl_path, dcJavaDTO)
+            
+            if (self.__checkvalues03[frame_constant.TS_HANDLER].get() == 1 or self.__checkvalues03[frame_constant.OBSERVABLE_OBJ].get() == 1) and \
+                self.__checkvalues02[frame_constant.DATA_CONTROLLER].get() != 1 in proc:
+                
+                if not self.get_dtos().get_dataControllerPath():
+                    dataController_path = self.get_trans().get_projectpath() + fileconstant.JAVA_DATACONTROLLER_PATH % (parent_pack, business_entity_name + fileconstant.DATACONTROLLER_SUFFIX + fileconstant.JAVA_SUFFIX)
+                    self.__result, self.__error, dcJavaDTO = Java_processor.analysis_dataController(business_entity_name + fileconstant.DATACONTROLLER_SUFFIX, dataController_path, self.get_dtos())
+                    if not self.__result:
+                        #---- panel 02 ----------
+                        self.__pack_errorpanel()
+                        return
+                    else:
+                        self.get_dtos().set_dataControllerInfo(business_entity_name + fileconstant.DATACONTROLLER_SUFFIX + fileconstant.JAVA_SUFFIX, dataController_path, dcJavaDTO)
+            
             return True
         else:
             showerror('Error', 'You must select at least one generation file!')
@@ -201,31 +232,6 @@ class Frame_gene_selection(FormatableFrame):
                 return False
             else:
                 self.get_dtos().set_maintableInterDTO(maintableInterDTO)
-        
-        
-        # --------- analysis the serviceImpl class
-        fileconstant = File_constant()
-        tempstr01, tempstr02, parent_pack, tempstr03 = Java_processor.analysis_jar_package_name(self.get_dtos().get_serviceInterDTO().get_class_package())
-        
-        if not self.get_dtos().get_serviceImplPath():
-            serviceImpl_path = self.get_trans().get_projectpath() + fileconstant.JAVA_SERVICEIMPL_PATH % (parent_pack, business_entity_name + fileconstant.SERVICEIMPL_SUFFIX + fileconstant.JAVA_SUFFIX)
-            self.__result, self.__error, dcJavaDTO = Java_processor.analysis_serviceImpl(business_entity_name + fileconstant.SERVICEIMPL_SUFFIX, serviceImpl_path, self.get_dtos())
-            if not self.__result:
-                #---- panel 02 ----------
-                self.__pack_errorpanel()
-                return
-            else:
-                self.get_dtos().set_serviceImplInfo(business_entity_name + fileconstant.SERVICEIMPL_SUFFIX + fileconstant.JAVA_SUFFIX, serviceImpl_path, dcJavaDTO)
-        
-        if not self.get_dtos().get_dataControllerPath():
-            dataController_path = self.get_trans().get_projectpath() + fileconstant.JAVA_DATACONTROLLER_PATH % (parent_pack, business_entity_name + fileconstant.DATACONTROLLER_SUFFIX + fileconstant.JAVA_SUFFIX)
-            self.__result, self.__error, dcJavaDTO = Java_processor.analysis_dataController(business_entity_name + fileconstant.DATACONTROLLER_SUFFIX, dataController_path, self.get_dtos())
-            if not self.__result:
-                #---- panel 02 ----------
-                self.__pack_errorpanel()
-                return
-            else:
-                self.get_dtos().set_dataControllerInfo(business_entity_name + fileconstant.DATACONTROLLER_SUFFIX + fileconstant.JAVA_SUFFIX, dataController_path, dcJavaDTO)
 
         return True
     
