@@ -19,6 +19,7 @@ from src.main.pydev.com.ftd.generalutilities.metadata.gui.impl.frame.Frame_ts_ob
 from src.main.pydev.com.ftd.generalutilities.metadata.gui.impl.frame.Frame_ts_handler_maint import Frame_ts_handler_maint
 from src.main.pydev.com.ftd.generalutilities.metadata.gui.impl.frame.Frame_ts_handler_viewform import Frame_ts_handler_viewform
 from src.main.pydev.com.ftd.generalutilities.metadata.gui.impl.frame.Frame_ts_handler_grid import Frame_ts_handler_grid
+from src.main.pydev.com.ftd.generalutilities.metadata.gui.impl.frame.Frame_ts_handler_browse import Frame_ts_handler_browse
 from src.main.pydev.com.ftd.generalutilities.metadata.gui.impl.frame.Frame_ts_handler_commonservice import Frame_ts_handler_commonservice
 
 @unique
@@ -43,3 +44,5 @@ class Mainframe_enum(Enum):
     TS_HANDLER_VIEWFORM = [Frame_ts_handler_viewform, 'TSViewForm']
     TS_HANDLER_GRID = [Frame_ts_handler_grid, 'TSGrid']
     TS_HANDLER_COMMON = [Frame_ts_handler_commonservice, 'TSCommonService']
+    TS_HANDLER_BROWSE =[Frame_ts_handler_browse, 'TSBrowse']
+    

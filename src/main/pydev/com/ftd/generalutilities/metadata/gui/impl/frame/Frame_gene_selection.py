@@ -116,7 +116,7 @@ class Frame_gene_selection(FormatableFrame):
             #merge the selections into process flow
             self.get_trans().update_process_flow_by_gene_selection(selections)
             
-            # --------- analysis the serviceImpl and datacontroller class
+            # --------- analysis the serviceImpl and datacontroller class if needed
             fileconstant = File_constant()
             tempstr01, tempstr02, parent_pack, tempstr03 = Java_processor.analysis_jar_package_name(self.get_dtos().get_serviceInterDTO().get_class_package())
             self.__result, self.__error, business_entity_name, self.__classlist = Java_processor.validate_lib_javas(self.get_trans(), self.get_dtos())
@@ -134,7 +134,7 @@ class Frame_gene_selection(FormatableFrame):
                         self.get_dtos().set_serviceImplInfo(business_entity_name + fileconstant.SERVICEIMPL_SUFFIX + fileconstant.JAVA_SUFFIX, serviceImpl_path, dcJavaDTO)
             
             if (self.__checkvalues03[frame_constant.TS_HANDLER].get() == 1 or self.__checkvalues03[frame_constant.OBSERVABLE_OBJ].get() == 1) and \
-                self.__checkvalues02[frame_constant.DATA_CONTROLLER].get() != 1 in proc:
+                self.__checkvalues02[frame_constant.DATA_CONTROLLER].get() != 1:
                 
                 if not self.get_dtos().get_dataControllerPath():
                     dataController_path = self.get_trans().get_projectpath() + fileconstant.JAVA_DATACONTROLLER_PATH % (parent_pack, business_entity_name + fileconstant.DATACONTROLLER_SUFFIX + fileconstant.JAVA_SUFFIX)

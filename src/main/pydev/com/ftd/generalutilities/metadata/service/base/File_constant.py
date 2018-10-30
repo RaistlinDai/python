@@ -63,6 +63,9 @@ class File_constant(object):
         self.RESOURCE_TS_UTIL_FOLDER = 'util\\'
         
         
+        # ----------- The xml files -------
+        self.RESOURCE_METADATA_SUFFIX = "-ViewResourceMeta.xml"
+        
         # ----------- The java service and interface -------
         self.JAVA_SERVICE_SUFFIX = 'Service'
         self.JAVA_FACTORY_SUFFIX = 'Factory'
@@ -71,8 +74,6 @@ class File_constant(object):
         self.JAVA_QRA_PREFIX = 'Qra'
         self.SERVICEIMPL_SUFFIX = 'ServiceImpl'
         self.DATACONTROLLER_SUFFIX = 'DataController'
-        self.TS_CONSTANT_SUFFIX ='Constants'
-        self.TS_OBSERVABLE_OBJECT_SUFFIX = 'ObservableObject'
         
         self.UNZIP_JAR_FOLDER = 'uz\\'
         self.BACKUP_JAVA_FOLDER = 'bck\\'
@@ -81,11 +82,20 @@ class File_constant(object):
         self.XML_SUFFIX = ".xml"
         self.JAR_SUFFIX = ".jar"
         self.JAVA_SUFFIX = ".java"
-        self.TS_SUFFIX = ".ts"
-        self.TS_MOCK_DS_SUFFIX = "Mock"
         self.DEPOMPILE_JAVA_SUFFIX = "._java"
-        self.RESOURCE_METADATA_SUFFIX = "-ViewResourceMeta.xml"
+        
+        
+        # ----------- The ts files -------
+        self.TS_SUFFIX = ".ts"
+        self.TS_CONSTANT_SUFFIX ='Constants'
+        self.TS_OBSERVABLE_OBJECT_SUFFIX = 'ObservableObject'
+        self.TS_MOCK_DS_SUFFIX = "Mock"
         self.TS_DATASET_PREFIX = "ds"
+        self.TS_COMMON_SERVICE_SUFFIX = "CommonService"
+        self.TS_MAINT_SUFFIX = "Maint"
+        self.TS_VIEWFORM_SUFFIX = "ViewForm"
+        self.TS_GRID_SUFFIX = "Grid"
+        self.TS_BROWSE_SUFFIX = "Browse"
         
         self.FILE_TYPE = {'FFD8FF':'jpg', 
                           '89504E47':'png', 

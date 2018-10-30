@@ -31,6 +31,7 @@ class TS_constant(object):
         self.TS_TAB = '    '
         self.TS_COLON = ':'
         self.TS_QUESTION_MARK = '?'
+        self.TS_SQUARE_BRACKETS = '[]'
         
         # ----------------- types ------------------
         self.TS_TYPE_STRING = 'string'
@@ -40,6 +41,7 @@ class TS_constant(object):
         
         # ----------------- function prefix ------------------
         self.TS_HTTPRESPONSE_PREFIX = 'HttpResponse'
+        self.TS_EXPORT_INTERFACE_PREFIX = 'export interface '
         
         # ----------------- TS module key word ---------------
         self.TS_KEYWORD_MODULE = 'module'
@@ -57,9 +59,17 @@ class TS_constant(object):
                                                self.TS_REFERENCE_COMMON_UTILS,
                                                self.TS_REFERENCE_COMMON_QADTS]
         
+        # util references
+        self.TS_REFERENCE_UTIL_GENERAL = '/// <reference path="../../util/services/GeneralUtilities.ts" />'
+        self.TS_REFERENCE_UTIL_FIN_WEB = '/// <reference path="../../util/services/FinancialsWebUIService.ts" />'
+        self.TS_REFERENCE_UTIL_VALIDATOR = '/// <reference path="../../util/services/Validator.ts" />'
+        
+        self.TS_REFERENCE_UTIL_REFERENCES = [self.TS_REFERENCE_UTIL_GENERAL,
+                                             self.TS_REFERENCE_UTIL_FIN_WEB,
+                                             self.TS_REFERENCE_UTIL_VALIDATOR]
+        
         # observable object header
         self.TS_OBSERVABLE_OBJ_HEADER = 'namespace com.qad.financials.%s.%s.TSHandler.%s.DTO.UI {\n' + self.TS_TAB + '\"use strict\";\n'
-        
         
         # observable object template
         self.TS_OBSERVABLE_OBJ_RESPONSE_TEMPLATE = 'export interface HttpResponse%s {\n%s \n    }\n'
@@ -88,4 +98,12 @@ class TS_constant(object):
         
         # constant grid field interface template
         self.TS_CONSTANT_GRIDFIELD_TEMP = self.TS_TAB + 'export const %sFields = {\n%s\n' + self.TS_TAB + '};\n\n'
+        
+        
+        # TS CommonService header
+        self.TS_COMMONSERVICE_HEADER = 'namespace com.qad.erp.financials.%s.%s {\n' + self.TS_TAB + '\"use strict\";\n'
+        
+        # TS CommonService import
+        self.TS_FIN_COMMONSERVICE_IMPORT = 'import FinancialsCommonService = com.qad.erp.financials.common.services.FinancialsWebUIService;'
+        self.TS_DTO_IMPORT_TEMP = 'import %s = com.qad.financials.%s.%s.TSHandler.%s.DTO.%s;'
         

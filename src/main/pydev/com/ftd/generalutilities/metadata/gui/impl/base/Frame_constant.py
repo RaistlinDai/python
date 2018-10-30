@@ -38,6 +38,7 @@ class Frame_constant:
         self.TS_HANDLER_MAINT = 'TSMaint'
         self.TS_HANDLER_VIEWFORM = 'TSViewForm'
         self.TS_HANDLER_GRID = 'TSGrid'
+        self.TS_HANDLER_BROWSE = 'TSBrowse'
         self.TS_HANDLER_COMMON = 'TSCommonService'
         
         #----------------- action ------------

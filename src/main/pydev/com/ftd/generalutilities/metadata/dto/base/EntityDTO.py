@@ -39,6 +39,8 @@ class EntityDTO(object):
                       'FactoryQraDTO':factoryQraDTO,      # factory Qra DTO
                       'EntContQraDTO':entContQraDTO,      # entity container Qra DTO
                       'MaintableInterDTO':maintableInterDTO,   # main table interface DTO
+                      'TSDTOs':{}                         # the dict of TS DTOs
+                                                          # TSDtoDTO: the DTO of the current entity (dsSuppPayment.ts)
                       }
         
     
@@ -70,6 +72,30 @@ class EntityDTO(object):
     def get_businessentityname(self):
         if self.__dto:
             return self.__dto['BusinessEntity']
+        else:
+            return None
+        
+        
+    def set_tsdtos(self, values):
+        if self.__dto:
+            self.__dto['TSDTOs'] = values
+    
+    
+    def set_tsdto_value(self, dtoname, value):
+        if self.__dto and self.__dto['TSDTOs']:
+            self.__dto['TSDTOs'][dtoname] = value
+    
+            
+    def get_tsdtos(self):
+        if self.__dto:
+            return self.__dto['TSDTOs']
+        else:
+            return None
+        
+    
+    def get_tsdto_value(self, dtoname):
+        if self.__dto and self.__dto['TSDTOs']:
+            return self.__dto['TSDTOs'][dtoname]
         else:
             return None
         

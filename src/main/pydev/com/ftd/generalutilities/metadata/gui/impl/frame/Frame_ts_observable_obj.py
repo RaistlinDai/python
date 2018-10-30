@@ -89,7 +89,7 @@ class Frame_ts_observable_obj(FormatableFrame):
         '''
         if not self.__result:
             showwarning('Warning', 'There are error existing, the ObservableObj cannot be generated.')
-            return
+            return False
         
         # analysis the dataController
         if not self.get_dtos().get_dataControllerDTO():

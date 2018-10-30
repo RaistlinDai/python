@@ -9,6 +9,8 @@ from pathlib import Path
 from src.main.pydev.com.ftd.generalutilities.metadata.service.base.TS_constant import TS_constant
 from src.main.pydev.com.ftd.generalutilities.metadata.service.fileproc.Java_processor import Java_processor
 from src.main.pydev.com.ftd.generalutilities.metadata.service.base.Java_constant import Java_constant
+from src.main.pydev.com.ftd.generalutilities.metadata.dto.ts.TSDtoDTO import TSDtoDTO,\
+    TSDtoTable
 
 class TS_processor(File_processor):
     '''
@@ -227,11 +229,87 @@ class TS_processor(File_processor):
 
 
     @staticmethod
+    def analysis_DTO(entityDto, dto_fullpath):
+        '''
+        analysis the DTO content
+        '''
+        tsconstant = TS_constant()
+        tempDTO = TSDtoDTO()
+        
+        tempDTO.set_fullpath(dto_fullpath)
+        
+        file = open(dto_fullpath, 'r')
+        table_start_flag = False
+        table_field_flag = False
+        table_name = ''
+        
+        # create the main table object
+        maintable_name = ''
+        tableList = []
+        tempTableObj = None
+        
+        for eachline in file.readlines():
+            if tsconstant.TS_EXPORT_INTERFACE_PREFIX in eachline:
+                table_name = eachline.replace(tsconstant.TS_EXPORT_INTERFACE_PREFIX, '').replace(tsconstant.TS_LEFT_BRACE, '').replace('\n', '').lstrip()
+                table_start_flag = True
+                # create the table object
+                tempTableObj = TSDtoTable()
+                tempTableObj.set_tablename(table_name)
+            
+            if table_start_flag and tsconstant.TS_COLON in eachline and not tsconstant.TS_SQUARE_BRACKETS in eachline:
+                table_field_flag = True
+            
+            if table_start_flag and tsconstant.TS_SQUARE_BRACKETS in eachline:
+                subtable_name = eachline[eachline.index(tsconstant.TS_COLON)+1:eachline.index(tsconstant.TS_SQUARE_BRACKETS)].strip()
+                subTableObj = TSDtoTable()
+                subTableObj.set_tablename(subtable_name)
+                
+                tempTableObj.push_subtable(subTableObj)
+                
+            if tsconstant.TS_RIGHT_BRACE in eachline and table_start_flag:
+                
+                if not table_field_flag:
+                    tempDTO.set_dsname(table_name)
+                    maintable_name = table_name
+                else:
+                    tableList.append(tempTableObj)
+                
+                table_start_flag = False
+                table_field_flag = False
+                
+        file.close()
+        
+        # set table construct
+        for tbtb in tableList:
+            if maintable_name == tbtb.get_tablename():
+                TS_processor.set_subTables(tbtb, tableList)
+                tempDTO.set_maintable(tbtb)
+                break
+        
+        print(tempDTO)
+        
+        entityDto.set_tsdto_value('TSDTOs', tempDTO)
+        
+        return
+    
+
+    @staticmethod
+    def set_subTables(tableObj, tableList):
+        if len(tableObj.get_subtables() > 0):
+            for subtb in tableObj.get_subtables():
+                for tbtb in tableList:
+                    if subtb.get_tablename() == tbtb.get_tablename():
+                        TS_processor.set_subTables(tbtb, tableList)
+                        tableObj.push_subtable(tbtb)
+        else:
+            return
+
+
+    @staticmethod
     def create_TS_Constant(entityDto, transDto, tsConstant_name):
         '''
         create TS Constant
         '''
-         
         #path constant
         fileconstant = File_constant()
         tsconstant = TS_constant()
@@ -385,4 +463,96 @@ class TS_processor(File_processor):
         
         return constName
     
+    
+    @staticmethod
+    def create_TS_CommonService(entityDto, transDto, ts_name):
+        '''
+        This method is used to create the CommonService TSHandler 
+        '''
+        #path constant
+        fileconstant = File_constant()
+        tsconstant = TS_constant()
+        proj_path = transDto.get_projectpath()
         
+        # get the main table interface name
+        controller_dto = entityDto.get_dataControllerDTO()
+        business_entity_name = entityDto.get_businessentityname()
+        # get the parent package name
+        parent_pack = Java_processor.analysis_dataController_package_name(controller_dto.get_class_package())
+        
+        # get the generated constant full path
+        commsev_filefullpath = proj_path + fileconstant.RESOURCE_TS_MAIN_PATH + parent_pack + '\\' + business_entity_name.lower() + '\\' + ts_name
+        
+        # create the header for constant file
+        temp_lines = []
+        additional_reference = []
+        import_list = []
+        
+        # ------------------------------------------------------- #
+        # ----- Prepare the imports -----
+        # ------------------------------------------------------- #
+        import_list.append(tsconstant.TS_TAB + tsconstant.TS_FIN_COMMONSERVICE_IMPORT)
+        
+        # DTO import
+        #tempStr = tsconstant.TS_DTO_IMPORT_TEMP % (dsName,parent_pack,business_entity_name.lower(),business_entity_name,)
+        #import_list.append(tsconstant.TS_TAB + tempStr)
+        
+        # ------------------------------------------------------- #
+        # ----- Create the file -----
+        # ------------------------------------------------------- #
+        if not File_processor.verify_dir_existing(commsev_filefullpath):
+            # create file
+            Path(commsev_filefullpath).touch()
+        
+        # ------------------------------------------------------- #
+        # ----- open the observable object file -----
+        # ------------------------------------------------------- #
+        file = open(commsev_filefullpath, 'w')
+    
+        # ------------------------------------------------------- #
+        # ----- write the common references -----
+        # ------------------------------------------------------- # 
+        for temp_ref in tsconstant.TS_REFERENCE_COMMON_REFERENCES:
+            file.write(temp_ref)
+            file.write('\n')
+            
+        for temp_ref in tsconstant.TS_REFERENCE_UTIL_REFERENCES:
+            file.write(temp_ref)
+            file.write('\n') 
+        
+        # ------------------------------------------------------- #
+        # ----- write the common references -----
+        # ------------------------------------------------------- # 
+        for temp_ref in additional_reference:
+            file.write(temp_ref)
+            file.write('\n')
+        
+        file.write('\n')
+        
+        # ------------------------------------------------------- #
+        # ----- write the observable object header -----
+        # ------------------------------------------------------- # 
+        temp_header = tsconstant.TS_COMMONSERVICE_HEADER % (parent_pack,business_entity_name.lower())
+        file.write(temp_header)
+        file.write('\n')
+        
+        # ------------------------------------------------------- #
+        # ----- write the imports -----
+        # ------------------------------------------------------- # 
+        for temp_ref in import_list:
+            file.write(temp_ref)
+            file.write('\n')
+        
+        file.write('\n')
+        
+        # ------------------------------------------------------- #
+        # ----- write the observable object content -----
+        # ------------------------------------------------------- # 
+        for sub_line in temp_lines:
+            file.write(sub_line)
+        
+        file.write(tsconstant.TS_RIGHT_BRACE)
+    
+        file.close()
+        
+        return True, None

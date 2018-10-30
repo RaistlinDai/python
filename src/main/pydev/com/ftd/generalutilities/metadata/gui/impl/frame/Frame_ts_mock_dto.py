@@ -46,7 +46,6 @@ class Frame_ts_mock_dto(FormatableFrame):
         self.__feet = StringVar()
         self.__dicinput = Entry(canv1, textvariable=self.__feet, borderwidth=3, bg='black', foreground='yellow', highlightcolor='red', insertbackground='red')
         self.__dicinput.place(height=20, width=250, relx=0.3, rely=0.2)
-        
         canv1.pack()
             
         #---- panel 02 ----------
