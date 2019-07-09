@@ -18,12 +18,15 @@ class ViewForm_fileload(IViewForm):
     '''
 
 
-    def __init__(self, master=None):
+    def __init__(self, func, master=None):
         '''
         Constructor
         '''
         #main frame
-        self.__main = Frame_main()
+        if func == 1:
+            self.__main = Frame_main('File Generator')
+        elif func == 2:
+            self.__main = Frame_main('Cassandra connector')
         self.__body = None
         self.__dtos = EntityDTO()
         self.__trans = TransactionDTO()
@@ -33,8 +36,13 @@ class ViewForm_fileload(IViewForm):
         self.__trans.set_prev_frame_func(self.open_prevframe)
         
         #mock processing flow
-        self.__trans.add_next_process(Mainframe_enum.START_UP)
-        #self.__trans.add_next_process(Mainframe_enum.SERVICEIMPL_OPTION)
+        if func == 1:
+            self.__trans.add_next_process(Mainframe_enum.START_UP)
+            #self.__trans.add_next_process(Mainframe_enum.SERVICEIMPL_OPTION)
+            #self.__trans.add_next_process(Mainframe_enum.SERVICEIMPL_OPTION)
+        elif func == 2:
+            #self.__trans.add_next_process(Mainframe_enum.CASSANDRA_STARTUP)
+            self.__trans.add_next_process(Mainframe_enum.CASSANDRA_CREATE_CONNECTION)
         
         #load frame
         self.open_firstframe()

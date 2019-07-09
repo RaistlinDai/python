@@ -15,12 +15,14 @@ from src.main.pydev.com.ftd.generalutilities.metadata.gui.impl.frame.Frame_ts_ha
 from src.main.pydev.com.ftd.generalutilities.metadata.gui.impl.frame.Frame_ts_constant_option import Frame_ts_constant_option
 from src.main.pydev.com.ftd.generalutilities.metadata.gui.impl.frame.Frame_ts_mock_dto import Frame_ts_mock_dto
 from src.main.pydev.com.ftd.generalutilities.metadata.gui.impl.frame.Frame_ts_observable_obj import Frame_ts_observable_obj
-
 from src.main.pydev.com.ftd.generalutilities.metadata.gui.impl.frame.Frame_ts_handler_maint import Frame_ts_handler_maint
 from src.main.pydev.com.ftd.generalutilities.metadata.gui.impl.frame.Frame_ts_handler_viewform import Frame_ts_handler_viewform
 from src.main.pydev.com.ftd.generalutilities.metadata.gui.impl.frame.Frame_ts_handler_grid import Frame_ts_handler_grid
 from src.main.pydev.com.ftd.generalutilities.metadata.gui.impl.frame.Frame_ts_handler_browse import Frame_ts_handler_browse
 from src.main.pydev.com.ftd.generalutilities.metadata.gui.impl.frame.Frame_ts_handler_commonservice import Frame_ts_handler_commonservice
+
+from src.main.pydev.com.ftd.generalutilities.metadata.gui.impl.frame.Frame_cassandra_startup import Frame_cassandra_startup
+from src.main.pydev.com.ftd.generalutilities.metadata.gui.impl.frame.Frame_cassandra_create_connection import Frame_cassandra_create_connection
 
 @unique
 class Mainframe_enum(Enum):
@@ -45,4 +47,8 @@ class Mainframe_enum(Enum):
     TS_HANDLER_GRID = [Frame_ts_handler_grid, 'TSGrid']
     TS_HANDLER_COMMON = [Frame_ts_handler_commonservice, 'TSCommonService']
     TS_HANDLER_BROWSE =[Frame_ts_handler_browse, 'TSBrowse']
+    
+    # ===== Cassandra =====
+    CASSANDRA_STARTUP = [Frame_cassandra_startup, 'CassandraStartup']
+    CASSANDRA_CREATE_CONNECTION = [Frame_cassandra_create_connection, 'CassandraStartup']
     

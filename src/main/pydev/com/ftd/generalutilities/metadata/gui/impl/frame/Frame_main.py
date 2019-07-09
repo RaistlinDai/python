@@ -12,7 +12,7 @@ class Frame_main(Frame):
     '''
 
 
-    def __init__(self, master=None):
+    def __init__(self, title, master=None):
         '''
         Constructor
         '''
@@ -20,7 +20,7 @@ class Frame_main(Frame):
         
         #main window
         #update the title
-        self.master.title('File Generator')
+        self.master.title(title)
         self.master.geometry('600x400')
         self.master.resizable(width=False, height=False)
         #font
