@@ -11,7 +11,7 @@ class Cassandra_service_impl(object):
     classdocs
     '''
 
-    def __init__(self, params):
+    def __init__(self, **params):
         '''
         Constructor
         '''

@@ -8,6 +8,7 @@ from tkinter import *
 from src.main.pydev.com.ftd.generalutilities.metadata.gui.impl.frame.Frame_bottom import Frame_bottom
 from src.main.pydev.com.ftd.generalutilities.metadata.gui.impl.base.FormatableFrame import FormatableFrame
 from src.main.pydev.com.ftd.generalutilities.metadata.gui.impl.button.Button_selfdesign import Button_selfdesign
+from src.main.pydev.com.ftd.generalutilities.metadata.service.database.cassandra.Cassandra_service_impl import Cassandra_service_impl
 from tkinter.messagebox import showerror
 
 class Frame_cassandra_create_connection(FormatableFrame):
@@ -125,4 +126,5 @@ class Frame_cassandra_create_connection(FormatableFrame):
         test the connection
         '''
         print('TEST CONNECTION')
+        Cassandra_service_impl()
         
