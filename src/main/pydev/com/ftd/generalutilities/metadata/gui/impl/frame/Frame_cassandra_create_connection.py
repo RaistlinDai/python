@@ -7,6 +7,7 @@ import os
 from tkinter import *
 from src.main.pydev.com.ftd.generalutilities.metadata.gui.impl.frame.Frame_bottom import Frame_bottom
 from src.main.pydev.com.ftd.generalutilities.metadata.gui.impl.base.FormatableFrame import FormatableFrame
+from src.main.pydev.com.ftd.generalutilities.metadata.gui.impl.button.Button_selfdesign import Button_selfdesign
 from tkinter.messagebox import showerror
 
 class Frame_cassandra_create_connection(FormatableFrame):
@@ -44,6 +45,9 @@ class Frame_cassandra_create_connection(FormatableFrame):
         self.__feet = StringVar()
         self.__input01 = Entry(canv2, textvariable=self.__feet, borderwidth=3, bg='black', foreground='yellow', highlightcolor='red', insertbackground='red')
         self.__input01.place(height=20, width=100, relx=0.2, rely=0.2)
+        #button
+        self.__dicload = Button_selfdesign(canv2, self.auto_config, 'Auto Config', height=1)
+        self.__dicload.place(height=20, width=100, relx=0.4, rely=0.2)
         
         #label
         self.__label02 = Label(canv2, text='Host:')
@@ -62,7 +66,7 @@ class Frame_cassandra_create_connection(FormatableFrame):
         self.__input03.place(height=20, width=100, relx=0.65, rely=0.4)
         #label
         label2 = Label(canv2, text='(yab config | grep cassandra.default.node.main.native_transport_port)', fg='blue')
-        label2.place(height=20, width=400, relx=0.1, rely=0.47)
+        label2.place(height=20, width=410, relx=0.1, rely=0.47)
         
         #label
         self.__label04 = Label(canv2, text='User:')
@@ -89,8 +93,9 @@ class Frame_cassandra_create_connection(FormatableFrame):
     #overwrite before_next
     def add_bottom(self, parent):
         #bottom frame
-        exFuncs = {'Next':{'process':self.get_nextframe(), 'before':self.before_next}}
-        self.__buttom = Frame_bottom(parent, ['Next'], exFuncs)
+        exFuncs = {'Self':{'process':self.test_connection, 'title':'Test'},
+                   'Next':{'process':self.get_nextframe(), 'before':self.before_next}}
+        self.__buttom = Frame_bottom(parent, ['Next','Self'], exFuncs)
         self.__buttom.pack(fill=X, ipady=10,side=BOTTOM)
         
     
@@ -106,5 +111,18 @@ class Frame_cassandra_create_connection(FormatableFrame):
             return False
         
         return True
+    
+    
+    def auto_config(self):
+        '''
+        automatically read yab config
+        '''
+        print('AUTO CONFIG')
         
+    
+    def test_connection(self):
+        '''
+        test the connection
+        '''
+        print('TEST CONNECTION')
         
