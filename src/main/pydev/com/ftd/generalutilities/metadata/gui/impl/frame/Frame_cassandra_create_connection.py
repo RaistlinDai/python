@@ -10,6 +10,9 @@ from src.main.pydev.com.ftd.generalutilities.metadata.gui.impl.base.FormatableFr
 from src.main.pydev.com.ftd.generalutilities.metadata.gui.impl.button.Button_selfdesign import Button_selfdesign
 from src.main.pydev.com.ftd.generalutilities.metadata.service.database.cassandra.Cassandra_service_impl import Cassandra_service_impl
 from tkinter.messagebox import showerror, showinfo
+from src.main.pydev.com.ftd.generalutilities.metadata.service.base.File_constant import File_constant
+from src.main.pydev.com.ftd.generalutilities.metadata.service.fileproc.Cassandra_connection_file_processor import Cassandra_connection_file_processor
+from src.main.pydev.com.ftd.generalutilities.metadata.service.base.File_processor import File_processor
 
 class Frame_cassandra_create_connection(FormatableFrame):
     '''
@@ -114,8 +117,27 @@ class Frame_cassandra_create_connection(FormatableFrame):
         # validate connection
         
         
+        # setup the connection file path into workspace folder
+        fileconstant = File_constant()
+        workspacepath = self.get_trans().get_workspacepath()
+        cassandra_conection_folder = workspacepath + fileconstant.CASSANDRA_CONFIG_FOLDER
+        
+        if not File_processor.verify_dir_existing(cassandra_conection_folder):
+            File_processor.create_folder(cassandra_conection_folder)
+        
+        cassandra_conection_file = cassandra_conection_folder + fileconstant.CASSANDRA_CONNECTION_FILE
+        
+        print(cassandra_conection_file)
+        
+        # combine the connection parameter
+        # TODO: this should be implemented as toString() in Cassandra_connection_dto
+        connection_param = 'host=' + self.__input02.get() + ',port=' + self.__input03.get() + ',username=' + self.__input04.get() + ',password=' + self.__input05.get()
+        
         # store the connection parameters
-            
+        if not File_processor.verify_file(cassandra_conection_file):
+            Cassandra_connection_file_processor.create_connection_file(cassandra_conection_file, self.__input01.get() + ':' + connection_param)
+        else:
+            Cassandra_connection_file_processor.update_default_file(cassandra_conection_file, self.__input01.get(), connection_param)
         
         return True
     
