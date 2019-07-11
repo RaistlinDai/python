@@ -12,7 +12,7 @@ from src.main.pydev.com.ftd.generalutilities.metadata.service.fileproc.Xmlfile_p
 from tkinter.messagebox import showerror, showinfo
 from src.main.pydev.com.ftd.generalutilities.metadata.service.base.File_processor import File_processor
 from src.main.pydev.com.ftd.generalutilities.metadata.service.base.File_constant import File_constant
-from src.main.pydev.com.ftd.generalutilities.metadata.service.fileproc.Deffile_processor import Deffile_processor
+from src.main.pydev.com.ftd.generalutilities.metadata.service.fileproc.User_default_file_processor import User_default_file_processor
 
 class Frame_cassandra_startup(FormatableFrame):
     '''
@@ -122,7 +122,7 @@ class Frame_cassandra_startup(FormatableFrame):
         userdefault = File_processor.get_home_dir()
         userdefault = userdefault + fileconstant.USER_DEFAULT
         print(userdefault)
-        Deffile_processor.update_default_file(userdefault, 'workspace', tempdir)
+        User_default_file_processor.update_default_file(userdefault, 'workspace', tempdir)
         
         return True
     
@@ -148,9 +148,9 @@ class Frame_cassandra_startup(FormatableFrame):
         
         #create default file if not existing
         if not File_processor.verify_dir_existing(userdefault):
-            Deffile_processor.create_default_file(userdefault)
+            User_default_file_processor.create_default_file(userdefault)
         #read default file
-        default_info = Deffile_processor.read_default_file(userdefault)
+        default_info = User_default_file_processor.read_default_file(userdefault)
         
         if default_info['workspace'] and default_info['workspace'] != "":
             self.get_trans().set_workspacepath(default_info['workspace'])

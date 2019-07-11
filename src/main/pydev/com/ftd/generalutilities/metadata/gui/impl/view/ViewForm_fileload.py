@@ -41,8 +41,8 @@ class ViewForm_fileload(IViewForm):
             #self.__trans.add_next_process(Mainframe_enum.SERVICEIMPL_OPTION)
             #self.__trans.add_next_process(Mainframe_enum.SERVICEIMPL_OPTION)
         elif func == 2:
-            #self.__trans.add_next_process(Mainframe_enum.CASSANDRA_STARTUP)
-            self.__trans.add_next_process(Mainframe_enum.CASSANDRA_CREATE_CONNECTION)
+            self.__trans.add_next_process(Mainframe_enum.CASSANDRA_STARTUP)
+            #self.__trans.add_next_process(Mainframe_enum.CASSANDRA_CREATE_CONNECTION)
         
         #load frame
         self.open_firstframe()

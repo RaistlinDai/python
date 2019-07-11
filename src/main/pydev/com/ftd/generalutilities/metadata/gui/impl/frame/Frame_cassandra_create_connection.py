@@ -9,7 +9,7 @@ from src.main.pydev.com.ftd.generalutilities.metadata.gui.impl.frame.Frame_botto
 from src.main.pydev.com.ftd.generalutilities.metadata.gui.impl.base.FormatableFrame import FormatableFrame
 from src.main.pydev.com.ftd.generalutilities.metadata.gui.impl.button.Button_selfdesign import Button_selfdesign
 from src.main.pydev.com.ftd.generalutilities.metadata.service.database.cassandra.Cassandra_service_impl import Cassandra_service_impl
-from tkinter.messagebox import showerror
+from tkinter.messagebox import showerror, showinfo
 
 class Frame_cassandra_create_connection(FormatableFrame):
     '''
@@ -111,6 +111,12 @@ class Frame_cassandra_create_connection(FormatableFrame):
             showerror('Error', 'Please provide the complete info!')
             return False
         
+        # validate connection
+        
+        
+        # store the connection parameters
+            
+        
         return True
     
     
@@ -118,7 +124,7 @@ class Frame_cassandra_create_connection(FormatableFrame):
         '''
         automatically read yab config
         '''
-        print('AUTO CONFIG')
+        showinfo('Info', 'Not available yet ...')
         
     
     def test_connection(self):

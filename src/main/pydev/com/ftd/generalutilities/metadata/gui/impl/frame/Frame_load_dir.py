@@ -11,7 +11,7 @@ from src.main.pydev.com.ftd.generalutilities.metadata.gui.impl.base.FormatableFr
 from src.main.pydev.com.ftd.generalutilities.metadata.service.base.File_processor import File_processor
 from src.main.pydev.com.ftd.generalutilities.metadata.service.base.File_constant import File_constant
 from src.main.pydev.com.ftd.generalutilities.metadata.service.fileproc.Xmlfile_processor import Xmlfile_processor
-from src.main.pydev.com.ftd.generalutilities.metadata.service.fileproc.Deffile_processor import Deffile_processor
+from src.main.pydev.com.ftd.generalutilities.metadata.service.fileproc.User_default_file_processor import User_default_file_processor
 
 class Frame_load_dir(FormatableFrame):
     '''
@@ -218,7 +218,7 @@ class Frame_load_dir(FormatableFrame):
             fileconstant = File_constant()
             userdefault = File_processor.get_home_dir()
             userdefault = userdefault + fileconstant.USER_DEFAULT
-            Deffile_processor.update_default_file(userdefault, 'project', self.__input01.get())
+            User_default_file_processor.update_default_file(userdefault, 'project', self.__input01.get())
             return True
         else:
             showerror('Error', 'You must select an existing entity!')
@@ -235,9 +235,9 @@ class Frame_load_dir(FormatableFrame):
         
         #create default file if not existing
         if not File_processor.verify_dir_existing(userdefault):
-            Deffile_processor.create_default_file(userdefault)
+            User_default_file_processor.create_default_file(userdefault)
         #read default file
-        default_info = Deffile_processor.read_default_file(userdefault)
+        default_info = User_default_file_processor.read_default_file(userdefault)
         
         if default_info['project'] and default_info['project'] != "":
             self.get_trans().set_projectpath(default_info['project'])
