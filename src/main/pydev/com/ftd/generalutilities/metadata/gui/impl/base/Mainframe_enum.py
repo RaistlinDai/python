@@ -23,6 +23,7 @@ from src.main.pydev.com.ftd.generalutilities.metadata.gui.impl.frame.Frame_ts_ha
 
 from src.main.pydev.com.ftd.generalutilities.metadata.gui.impl.frame.Frame_cassandra_startup import Frame_cassandra_startup
 from src.main.pydev.com.ftd.generalutilities.metadata.gui.impl.frame.Frame_cassandra_create_connection import Frame_cassandra_create_connection
+from src.main.pydev.com.ftd.generalutilities.metadata.gui.impl.frame.Frame_cassandra_load_connection import Frame_cassandra_load_connection
 
 @unique
 class Mainframe_enum(Enum):
@@ -50,5 +51,6 @@ class Mainframe_enum(Enum):
     
     # ===== Cassandra =====
     CASSANDRA_STARTUP = [Frame_cassandra_startup, 'CassandraStartup']
-    CASSANDRA_CREATE_CONNECTION = [Frame_cassandra_create_connection, 'CassandraStartup']
+    CASSANDRA_CREATE_CONNECTION = [Frame_cassandra_create_connection, 'CassandraCreateConnection']
+    CASSANDRA_LOAD_CONNECTION = [Frame_cassandra_load_connection, 'CassandraLoadConnection']
     

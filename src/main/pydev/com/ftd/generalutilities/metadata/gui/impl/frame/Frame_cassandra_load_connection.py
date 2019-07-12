@@ -7,14 +7,14 @@ import os
 from tkinter import *
 from src.main.pydev.com.ftd.generalutilities.metadata.gui.impl.frame.Frame_bottom import Frame_bottom
 from src.main.pydev.com.ftd.generalutilities.metadata.gui.impl.base.FormatableFrame import FormatableFrame
-from src.main.pydev.com.ftd.generalutilities.metadata.gui.impl.button.Button_selfdesign import Button_selfdesign
 from src.main.pydev.com.ftd.generalutilities.metadata.service.database.cassandra.Cassandra_service_impl import Cassandra_service_impl
-from tkinter.messagebox import showerror, showinfo, askyesno
+from tkinter.messagebox import showerror, showinfo
 from src.main.pydev.com.ftd.generalutilities.metadata.service.base.File_constant import File_constant
 from src.main.pydev.com.ftd.generalutilities.metadata.service.fileproc.Cassandra_connection_file_processor import Cassandra_connection_file_processor
 from src.main.pydev.com.ftd.generalutilities.metadata.service.base.File_processor import File_processor
+from tkinter.ttk import Combobox
 
-class Frame_cassandra_create_connection(FormatableFrame):
+class Frame_cassandra_load_connection(FormatableFrame):
     '''
     classdocs
     '''
@@ -33,25 +33,24 @@ class Frame_cassandra_create_connection(FormatableFrame):
         self.__frame1 = FormatableFrame(self)
         self.__frame1.pack(side=TOP)
         #Title
-        self.__label01 = Label(self.__frame1, text="Cassandra create connection", width= 45)
+        self.__label01 = Label(self.__frame1, text="Cassandra load connection", width= 45)
         self.__label01.pack(side=TOP, fill=X, ipady=10)
         
         #---- panel 01 ----------
         canv2 = Canvas(self, height=300, width=550)
         #label
-        label1 = Label(canv2, text='Please input the database parameters:')
+        label1 = Label(canv2, text='Please choose the database connection:')
         label1.place(height=20, width=250, relx=0.01, rely=0.06)
         
         #label
         self.__label01 = Label(canv2, text='Name:')
         self.__label01.place(height=20, width=80, relx=0.05, rely=0.2)
         #input1
-        self.__feet = StringVar()
-        self.__input01 = Entry(canv2, textvariable=self.__feet, borderwidth=3, bg='black', foreground='yellow', highlightcolor='red', insertbackground='red')
-        self.__input01.place(height=20, width=100, relx=0.2, rely=0.2)
-        #button
-        self.__dicload = Button_selfdesign(canv2, self.auto_config, 'Auto Config', height=1)
-        self.__dicload.place(height=20, width=100, relx=0.4, rely=0.2)
+        self.__comvalue = StringVar() 
+        self.__comboxlist = Combobox(canv2,textvariable=self.__comvalue) 
+        self.__comboxlist.place(height=20, width=100, relx=0.2, rely=0.2)
+        self.__comboxlist.bind("<<ComboboxSelected>>",self.load_connection_parameters)
+        self.__comboxlist["state"] = "readonly"
         
         #label
         self.__label02 = Label(canv2, text='Host:')
@@ -93,6 +92,9 @@ class Frame_cassandra_create_connection(FormatableFrame):
         
         canv2.pack()
         
+        # load saved connections
+        self.load_connection_names()
+        
     
     #overwrite before_next
     def add_bottom(self, parent):
@@ -110,11 +112,12 @@ class Frame_cassandra_create_connection(FormatableFrame):
         generating the next frames according to the selections
         '''
         #--- verify the input value
-        if not self.__input01.get() or not self.__input02.get() or not self.__input03.get() or not self.__input04.get() or not self.__input05.get():
+        if not self.__input02.get() or not self.__input03.get() or not self.__input04.get() or not self.__input05.get():
             showerror('Error', 'Please provide the complete info!')
             return False
         
         # validate connection
+        # TODO: after merge
         
         
         # setup the connection file path into workspace folder
@@ -131,26 +134,75 @@ class Frame_cassandra_create_connection(FormatableFrame):
         
         # combine the connection parameter
         # TODO: this should be implemented as toString() in Cassandra_connection_dto
-        connection_param = self.__input01.get() + ':' + 'host=' + self.__input02.get() + ',port=' + self.__input03.get() + ',username=' + self.__input04.get() + ',password=' + self.__input05.get()
+        connection_param = self.__comboxlist.get() + ':' + 'host=' + self.__input02.get() + ',port=' + self.__input03.get() + ',username=' + self.__input04.get() + ',password=' + self.__input05.get()
         
         # store the connection parameters
         if not File_processor.verify_file(cassandra_conection_file):
             Cassandra_connection_file_processor.create_connection_file(cassandra_conection_file, connection_param)
         else:
-            if Cassandra_connection_file_processor.verify_connection_name_exist(cassandra_conection_file, self.__input01.get()):
-                if not askyesno('Warning', 'The connection name is existing, do you confirm to overwrite?'):
-                    return False
-                
-            Cassandra_connection_file_processor.update_connection_file(cassandra_conection_file, self.__input01.get(), connection_param)
+            Cassandra_connection_file_processor.update_connection_file(cassandra_conection_file, self.__comboxlist.get(), connection_param)
         
         return True
     
     
-    def auto_config(self):
+    def load_connection_names(self):
         '''
-        automatically read yab config
+        load all connection names from workspace
         '''
-        showinfo('Info', 'Not available yet ...')
+        # combine the workspace path
+        fileconstant = File_constant()
+        workspacepath = self.get_trans().get_workspacepath()
+        cassandra_conection_file = workspacepath + fileconstant.CASSANDRA_CONFIG_FOLDER + fileconstant.CASSANDRA_CONNECTION_FILE
+        
+        # verify connection file existing
+        if not File_processor.verify_file(cassandra_conection_file):
+            showerror('Error', 'Cassandra connection file does not exist!')
+            return
+        
+        # load connection names
+        connection_names = Cassandra_connection_file_processor.read_connection_names(cassandra_conection_file)
+        # set tuple to combox list
+        self.__comboxlist["values"]=tuple(connection_names) 
+        self.__comboxlist.current(0)
+        
+        # load connection parameters
+        connection_params = Cassandra_connection_file_processor.read_connection_params(cassandra_conection_file, self.__comboxlist.get())
+        # set parameters
+        self.__input02.delete(0, END)
+        self.__input02.insert(END, connection_params['host'])
+        self.__input03.delete(0, END)
+        self.__input03.insert(END, connection_params['port'])
+        self.__input04.delete(0, END)
+        self.__input04.insert(END, connection_params['username'])
+        self.__input05.delete(0, END)
+        self.__input05.insert(END, connection_params['password'])
+    
+    
+    def load_connection_parameters(self, event):
+        '''
+        load connection parameters from workspace
+        '''
+        # combine the workspace path
+        fileconstant = File_constant()
+        workspacepath = self.get_trans().get_workspacepath()
+        cassandra_conection_file = workspacepath + fileconstant.CASSANDRA_CONFIG_FOLDER + fileconstant.CASSANDRA_CONNECTION_FILE
+        
+        # verify connection file existing
+        if not File_processor.verify_file(cassandra_conection_file):
+            showerror('Error', 'Cassandra connection file does not exist!')
+            return
+        
+        # load connection parameters
+        connection_params = Cassandra_connection_file_processor.read_connection_params(cassandra_conection_file, self.__comboxlist.get())
+        # set parameters
+        self.__input02.delete(0, END)
+        self.__input02.insert(END, connection_params['host'])
+        self.__input03.delete(0, END)
+        self.__input03.insert(END, connection_params['port'])
+        self.__input04.delete(0, END)
+        self.__input04.insert(END, connection_params['username'])
+        self.__input05.delete(0, END)
+        self.__input05.insert(END, connection_params['password'])
         
     
     def test_connection(self):

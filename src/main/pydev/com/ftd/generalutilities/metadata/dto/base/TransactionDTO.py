@@ -319,7 +319,7 @@ class TransactionDTO(object):
                 self.add_next_process(Mainframe_enum.CASSANDRA_CREATE_CONNECTION)
                 break
             if case(12): #load the existing connections for cassandra
-                print('model 12')
+                self.add_next_process(Mainframe_enum.CASSANDRA_LOAD_CONNECTION)
                 break
             
             if case(): # default, could also just omit condition or 'if True'
