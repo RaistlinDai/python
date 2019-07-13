@@ -22,11 +22,13 @@ class Button_nextprev(Button):
         self.__module = module
         
         if isinstance(exFuncs, dict):
-            self.__click_event = exFuncs.get('process')
             self.__before_click_event = exFuncs.get('before')
+            self.__process_click_event = exFuncs.get('process')
+            self.__cancel_click_event = exFuncs.get('cancel')
         else:
-            self.__click_event = None
             self.__before_click_event = None
+            self.__process_click_event = None
+            self.__cancel_click_event = None
     
         
     '''
@@ -46,17 +48,19 @@ class Button_nextprev(Button):
             message = 'Are you sure roll back to the previous step?'
         
         if askyesno(title, message):
-            if self.__click_event:
-                self.__click_event()
+            if self.__process_click_event:
+                self.__process_click_event()
+        else:
+            if self.__cancel_click_event:
+                self.__cancel_click_event()
                 
     
     def before_click_event(self):
         if self.__before_click_event:
             result = self.__before_click_event()
-            if result:
-                return True
-            else:
+            if not result:
                 return False
-        else:
-            return True
         
+        return True
+        
+    

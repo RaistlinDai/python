@@ -81,7 +81,7 @@ class ViewForm_fileload(IViewForm):
         
     def open_nextframe(self):
         '''
-        open the next frame according to the processing list
+        render the next frame according to the processing list
         '''
         #destroy the body before rendering it
         try:

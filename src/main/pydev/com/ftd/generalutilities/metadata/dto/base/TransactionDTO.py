@@ -295,6 +295,62 @@ class TransactionDTO(object):
             else:
                 continue
             
+    
+    def remove_process_flow_by_index(self, step_index):
+        '''
+        clear the process flow by index
+        @param step_index: the index of step
+        '''
+        if not self.__dto:
+            return False, None, 'There is no transaction info, please re-open the app'
+        elif not self.get_processflow():
+            return False, None, 'There is no process info'
+        
+        length = len(self.get_processflow())
+        if step_index < 0:
+            return
+        elif step_index >= length:
+            return
+        else:
+            self.get_processflow().pop(step_index)
+    
+    
+    def remove_subsequent_process_flows(self, curr_step=None, is_remove_curr_step=False):
+        '''
+        clear the subsequent process flows from current step
+        @param curr_step: the current step
+        @param is_remove_curr_step: if the current step also need to removed
+        '''
+        if not self.__dto:
+            return False, None, 'There is no transaction info, please re-open the app'
+        elif not self.get_processflow():
+            return False, None, 'There is no process info'
+            
+        #verify the input type
+        if not curr_step:
+            curr_step = self.get_currentframe()
+        elif not isinstance(curr_step, Mainframe_enum):
+            return False, None, 'The input parameter is incorrect'
+        
+        try:
+            proc = self.get_processflow()
+            idx = proc.index(curr_step)
+            #verify if current step is the last step
+            if idx == 0 and is_remove_curr_step:
+                self.get_processflow().clear() # clear the whole list
+            else:
+                remove_position = idx
+                if not is_remove_curr_step:
+                    remove_position = remove_position + 1
+                while len(self.get_processflow()) > remove_position:
+                    self.remove_process_flow_by_index(remove_position)
+                    
+        except ValueError as e:
+            print('expect:', e)
+            return False, None, e
+        
+        return True, None, None
+            
             
     def update_process_flow_by_start_selection(self, selections):
         '''
