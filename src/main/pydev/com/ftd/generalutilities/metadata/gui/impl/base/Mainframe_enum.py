@@ -21,9 +21,8 @@ from src.main.pydev.com.ftd.generalutilities.metadata.gui.impl.frame.Frame_ts_ha
 from src.main.pydev.com.ftd.generalutilities.metadata.gui.impl.frame.Frame_ts_handler_browse import Frame_ts_handler_browse
 from src.main.pydev.com.ftd.generalutilities.metadata.gui.impl.frame.Frame_ts_handler_commonservice import Frame_ts_handler_commonservice
 
-from src.main.pydev.com.ftd.generalutilities.metadata.gui.impl.frame.cassandra.Frame_cassandra_startup import Frame_cassandra_startup
-from src.main.pydev.com.ftd.generalutilities.metadata.gui.impl.frame.cassandra.Frame_cassandra_create_connection import Frame_cassandra_create_connection
-from src.main.pydev.com.ftd.generalutilities.metadata.gui.impl.frame.cassandra.Frame_cassandra_load_connection import Frame_cassandra_load_connection
+from src.main.pydev.com.ftd.generalutilities.metadata.gui.impl.frame.database.Frame_database_startup import Frame_database_startup
+from src.main.pydev.com.ftd.generalutilities.metadata.gui.impl.frame.database.cassandra.Frame_cassandra_maint_connection import Frame_cassandra_maint_connection
 
 @unique
 class Mainframe_enum(Enum):
@@ -49,8 +48,7 @@ class Mainframe_enum(Enum):
     TS_HANDLER_COMMON = [Frame_ts_handler_commonservice, 'TSCommonService']
     TS_HANDLER_BROWSE =[Frame_ts_handler_browse, 'TSBrowse']
     
-    # ===== Cassandra =====
-    CASSANDRA_STARTUP = [Frame_cassandra_startup, 'CassandraStartup']
-    CASSANDRA_CREATE_CONNECTION = [Frame_cassandra_create_connection, 'CassandraCreateConnection']
-    CASSANDRA_LOAD_CONNECTION = [Frame_cassandra_load_connection, 'CassandraLoadConnection']
+    # ===== Database =====
+    DATABASE_STARTUP = [Frame_database_startup, 'DatabaseStartup']
+    CASSANDRA_MAINT_CONNECTION = [Frame_cassandra_maint_connection, 'CassandraMaintConnection']
     

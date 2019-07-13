@@ -386,12 +386,11 @@ class TransactionDTO(object):
                 print('model 3')
                 break
             
-            # ====== Cassandra ======
-            if case(11): #create a new connection for cassandra
-                self.add_next_process(Mainframe_enum.CASSANDRA_CREATE_CONNECTION)
+            # ====== Database ======
+            if case(11): #connection for cassandra
+                self.add_next_process(Mainframe_enum.CASSANDRA_MAINT_CONNECTION)
                 break
-            if case(12): #load the existing connections for cassandra
-                self.add_next_process(Mainframe_enum.CASSANDRA_LOAD_CONNECTION)
+            if case(12): #connections for mongodb
                 break
             
             if case(): # default, could also just omit condition or 'if True'

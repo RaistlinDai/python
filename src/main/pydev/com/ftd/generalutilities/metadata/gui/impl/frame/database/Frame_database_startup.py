@@ -14,7 +14,7 @@ from src.main.pydev.com.ftd.generalutilities.metadata.service.base.File_processo
 from src.main.pydev.com.ftd.generalutilities.metadata.service.base.File_constant import File_constant
 from src.main.pydev.com.ftd.generalutilities.metadata.service.fileproc.User_default_file_processor import User_default_file_processor
 
-class Frame_cassandra_startup(FormatableFrame):
+class Frame_database_startup(FormatableFrame):
     '''
     classdocs
     '''
@@ -33,21 +33,21 @@ class Frame_cassandra_startup(FormatableFrame):
         self.__frame1 = FormatableFrame(self)
         self.__frame1.pack(side=TOP)
         #Title
-        self.__label01 = Label(self.__frame1, text="Cassandra connection", width= 45)
+        self.__label01 = Label(self.__frame1, text="Database connection", width= 45)
         self.__label01.pack(side=TOP, fill=X, ipady=10)
         
         #---- panel 01 ----------
         canv1 = Canvas(self, height=150, width=550)
         #label
-        label1 = Label(canv1, text='Please select a processing pattern:')
+        label1 = Label(canv1, text='Please select a database pattern:')
         label1.place(height=20, width=200, relx=0.01, rely=0.05)
         #radio box
         self.__vari1 = IntVar()
-        self.__rad1 = Radiobutton(canv1, text='Create new connection', variable=self.__vari1, value=11)
-        self.__rad1.place(height=20, width=160, relx= 0.2, rely=0.3)
+        self.__rad1 = Radiobutton(canv1, text='Cassandra database', variable=self.__vari1, value=11)
+        self.__rad1.place(height=20, width=160, x= 100, rely=0.3)
         self.__rad1.select()
-        self.__rad2 = Radiobutton(canv1, text='Load existing connection', variable=self.__vari1, value=12)
-        self.__rad2.place(height=20, width=170, relx= 0.2, rely=0.52)
+        self.__rad2 = Radiobutton(canv1, text='Mongodb database', variable=self.__vari1, value=12)
+        self.__rad2.place(height=20, width=160, x= 100, rely=0.52)
         self.__rad2.deselect()
         canv1.pack()
         
