@@ -76,7 +76,7 @@ class Frame_cassandra_startup(FormatableFrame):
     #overwrite before_next
     def add_bottom(self, parent):
         #bottom frame
-        exFuncs = {'Next':{'process':self.get_nextframe(), 'cancel':self.remove_subsequent_frame(), 'before':self.before_next}}
+        exFuncs = {'Next':{'process':self.get_nextframe(), 'cancel':self.remove_subsequent_frame_exclude_current(), 'before':self.before_next}}
         self.__buttom = Frame_bottom(parent, ['Next'], exFuncs)
         self.__buttom.pack(fill=X, ipady=10,side=BOTTOM)
         
@@ -121,6 +121,7 @@ class Frame_cassandra_startup(FormatableFrame):
         User_default_file_processor.update_default_file(userdefault, 'workspace', tempdir)
         
         #--- set the process flow according to the selection
+        self.get_trans().remove_subsequent_process_flows_exclude_current()
         self.get_trans().update_process_flow_by_start_selection(self.__vari1.get())
         
         return True

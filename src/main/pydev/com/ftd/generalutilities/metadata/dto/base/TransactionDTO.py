@@ -350,6 +350,22 @@ class TransactionDTO(object):
             return False, None, e
         
         return True, None, None
+    
+    
+    def remove_subsequent_process_flows_include_current(self, curr_step=None):
+        '''
+        clear the subsequent process flows from current step (include current one)
+        @param curr_step: the current step
+        '''
+        self.remove_subsequent_process_flows(curr_step, True)
+        
+    
+    def remove_subsequent_process_flows_exclude_current(self, curr_step=None):
+        '''
+        clear the subsequent process flows from current step (exclude current one)
+        @param curr_step: the current step
+        '''
+        self.remove_subsequent_process_flows(curr_step, False)
             
             
     def update_process_flow_by_start_selection(self, selections):

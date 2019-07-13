@@ -45,7 +45,7 @@ class Button_nextprev(Button):
             message = 'Please verify your selection before going to next step.'
         else:
             title = "Warning"
-            message = 'Are you sure roll back to the previous step?'
+            message = 'Are you sure move back to the previous step?'
         
         if askyesno(title, message):
             if self.__process_click_event:

@@ -99,9 +99,10 @@ class Frame_cassandra_load_connection(FormatableFrame):
     #overwrite before_next
     def add_bottom(self, parent):
         #bottom frame
-        exFuncs = {'Self':{'process':self.test_connection, 'title':'Test'},
+        exFuncs = {'Prev':{'process':self.get_prevframe(), 'before':self.before_prev},
+                   'Self':{'process':self.test_connection, 'title':'Test'},
                    'Next':{'process':self.get_nextframe(), 'before':self.before_next}}
-        self.__buttom = Frame_bottom(parent, ['Next','Self'], exFuncs)
+        self.__buttom = Frame_bottom(parent, ['Prev','Next','Self'], exFuncs)
         self.__buttom.pack(fill=X, ipady=10,side=BOTTOM)
         
     
