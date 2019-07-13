@@ -112,3 +112,7 @@ class File_constant(object):
         # ----------- Cassandra files --------
         self.CASSANDRA_CONFIG_FOLDER = "cassandra\\config\\"
         self.CASSANDRA_CONNECTION_FILE = 'cassandra_connections.txt'
+        
+        # ----------- Mongodb files --------
+        self.MONGODB_CONFIG_FOLDER = "mongodb\\config\\"
+        self.MONGODB_CONNECTION_FILE = 'mongodb_connections.txt'

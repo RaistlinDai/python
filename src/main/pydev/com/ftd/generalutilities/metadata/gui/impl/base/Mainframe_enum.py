@@ -23,6 +23,7 @@ from src.main.pydev.com.ftd.generalutilities.metadata.gui.impl.frame.Frame_ts_ha
 
 from src.main.pydev.com.ftd.generalutilities.metadata.gui.impl.frame.database.Frame_database_startup import Frame_database_startup
 from src.main.pydev.com.ftd.generalutilities.metadata.gui.impl.frame.database.cassandra.Frame_cassandra_maint_connection import Frame_cassandra_maint_connection
+from src.main.pydev.com.ftd.generalutilities.metadata.gui.impl.frame.database.mongodb.Frame_mongodb_maint_connection import Frame_mongodb_maint_connection
 
 @unique
 class Mainframe_enum(Enum):
@@ -51,4 +52,4 @@ class Mainframe_enum(Enum):
     # ===== Database =====
     DATABASE_STARTUP = [Frame_database_startup, 'DatabaseStartup']
     CASSANDRA_MAINT_CONNECTION = [Frame_cassandra_maint_connection, 'CassandraMaintConnection']
-    
+    MONGODB_MAINT_CONNECTION = [Frame_mongodb_maint_connection, 'MongodbMaintConnection']

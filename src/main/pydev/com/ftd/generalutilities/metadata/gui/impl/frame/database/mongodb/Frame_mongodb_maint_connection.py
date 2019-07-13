@@ -6,7 +6,7 @@ Created on Jul 10, 2018
 from tkinter import *
 from src.main.pydev.com.ftd.generalutilities.metadata.gui.impl.frame.Frame_bottom import Frame_bottom
 from src.main.pydev.com.ftd.generalutilities.metadata.gui.impl.base.FormatableFrame import FormatableFrame
-from src.main.pydev.com.ftd.generalutilities.metadata.service.database.cassandra.Cassandra_service_impl import Cassandra_service_impl
+from src.main.pydev.com.ftd.generalutilities.metadata.service.database.mongodb.Mongodb_driver import Mongodb_driver
 from tkinter.messagebox import showerror, askyesno
 from src.main.pydev.com.ftd.generalutilities.metadata.service.base.File_constant import File_constant
 from src.main.pydev.com.ftd.generalutilities.metadata.service.fileproc.Database_connection_file_processor import Database_connection_file_processor
@@ -14,7 +14,7 @@ from src.main.pydev.com.ftd.generalutilities.metadata.service.base.File_processo
 from tkinter.ttk import Combobox
 from src.main.pydev.com.ftd.generalutilities.metadata.gui.impl.button.Button_selfdesign import Button_selfdesign
 
-class Frame_cassandra_maint_connection(FormatableFrame):
+class Frame_mongodb_maint_connection(FormatableFrame):
     '''
     classdocs
     '''
@@ -44,7 +44,7 @@ class Frame_cassandra_maint_connection(FormatableFrame):
         self.__frame1 = FormatableFrame(self)
         self.__frame1.pack(side=TOP)
         #Title
-        self.__label01 = Label(self.__frame1, text="Cassandra maint connection", width= 45)
+        self.__label01 = Label(self.__frame1, text="Mongodb maint connection", width= 45)
         self.__label01.pack(side=TOP, fill=X, ipady=10)
         
         #---- panel 01 ----------
@@ -94,7 +94,7 @@ class Frame_cassandra_maint_connection(FormatableFrame):
         self.__input03 = Entry(canv2, textvariable=self.__feet, borderwidth=3, bg='black', foreground='yellow', highlightcolor='red', insertbackground='red')
         self.__input03.place(height=20, width=100, relx=0.65, rely=0.4)
         #label
-        label2 = Label(canv2, text='(yab config | grep cassandra.default.node.main.native_transport_port)', fg='blue')
+        label2 = Label(canv2, text='(yab config | grep mongodb.default.node.main.native_transport_port)', fg='blue')
         label2.place(height=20, width=410, relx=0.1, rely=0.47)
         
         #label
@@ -113,7 +113,7 @@ class Frame_cassandra_maint_connection(FormatableFrame):
         self.__input05 = Entry(canv2, textvariable=self.__feet, borderwidth=3, bg='black', foreground='yellow', highlightcolor='red', insertbackground='red')
         self.__input05.place(height=20, width=100, relx=0.65, rely=0.6)
         #label
-        label3 = Label(canv2, text='(the default user and password for cassandra both are "qad")', fg='blue')
+        label3 = Label(canv2, text='(the default user and password for mongodb both are "qad")', fg='blue')
         label3.place(height=20, width=400, relx=0.1, rely=0.67)
         
         canv2.pack()
@@ -156,15 +156,15 @@ class Frame_cassandra_maint_connection(FormatableFrame):
         # setup the connection file path into workspace folder
         fileconstant = File_constant()
         workspacepath = self.get_trans().get_workspacepath()
-        cassandra_conection_folder = workspacepath + fileconstant.CASSANDRA_CONFIG_FOLDER
+        mongodb_conection_folder = workspacepath + fileconstant.MONGODB_CONFIG_FOLDER
         
-        if not File_processor.verify_dir_existing(cassandra_conection_folder):
-            File_processor.create_folder(cassandra_conection_folder)
+        if not File_processor.verify_dir_existing(mongodb_conection_folder):
+            File_processor.create_folder(mongodb_conection_folder)
         
-        cassandra_conection_file = cassandra_conection_folder + fileconstant.CASSANDRA_CONNECTION_FILE
+        mongodb_conection_file = mongodb_conection_folder + fileconstant.MONGODB_CONNECTION_FILE
         
         # combine the connection parameter
-        # TODO: this should be implemented as toString() in Cassandra_connection_dto
+        # TODO: this should be implemented as toString() in mongodb_connection_dto
         if self.__maintain_mode == MATAIN_MODE_NEW:
             connection_name = self.__input01.get()
             connection_param = self.__input01.get() + ':' + 'host=' + self.__input02.get() + ',port=' + self.__input03.get() + ',username=' + self.__input04.get() + ',password=' + self.__input05.get()
@@ -173,15 +173,15 @@ class Frame_cassandra_maint_connection(FormatableFrame):
             connection_param = self.__comboxlist.get() + ':' + 'host=' + self.__input02.get() + ',port=' + self.__input03.get() + ',username=' + self.__input04.get() + ',password=' + self.__input05.get()
         
         # store the connection parameters
-        if not File_processor.verify_file(cassandra_conection_file):
-            Database_connection_file_processor.create_connection_file(cassandra_conection_file, connection_param)
+        if not File_processor.verify_file(mongodb_conection_file):
+            Database_connection_file_processor.create_connection_file(mongodb_conection_file, connection_param)
         else:
             if self.__maintain_mode == MATAIN_MODE_NEW and \
-                Database_connection_file_processor.verify_connection_name_exist(cassandra_conection_file, self.__input01.get()):
+                Database_connection_file_processor.verify_connection_name_exist(mongodb_conection_file, self.__input01.get()):
                 
                 if not askyesno('Warning', 'The connection name is existing, do you confirm to overwrite?'):
                     return False
-            Database_connection_file_processor.update_connection_file(cassandra_conection_file, connection_name, connection_param)
+            Database_connection_file_processor.update_connection_file(mongodb_conection_file, connection_name, connection_param)
         
         return True
     
@@ -195,20 +195,20 @@ class Frame_cassandra_maint_connection(FormatableFrame):
         # setup the connection file path into workspace folder
         fileconstant = File_constant()
         workspacepath = self.get_trans().get_workspacepath()
-        cassandra_conection_folder = workspacepath + fileconstant.CASSANDRA_CONFIG_FOLDER
+        mongodb_conection_folder = workspacepath + fileconstant.MONGODB_CONFIG_FOLDER
         
-        if not File_processor.verify_dir_existing(cassandra_conection_folder):
+        if not File_processor.verify_dir_existing(mongodb_conection_folder):
             self.__maintain_mode = MATAIN_MODE_NEW
             return
         
-        cassandra_conection_file = cassandra_conection_folder + fileconstant.CASSANDRA_CONNECTION_FILE
+        mongodb_conection_file = mongodb_conection_folder + fileconstant.MONGODB_CONNECTION_FILE
         
         # verify the connection file
-        if not File_processor.verify_file(cassandra_conection_file):
+        if not File_processor.verify_file(mongodb_conection_file):
             self.__maintain_mode = MATAIN_MODE_NEW
             return
         # load connection names
-        connection_names = Database_connection_file_processor.read_connection_names(cassandra_conection_file)
+        connection_names = Database_connection_file_processor.read_connection_names(mongodb_conection_file)
         # set tuple to combox list
         templist = tuple(connection_names)
         if len(templist) == 0:
@@ -248,20 +248,20 @@ class Frame_cassandra_maint_connection(FormatableFrame):
         # setup the connection file path into workspace folder
         fileconstant = File_constant()
         workspacepath = self.get_trans().get_workspacepath()
-        cassandra_conection_folder = workspacepath + fileconstant.CASSANDRA_CONFIG_FOLDER
+        mongodb_conection_folder = workspacepath + fileconstant.MONGODB_CONFIG_FOLDER
         
-        if not File_processor.verify_dir_existing(cassandra_conection_folder):
-            File_processor.create_folder(cassandra_conection_folder)
+        if not File_processor.verify_dir_existing(mongodb_conection_folder):
+            File_processor.create_folder(mongodb_conection_folder)
         
-        cassandra_conection_file = cassandra_conection_folder + fileconstant.CASSANDRA_CONNECTION_FILE
+        mongodb_conection_file = mongodb_conection_folder + fileconstant.MONGODB_CONNECTION_FILE
         
         # verify connection file existing
-        if not File_processor.verify_file(cassandra_conection_file):
-            showerror('Error', 'Cassandra connection file does not exist!')
+        if not File_processor.verify_file(mongodb_conection_file):
+            showerror('Error', 'mongodb connection file does not exist!')
             return 0
         
         # load connection names
-        connection_names = Database_connection_file_processor.read_connection_names(cassandra_conection_file)
+        connection_names = Database_connection_file_processor.read_connection_names(mongodb_conection_file)
         # set tuple to combox list
         self.__comboxlist["values"]=tuple(connection_names)
         if len(self.__comboxlist["values"]) == 0:
@@ -272,7 +272,7 @@ class Frame_cassandra_maint_connection(FormatableFrame):
         self.__comboxlist.current(0)
         
         # load connection parameters
-        connection_params = Database_connection_file_processor.read_connection_params(cassandra_conection_file, self.__comboxlist.get())
+        connection_params = Database_connection_file_processor.read_connection_params(mongodb_conection_file, self.__comboxlist.get())
         # set parameters
         self.__input02.delete(0, END)
         self.__input02.insert(END, connection_params['host'])
@@ -293,15 +293,15 @@ class Frame_cassandra_maint_connection(FormatableFrame):
         # combine the workspace path
         fileconstant = File_constant()
         workspacepath = self.get_trans().get_workspacepath()
-        cassandra_conection_file = workspacepath + fileconstant.CASSANDRA_CONFIG_FOLDER + fileconstant.CASSANDRA_CONNECTION_FILE
+        mongodb_conection_file = workspacepath + fileconstant.MONGODB_CONFIG_FOLDER + fileconstant.MONGODB_CONNECTION_FILE
         
         # verify connection file existing
-        if not File_processor.verify_file(cassandra_conection_file):
-            showerror('Error', 'Cassandra connection file does not exist!')
+        if not File_processor.verify_file(mongodb_conection_file):
+            showerror('Error', 'mongodb connection file does not exist!')
             return
         
         # load connection parameters
-        connection_params = Database_connection_file_processor.read_connection_params(cassandra_conection_file, self.__comboxlist.get())
+        connection_params = Database_connection_file_processor.read_connection_params(mongodb_conection_file, self.__comboxlist.get())
         # set parameters
         self.__input02.delete(0, END)
         self.__input02.insert(END, connection_params['host'])
@@ -318,5 +318,5 @@ class Frame_cassandra_maint_connection(FormatableFrame):
         test the connection
         '''
         print('TEST CONNECTION')
-        Cassandra_service_impl()
+        Mongodb_driver()
         

@@ -44,10 +44,10 @@ class Frame_database_startup(FormatableFrame):
         #radio box
         self.__vari1 = IntVar()
         self.__rad1 = Radiobutton(canv1, text='Cassandra database', variable=self.__vari1, value=11)
-        self.__rad1.place(height=20, width=160, x= 100, rely=0.3)
+        self.__rad1.place(height=20, width=160, x= 100, y=45)
         self.__rad1.select()
         self.__rad2 = Radiobutton(canv1, text='Mongodb database', variable=self.__vari1, value=12)
-        self.__rad2.place(height=20, width=160, x= 100, rely=0.52)
+        self.__rad2.place(height=20, width=160, x= 100, y=75)
         self.__rad2.deselect()
         canv1.pack()
         

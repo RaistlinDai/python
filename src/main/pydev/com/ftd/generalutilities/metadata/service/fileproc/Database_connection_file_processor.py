@@ -5,7 +5,7 @@ Created on Jul 11, 2019
 '''
 from pathlib import Path
 
-class Cassandra_connection_file_processor(object):
+class Database_connection_file_processor(object):
     
     @staticmethod
     def create_connection_file(file_name, connection_params):

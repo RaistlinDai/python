@@ -391,6 +391,7 @@ class TransactionDTO(object):
                 self.add_next_process(Mainframe_enum.CASSANDRA_MAINT_CONNECTION)
                 break
             if case(12): #connections for mongodb
+                self.add_next_process(Mainframe_enum.MONGODB_MAINT_CONNECTION)
                 break
             
             if case(): # default, could also just omit condition or 'if True'
