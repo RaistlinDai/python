@@ -8,7 +8,7 @@ from tkinter import *
 from src.main.pydev.com.ftd.generalutilities.metadata.gui.impl.frame.Frame_bottom import Frame_bottom
 from src.main.pydev.com.ftd.generalutilities.metadata.gui.impl.base.FormatableFrame import FormatableFrame
 from src.main.pydev.com.ftd.generalutilities.metadata.service.database.cassandra.Cassandra_service_impl import Cassandra_service_impl
-from tkinter.messagebox import showerror, showinfo
+from tkinter.messagebox import showerror
 from src.main.pydev.com.ftd.generalutilities.metadata.service.base.File_constant import File_constant
 from src.main.pydev.com.ftd.generalutilities.metadata.service.fileproc.Cassandra_connection_file_processor import Cassandra_connection_file_processor
 from src.main.pydev.com.ftd.generalutilities.metadata.service.base.File_processor import File_processor

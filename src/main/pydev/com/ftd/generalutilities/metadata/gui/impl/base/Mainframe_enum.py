@@ -21,9 +21,9 @@ from src.main.pydev.com.ftd.generalutilities.metadata.gui.impl.frame.Frame_ts_ha
 from src.main.pydev.com.ftd.generalutilities.metadata.gui.impl.frame.Frame_ts_handler_browse import Frame_ts_handler_browse
 from src.main.pydev.com.ftd.generalutilities.metadata.gui.impl.frame.Frame_ts_handler_commonservice import Frame_ts_handler_commonservice
 
-from src.main.pydev.com.ftd.generalutilities.metadata.gui.impl.frame.Frame_cassandra_startup import Frame_cassandra_startup
-from src.main.pydev.com.ftd.generalutilities.metadata.gui.impl.frame.Frame_cassandra_create_connection import Frame_cassandra_create_connection
-from src.main.pydev.com.ftd.generalutilities.metadata.gui.impl.frame.Frame_cassandra_load_connection import Frame_cassandra_load_connection
+from src.main.pydev.com.ftd.generalutilities.metadata.gui.impl.frame.cassandra.Frame_cassandra_startup import Frame_cassandra_startup
+from src.main.pydev.com.ftd.generalutilities.metadata.gui.impl.frame.cassandra.Frame_cassandra_create_connection import Frame_cassandra_create_connection
+from src.main.pydev.com.ftd.generalutilities.metadata.gui.impl.frame.cassandra.Frame_cassandra_load_connection import Frame_cassandra_load_connection
 
 @unique
 class Mainframe_enum(Enum):
