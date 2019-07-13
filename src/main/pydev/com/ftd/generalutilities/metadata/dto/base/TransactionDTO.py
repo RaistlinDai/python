@@ -392,6 +392,7 @@ class TransactionDTO(object):
                 break
             if case(12): #connections for mongodb
                 self.add_next_process(Mainframe_enum.MONGODB_MAINT_CONNECTION)
+                self.add_next_process(Mainframe_enum.MONGODB_PROCESSOR)
                 break
             
             if case(): # default, could also just omit condition or 'if True'

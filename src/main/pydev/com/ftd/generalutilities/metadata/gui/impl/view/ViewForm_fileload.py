@@ -26,7 +26,7 @@ class ViewForm_fileload(IViewForm):
         if func == 1:
             self.__main = Frame_main('File Generator')
         elif func == 2:
-            self.__main = Frame_main('Cassandra connector')
+            self.__main = Frame_main('Database connector')
         self.__body = None
         self.__dtos = EntityDTO()
         self.__trans = TransactionDTO()
@@ -41,8 +41,8 @@ class ViewForm_fileload(IViewForm):
             #self.__trans.add_next_process(Mainframe_enum.SERVICEIMPL_OPTION)
             #self.__trans.add_next_process(Mainframe_enum.SERVICEIMPL_OPTION)
         elif func == 2:
-            self.__trans.add_next_process(Mainframe_enum.DATABASE_STARTUP)
-            #self.__trans.add_next_process(Mainframe_enum.CASSANDRA_CREATE_CONNECTION)
+            #self.__trans.add_next_process(Mainframe_enum.DATABASE_STARTUP)
+            self.__trans.add_next_process(Mainframe_enum.MONGODB_PROCESSOR)
         
         #load frame
         self.open_firstframe()
