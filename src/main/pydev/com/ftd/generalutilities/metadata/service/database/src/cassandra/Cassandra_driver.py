@@ -6,7 +6,7 @@ Created on Jul 10, 2018
 
 from cassandra.cluster import Cluster
 
-class Cassandra_service_impl(object):
+class Cassandra_driver(object):
     '''
     classdocs
     '''

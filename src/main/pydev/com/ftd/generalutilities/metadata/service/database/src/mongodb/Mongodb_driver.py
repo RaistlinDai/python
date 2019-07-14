@@ -4,22 +4,29 @@ Created on Jul 13, 2019
 @author: ftd
 '''
 import pymongo
+from src.main.pydev.com.ftd.generalutilities.metadata.service.database.api.IDatabase_driver import IDatabase_driver
 
-class Mongodb_driver(object):
+class Mongodb_driver(IDatabase_driver):
     '''
     class doc
     '''
     
-    def __init__(self, connection_param):
-        self.__mongodb_client = pymongo.MongoClient('mongodb://localhost:27017/')
-        self.__mongodb_database_connector = None
+    def __init__(self, connection_param=None):
+        IDatabase_driver.__init__(self, connection_param)
+        pass
     
     
+    # overwrite super class
+    def setup_connection(self, connection_param=None):
+        return pymongo.MongoClient('mongodb://localhost:27017/')
+    
+    
+    # overwrite super class
     def get_database_list(self):
         '''
         get the mongodb database list
         '''
-        return self.__mongodb_client.list_database_names()
+        return self.get_database_driver().list_database_names()
     
     
     def connect_database_by_name(self, db_name):

@@ -6,7 +6,6 @@ Created on Jul 10, 2018
 from tkinter import *
 from src.main.pydev.com.ftd.generalutilities.metadata.gui.impl.frame.Frame_bottom import Frame_bottom
 from src.main.pydev.com.ftd.generalutilities.metadata.gui.impl.base.FormatableFrame import FormatableFrame
-from src.main.pydev.com.ftd.generalutilities.metadata.service.database.mongodb.Mongodb_driver import Mongodb_driver
 from tkinter.messagebox import showerror, askyesno
 from src.main.pydev.com.ftd.generalutilities.metadata.service.base.File_constant import File_constant
 from src.main.pydev.com.ftd.generalutilities.metadata.service.fileproc.Database_connection_file_processor import Database_connection_file_processor
@@ -14,6 +13,7 @@ from src.main.pydev.com.ftd.generalutilities.metadata.service.base.File_processo
 from tkinter.ttk import Combobox
 from src.main.pydev.com.ftd.generalutilities.metadata.gui.impl.button.Button_selfdesign import Button_selfdesign
 from src.main.pydev.com.ftd.generalutilities.metadata.gui.impl.view.database.Popup_table_maint import Popup_table_maint
+from src.main.pydev.com.ftd.generalutilities.metadata.service.database.src.mongodb.Mongodb_driver import Mongodb_driver
 
 class Frame_mongodb_maint_connection(FormatableFrame):
     '''
@@ -321,7 +321,9 @@ class Frame_mongodb_maint_connection(FormatableFrame):
         print('TEST CONNECTION')
         #Mongodb_driver()
         
-        popup = Popup_table_maint([])
+        mongodb_driver = Mongodb_driver()
+        
+        popup = Popup_table_maint(mongodb_driver)
         popup.grab_set()
         popup.focus_set()
         popup.wait_window()

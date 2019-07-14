@@ -6,7 +6,6 @@ Created on Jul 10, 2018
 from tkinter import *
 from src.main.pydev.com.ftd.generalutilities.metadata.gui.impl.frame.Frame_bottom import Frame_bottom
 from src.main.pydev.com.ftd.generalutilities.metadata.gui.impl.base.FormatableFrame import FormatableFrame
-from src.main.pydev.com.ftd.generalutilities.metadata.service.database.cassandra.Cassandra_service_impl import Cassandra_service_impl
 from tkinter.messagebox import showerror, askyesno
 from src.main.pydev.com.ftd.generalutilities.metadata.service.base.File_constant import File_constant
 from src.main.pydev.com.ftd.generalutilities.metadata.service.fileproc.Database_connection_file_processor import Database_connection_file_processor
@@ -318,5 +317,4 @@ class Frame_cassandra_maint_connection(FormatableFrame):
         test the connection
         '''
         print('TEST CONNECTION')
-        Cassandra_service_impl()
         

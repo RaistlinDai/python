@@ -6,18 +6,24 @@ Created on Jul 14, 2019
 from tkinter import *
 from numpy.core.tests.test_mem_overlap import xrange
 from tkinter.ttk import Combobox
+from src.main.pydev.com.ftd.generalutilities.metadata.service.database.api.IDatabase_driver import IDatabase_driver
+from tkinter.messagebox import showerror
 
 class Popup_table_maint(Toplevel):
     '''
     class doc
     '''
     
-    def __init__(self, filelists, parent=None, **configs):
+    def __init__(self, database_driver, parent=None, **configs):
         '''
         Constructor
         '''
-
+        
         Toplevel.__init__(self, parent, **configs)
+        # set database driver
+        self.__database_driver = database_driver
+        
+        # set title
         self.title('Table content')
         
         # forbidden resize
@@ -65,8 +71,6 @@ class Popup_table_maint(Toplevel):
         self.__scroll.place(height=300, width=10, x=155, y=40)
         self.__scroll.config(command = self.__listbox.yview)
         self.__listbox.place(height=300, width=150, x=5, y=40)
-        for name in ['a','b','c','d','e','f','g','h','i','j','k','l']:
-            self.__listbox.insert(0, name)
         
         #---- right panel ----------
         canv_right = Canvas(self.__table_body, bg="yellow")
@@ -108,9 +112,31 @@ class Popup_table_maint(Toplevel):
         # Set the canvas scrolling region
         canv_right.config(scrollregion=canv_right.bbox("all"))
         
+        # Validation for database driver
+        if not isinstance(database_driver, IDatabase_driver):
+            showerror('Error', 'Incorrect database parameters, please close!')
+            return
+        
+        result, message = self.load_databases()
+        if not result:
+            showerror('Error', message)
+        
+    
+    def load_databases(self):
+        '''
+        load the database name list from database_driver
+        '''
+        database_list = self.__database_driver.get_database_list()
+        if not database_list or len(database_list) == 0:
+            return False, 'No valid database!'
+        
+        self.__comboxlist["values"] = database_list
+        return True, None
+        
         
     def load_collections(self):
         '''
         load the collections (tables)
         '''
-        pass
+        #for name in database_list:
+        #    self.__listbox.insert(END, name)
