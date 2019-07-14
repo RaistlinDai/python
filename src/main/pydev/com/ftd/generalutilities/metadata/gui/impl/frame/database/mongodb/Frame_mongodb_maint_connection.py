@@ -13,6 +13,7 @@ from src.main.pydev.com.ftd.generalutilities.metadata.service.fileproc.Database_
 from src.main.pydev.com.ftd.generalutilities.metadata.service.base.File_processor import File_processor
 from tkinter.ttk import Combobox
 from src.main.pydev.com.ftd.generalutilities.metadata.gui.impl.button.Button_selfdesign import Button_selfdesign
+from src.main.pydev.com.ftd.generalutilities.metadata.gui.impl.view.database.Popup_table_maint import Popup_table_maint
 
 class Frame_mongodb_maint_connection(FormatableFrame):
     '''
@@ -318,5 +319,10 @@ class Frame_mongodb_maint_connection(FormatableFrame):
         test the connection
         '''
         print('TEST CONNECTION')
-        Mongodb_driver()
+        #Mongodb_driver()
+        
+        popup = Popup_table_maint([])
+        popup.grab_set()
+        popup.focus_set()
+        popup.wait_window()
         

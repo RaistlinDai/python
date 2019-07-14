@@ -41,8 +41,7 @@ class ViewForm_fileload(IViewForm):
             #self.__trans.add_next_process(Mainframe_enum.SERVICEIMPL_OPTION)
             #self.__trans.add_next_process(Mainframe_enum.SERVICEIMPL_OPTION)
         elif func == 2:
-            #self.__trans.add_next_process(Mainframe_enum.DATABASE_STARTUP)
-            self.__trans.add_next_process(Mainframe_enum.MONGODB_PROCESSOR)
+            self.__trans.add_next_process(Mainframe_enum.DATABASE_STARTUP)
         
         #load frame
         self.open_firstframe()
