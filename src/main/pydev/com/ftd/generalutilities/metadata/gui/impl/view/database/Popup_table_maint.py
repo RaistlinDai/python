@@ -8,6 +8,7 @@ from numpy.core.tests.test_mem_overlap import xrange
 from tkinter.ttk import Combobox
 from src.main.pydev.com.ftd.generalutilities.metadata.service.database.api.IDatabase_driver import IDatabase_driver
 from tkinter.messagebox import showerror
+from cassandra.cluster import NoHostAvailable
 
 class Popup_table_maint(Toplevel):
     '''
@@ -126,12 +127,31 @@ class Popup_table_maint(Toplevel):
         '''
         load the database name list from database_driver
         '''
-        database_list = self.__database_driver.get_database_list()
-        if not database_list or len(database_list) == 0:
-            return False, 'No valid database!'
+        result = True
+        message = None
+        database_list = []
+        
+        try:
+            database_list = self.__database_driver.get_database_list()
+            if not database_list or len(database_list) == 0:
+                result = False
+                message = 'No valid database!'
+        except TypeError as te:
+            message = te
+            result = False
+        except ValueError:
+            message = 'Incorrect port number!'
+            result = False
+        except NoHostAvailable as ne:
+            message = ne.args[0]
+            result = False
+        except Exception as e:
+            message = f'Connect failed:{e}'
+            result = False
         
         self.__comboxlist["values"] = database_list
-        return True, None
+        
+        return result, message
         
         
     def load_collections(self):

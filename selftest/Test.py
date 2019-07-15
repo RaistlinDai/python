@@ -50,6 +50,8 @@ elif testType == 4:
     for ii in dic.items():
         if ii[0] == 111:
             print(ii)
+    for ii in dic.keys():
+        print(ii)
 
 elif testType == 5:
     str1 = 123 # input('input a value:') 

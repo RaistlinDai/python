@@ -3,6 +3,7 @@ Created on Jul 14, 2019
 
 @author: ftd
 '''
+from src.main.pydev.com.ftd.generalutilities.metadata.dto.database.Database_parameters import Database_parameters
 
 class IDatabase_driver(object):
     '''
@@ -10,21 +11,28 @@ class IDatabase_driver(object):
     '''
     
     def __init__(self, connection_param=None):
-        print('IDATABASE_DRIVER')
-        self.__database_driver = self.setup_connection(connection_param)
+        self.verify_database_parameters(connection_param)
     
     
-    def set_database_driver(self, db_driver):
-        self.__database_driver = db_driver
+    def verify_database_parameters(self, params):
+        if not isinstance(params, Database_parameters):
+            raise TypeError('Incorrect connection parameters!')
+
         
-        
-    def get_database_driver(self):
-        return self.__database_driver
-    
-    
-    def setup_connection(self, connection_param=None):
+    def active_connection(self):
         pass
-        
+    
+    
+    def shutdown_connection(self):
+        pass
+    
+    
+    def test_connection(self):
+        pass
+    
     
     def get_database_list(self):
         pass
+    
+    
+    

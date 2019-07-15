@@ -4,7 +4,7 @@ Created on Jul 11, 2018
 @author: ftd
 '''
 
-class Cassandra_connection_parameters(object):
+class Database_parameters(object):
     '''
     classdocs
     '''
@@ -17,6 +17,7 @@ class Cassandra_connection_parameters(object):
         self.__port = port
         self.__username = username
         self.__password = password
+        
 
     def get_contact_points(self):
         return self.__contact_points

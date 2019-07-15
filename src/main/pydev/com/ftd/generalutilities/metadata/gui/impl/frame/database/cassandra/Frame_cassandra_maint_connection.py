@@ -6,12 +6,16 @@ Created on Jul 10, 2018
 from tkinter import *
 from src.main.pydev.com.ftd.generalutilities.metadata.gui.impl.frame.Frame_bottom import Frame_bottom
 from src.main.pydev.com.ftd.generalutilities.metadata.gui.impl.base.FormatableFrame import FormatableFrame
-from tkinter.messagebox import showerror, askyesno
+from tkinter.messagebox import showerror, askyesno, showinfo
 from src.main.pydev.com.ftd.generalutilities.metadata.service.base.File_constant import File_constant
 from src.main.pydev.com.ftd.generalutilities.metadata.service.fileproc.Database_connection_file_processor import Database_connection_file_processor
 from src.main.pydev.com.ftd.generalutilities.metadata.service.base.File_processor import File_processor
 from tkinter.ttk import Combobox
 from src.main.pydev.com.ftd.generalutilities.metadata.gui.impl.button.Button_selfdesign import Button_selfdesign
+from cassandra.cluster import NoHostAvailable
+from src.main.pydev.com.ftd.generalutilities.metadata.service.database.src.cassandra.Cassandra_driver import Cassandra_driver
+from src.main.pydev.com.ftd.generalutilities.metadata.dto.database.Database_parameters import Database_parameters
+from src.main.pydev.com.ftd.generalutilities.metadata.gui.impl.view.database.Popup_table_maint import Popup_table_maint
 
 class Frame_cassandra_maint_connection(FormatableFrame):
     '''
@@ -148,10 +152,6 @@ class Frame_cassandra_maint_connection(FormatableFrame):
             showerror('Error', 'Please provide the complete info!')
             return False
         
-        # validate connection
-        # TODO: after merge
-        
-        
         # setup the connection file path into workspace folder
         fileconstant = File_constant()
         workspacepath = self.get_trans().get_workspacepath()
@@ -183,6 +183,14 @@ class Frame_cassandra_maint_connection(FormatableFrame):
             Database_connection_file_processor.update_connection_file(cassandra_conection_file, connection_name, connection_param)
         
         return True
+    
+    
+    def get_nextframe(self):
+        '''
+        overwrite the super class FtdFrame, set the next frame as database maint popup
+        '''
+        func = self.open_popup_table_maint
+        return func
     
     
     def set_maintain_mode(self):
@@ -312,9 +320,58 @@ class Frame_cassandra_maint_connection(FormatableFrame):
         self.__input05.insert(END, connection_params['password'])
         
     
-    def test_connection(self):
+    def test_connection(self, is_show_success=True):
         '''
         test the connection
         '''
-        print('TEST CONNECTION')
+        cassandra_connection_result = False
+        
+        #--- verify the input value
+        if not self.__input02.get() or not self.__input03.get() or not self.__input04.get() or not self.__input05.get():
+            showerror('Error', 'Please provide the complete info!')
+            return
+        
+        connectionParams = Database_parameters()
+        connectionParams.set_contact_points(self.__input02.get())
+        connectionParams.set_port(self.__input03.get())
+        connectionParams.set_username(self.__input04.get())
+        connectionParams.set_password(self.__input05.get())
+        
+        try:
+            cassandra_connection = Cassandra_driver(connectionParams)
+            cassandra_connection_result = cassandra_connection.test_connection()
+        except TypeError as te:
+            showerror('Error', te)
+        except ValueError:
+            message = 'Incorrect port number!'
+            showerror('Error', message)
+        except NoHostAvailable as ne:
+            message = ne.args[0]
+            showerror('Error', message)
+        except Exception as e:
+            message = f'Connect failed:{e}'
+            showerror('Error', message)
+            
+        if cassandra_connection_result and is_show_success:
+            message = 'Connect successfully'
+            showinfo('Info', message)
+            
+        return cassandra_connection_result
+    
+    
+    def open_popup_table_maint(self):
+        '''
+        open the table maint popup
+        '''
+        connectionParams = Database_parameters()
+        connectionParams.set_contact_points(self.__input02.get())
+        connectionParams.set_port(self.__input03.get())
+        connectionParams.set_username(self.__input04.get())
+        connectionParams.set_password(self.__input05.get())
+        cassandra_connection = Cassandra_driver(connectionParams)
+        
+        popup = Popup_table_maint(cassandra_connection)
+        popup.grab_set()
+        popup.focus_set()
+        popup.wait_window()
         

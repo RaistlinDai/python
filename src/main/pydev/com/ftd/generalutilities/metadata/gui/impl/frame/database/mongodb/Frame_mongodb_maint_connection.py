@@ -6,7 +6,7 @@ Created on Jul 10, 2018
 from tkinter import *
 from src.main.pydev.com.ftd.generalutilities.metadata.gui.impl.frame.Frame_bottom import Frame_bottom
 from src.main.pydev.com.ftd.generalutilities.metadata.gui.impl.base.FormatableFrame import FormatableFrame
-from tkinter.messagebox import showerror, askyesno
+from tkinter.messagebox import showerror, askyesno, showinfo
 from src.main.pydev.com.ftd.generalutilities.metadata.service.base.File_constant import File_constant
 from src.main.pydev.com.ftd.generalutilities.metadata.service.fileproc.Database_connection_file_processor import Database_connection_file_processor
 from src.main.pydev.com.ftd.generalutilities.metadata.service.base.File_processor import File_processor
@@ -14,6 +14,7 @@ from tkinter.ttk import Combobox
 from src.main.pydev.com.ftd.generalutilities.metadata.gui.impl.button.Button_selfdesign import Button_selfdesign
 from src.main.pydev.com.ftd.generalutilities.metadata.gui.impl.view.database.Popup_table_maint import Popup_table_maint
 from src.main.pydev.com.ftd.generalutilities.metadata.service.database.src.mongodb.Mongodb_driver import Mongodb_driver
+from src.main.pydev.com.ftd.generalutilities.metadata.dto.database.Database_parameters import Database_parameters
 
 class Frame_mongodb_maint_connection(FormatableFrame):
     '''
@@ -151,8 +152,8 @@ class Frame_mongodb_maint_connection(FormatableFrame):
             return False
         
         # validate connection
-        # TODO: after merge
-        
+        if not self.test_connection(False):
+            return False
         
         # setup the connection file path into workspace folder
         fileconstant = File_constant()
@@ -314,17 +315,32 @@ class Frame_mongodb_maint_connection(FormatableFrame):
         self.__input05.insert(END, connection_params['password'])
         
     
-    def test_connection(self):
+    def test_connection(self, is_show_success=True):
         '''
         test the connection
         '''
-        print('TEST CONNECTION')
-        #Mongodb_driver()
+        mongodb_connection_result = False
         
-        mongodb_driver = Mongodb_driver()
+        #--- verify the input value
+        if not self.__input02.get() or not self.__input03.get() or not self.__input04.get() or not self.__input05.get():
+            showerror('Error', 'Please provide the complete info!')
+            return
         
-        popup = Popup_table_maint(mongodb_driver)
-        popup.grab_set()
-        popup.focus_set()
-        popup.wait_window()
+        connectionParams = Database_parameters(self.__input02.get(),self.__input03.get(),self.__input04.get(),self.__input05.get())
+        
+        try:
+            mongodb_connection = Mongodb_driver(connectionParams)
+            mongodb_connection.test_connection()
+            mongodb_connection_result = True
+        except Exception as e:
+            message = f'Connect failed:{e}'
+            showerror('Error', message)
+            mongodb_connection_result = False
+        
+        if mongodb_connection_result and is_show_success:
+            message = 'Connect successfully'
+            showinfo('Info', message)
+            
+        return mongodb_connection_result
+        
         
