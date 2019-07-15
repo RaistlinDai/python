@@ -91,4 +91,40 @@ class Cassandra_driver(IDatabase_driver):
         
         self.__cluster.shutdown()
         return keyspaces
+    
+    
+    def get_table_list(self, database_name):
+        '''
+        get the cassandra table by keyspace name
+        @param database_name: keyspace name
+        '''
+        tables = []
+        # Create Cassandra cluster
+        self.active_connection()
+        self.__cluster.connect()
+        table_items = self.__cluster.metadata.keyspaces[database_name].tables
+        
+        for item in table_items.items():
+            tables.append(item[0])
+        
+        self.__cluster.shutdown()
+        return tables
+    
+    
+    def get_records(self, database_name, table_name):
+        '''
+        get the records by table name
+        '''
+        rows = []
+        # Create Cassandra cluster
+        self.active_connection()
+        session = self.__cluster.connect(database_name)
+        
+        rows = session.execute('SELECT * FROM ' + table_name)
+        
+        self.__cluster.shutdown()
+        return rows
+    
+    
+    
         
