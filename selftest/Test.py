@@ -19,9 +19,24 @@ if testType == 1:
     print(xyz[-1])
     
 elif testType == 2:
-    abc = ['M', 'S', 'WQ']
+    abc = ['M', 'S', 'WQ', 'D', 'O', 'T']
     print(abc.index('S'))
     print(len(abc))
+
+    testType2 = int(input('Test index (1 - 9): '))
+    length = len(abc)
+    if testType2 < 0:
+        print('less than 0')
+    elif testType2 == 0:
+        abc.clear()
+        print('equals to 0')
+    elif testType2 >= length:
+        print('more than length')
+    else:
+        print('remove record')
+        while len(abc) > testType2 + 1:
+            abc.pop(testType2)
+    print(abc)
         
 elif testType == 3:
     sumx = 0

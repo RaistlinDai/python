@@ -107,3 +107,12 @@ class File_constant(object):
                           '504B0304':'jar', #the same as zip
                           '7061636b616765207765':'java',
                           '213C617263683E0A':'lib'}
+        
+        
+        # ----------- Cassandra files --------
+        self.CASSANDRA_CONFIG_FOLDER = "cassandra\\config\\"
+        self.CASSANDRA_CONNECTION_FILE = 'cassandra_connections.txt'
+        
+        # ----------- Mongodb files --------
+        self.MONGODB_CONFIG_FOLDER = "mongodb\\config\\"
+        self.MONGODB_CONNECTION_FILE = 'mongodb_connections.txt'

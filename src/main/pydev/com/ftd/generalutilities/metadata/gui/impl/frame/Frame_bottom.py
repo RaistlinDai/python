@@ -31,17 +31,17 @@ class Frame_bottom(Frame, IUnFormatableFrame):
         
         if 'Load' in buttons:
             self.__loadButton = Button_load(self, loadFunc, font=curFont, text='Load', bg='grey', fg='yellow', relief=RAISED, cursor='hand2')
-            self.__loadButton.pack(side=LEFT)
+            self.__loadButton.pack(side=LEFT,ipadx=15,padx=10)
         
         if 'Prev' in buttons:
             self.__prevButton = Button_nextprev(self, prevFunc, 'Prev', font=curFont, text='Prev', bg='grey', fg='yellow', relief=RAISED, cursor='hand2')
-            self.__prevButton.pack(side=LEFT)
+            self.__prevButton.pack(side=LEFT,ipadx=15,padx=10)
         
         if 'Next' in buttons:
             self.__quitButton = Button_nextprev(self, nextFunc, 'Next', font=curFont, text='Next', bg='grey', fg='yellow', relief=RAISED, cursor='hand2')
-            self.__quitButton.pack(side=RIGHT)
+            self.__quitButton.pack(side=RIGHT,ipadx=15,padx=10)
 
         if 'Self' in buttons:
             self.__selfButton = Button_selfdesign_bottom(self, selfFunc, btnText=selfFunc.get('title'), font=curFont, bg='grey', fg='yellow', relief=RAISED, cursor='hand2')
-            self.__selfButton.pack(side=LEFT)
+            self.__selfButton.pack(side=RIGHT,ipadx=15,padx=10)
             

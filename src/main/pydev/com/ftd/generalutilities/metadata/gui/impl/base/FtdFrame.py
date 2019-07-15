@@ -45,6 +45,16 @@ class FtdFrame(Frame):
         func = self.__trans.get_prev_frame_func()
         return func
         
+        
+    def remove_subsequent_frame_exclude_current(self):
+        func = self.__trans.remove_subsequent_process_flows_exclude_current
+        return func
+    
+    
+    def remove_subsequent_frame_include_current(self):
+        func = self.__trans.remove_subsequent_process_flows_include_current
+        return func
+    
 
     def set_dtos(self, dtos):
         self.__dtos = dtos

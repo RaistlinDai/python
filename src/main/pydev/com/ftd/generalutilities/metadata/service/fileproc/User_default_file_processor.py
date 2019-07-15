@@ -5,7 +5,7 @@ Created on Jul 23, 2018
 '''
 from pathlib import Path
 
-class Deffile_processor(object):
+class User_default_file_processor(object):
     
     @staticmethod
     def create_default_file(filename):

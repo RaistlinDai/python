@@ -26,7 +26,7 @@ class ViewForm_fileload(IViewForm):
         if func == 1:
             self.__main = Frame_main('File Generator')
         elif func == 2:
-            self.__main = Frame_main('Cassandra connector')
+            self.__main = Frame_main('Database connector')
         self.__body = None
         self.__dtos = EntityDTO()
         self.__trans = TransactionDTO()
@@ -41,8 +41,7 @@ class ViewForm_fileload(IViewForm):
             #self.__trans.add_next_process(Mainframe_enum.SERVICEIMPL_OPTION)
             #self.__trans.add_next_process(Mainframe_enum.SERVICEIMPL_OPTION)
         elif func == 2:
-            #self.__trans.add_next_process(Mainframe_enum.CASSANDRA_STARTUP)
-            self.__trans.add_next_process(Mainframe_enum.CASSANDRA_CREATE_CONNECTION)
+            self.__trans.add_next_process(Mainframe_enum.DATABASE_STARTUP)
         
         #load frame
         self.open_firstframe()
@@ -81,7 +80,7 @@ class ViewForm_fileload(IViewForm):
         
     def open_nextframe(self):
         '''
-        open the next frame according to the processing list
+        render the next frame according to the processing list
         '''
         #destroy the body before rendering it
         try:

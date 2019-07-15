@@ -12,9 +12,9 @@ from src.main.pydev.com.ftd.generalutilities.metadata.service.fileproc.Xmlfile_p
 from tkinter.messagebox import showerror, showinfo
 from src.main.pydev.com.ftd.generalutilities.metadata.service.base.File_processor import File_processor
 from src.main.pydev.com.ftd.generalutilities.metadata.service.base.File_constant import File_constant
-from src.main.pydev.com.ftd.generalutilities.metadata.service.fileproc.Deffile_processor import Deffile_processor
+from src.main.pydev.com.ftd.generalutilities.metadata.service.fileproc.User_default_file_processor import User_default_file_processor
 
-class Frame_cassandra_startup(FormatableFrame):
+class Frame_database_startup(FormatableFrame):
     '''
     classdocs
     '''
@@ -33,21 +33,21 @@ class Frame_cassandra_startup(FormatableFrame):
         self.__frame1 = FormatableFrame(self)
         self.__frame1.pack(side=TOP)
         #Title
-        self.__label01 = Label(self.__frame1, text="Cassandra connection", width= 45)
+        self.__label01 = Label(self.__frame1, text="Database client", width= 45)
         self.__label01.pack(side=TOP, fill=X, ipady=10)
         
         #---- panel 01 ----------
         canv1 = Canvas(self, height=150, width=550)
         #label
-        label1 = Label(canv1, text='Please select a processing pattern:')
+        label1 = Label(canv1, text='Please select a database client:')
         label1.place(height=20, width=200, relx=0.01, rely=0.05)
         #radio box
         self.__vari1 = IntVar()
-        self.__rad1 = Radiobutton(canv1, text='Create new connection', variable=self.__vari1, value=11)
-        self.__rad1.place(height=20, width=160, relx= 0.2, rely=0.3)
+        self.__rad1 = Radiobutton(canv1, text='Cassandra', variable=self.__vari1, value=11)
+        self.__rad1.place(height=20, width=100, x= 100, y=45)
         self.__rad1.select()
-        self.__rad2 = Radiobutton(canv1, text='Load existing connection', variable=self.__vari1, value=12)
-        self.__rad2.place(height=20, width=170, relx= 0.2, rely=0.52)
+        self.__rad2 = Radiobutton(canv1, text='Mongodb', variable=self.__vari1, value=12)
+        self.__rad2.place(height=20, width=100, x= 100, y=75)
         self.__rad2.deselect()
         canv1.pack()
         
@@ -76,7 +76,7 @@ class Frame_cassandra_startup(FormatableFrame):
     #overwrite before_next
     def add_bottom(self, parent):
         #bottom frame
-        exFuncs = {'Next':{'process':self.get_nextframe(), 'before':self.before_next}}
+        exFuncs = {'Next':{'process':self.get_nextframe(), 'cancel':self.remove_subsequent_frame_exclude_current(), 'before':self.before_next}}
         self.__buttom = Frame_bottom(parent, ['Next'], exFuncs)
         self.__buttom.pack(fill=X, ipady=10,side=BOTTOM)
         
@@ -114,15 +114,15 @@ class Frame_cassandra_startup(FormatableFrame):
             #--- set the workspace path into transaction dto
             self.get_trans().set_workspacepath(tempdir)
         
-        #--- set the process flow according to the selection
-        self.get_trans().update_process_flow_by_start_selection(self.__vari1.get())
-        
         #--- update default file
         fileconstant = File_constant()
         userdefault = File_processor.get_home_dir()
         userdefault = userdefault + fileconstant.USER_DEFAULT
-        print(userdefault)
-        Deffile_processor.update_default_file(userdefault, 'workspace', tempdir)
+        User_default_file_processor.update_default_file(userdefault, 'workspace', tempdir)
+        
+        #--- set the process flow according to the selection
+        self.get_trans().remove_subsequent_process_flows_exclude_current()
+        self.get_trans().update_process_flow_by_start_selection(self.__vari1.get())
         
         return True
     
@@ -148,9 +148,9 @@ class Frame_cassandra_startup(FormatableFrame):
         
         #create default file if not existing
         if not File_processor.verify_dir_existing(userdefault):
-            Deffile_processor.create_default_file(userdefault)
+            User_default_file_processor.create_default_file(userdefault)
         #read default file
-        default_info = Deffile_processor.read_default_file(userdefault)
+        default_info = User_default_file_processor.read_default_file(userdefault)
         
         if default_info['workspace'] and default_info['workspace'] != "":
             self.get_trans().set_workspacepath(default_info['workspace'])

@@ -36,6 +36,16 @@ class File_processor(object):
     @staticmethod
     def create_folder(directory):
         os.makedirs(directory)
+        
+        
+    @staticmethod
+    def create_file(srcfile):
+        '''
+        create file
+        @param srcfile: the target file
+        '''
+        Path(srcfile).touch()
+        srcfile.close()
     
     
     @staticmethod
