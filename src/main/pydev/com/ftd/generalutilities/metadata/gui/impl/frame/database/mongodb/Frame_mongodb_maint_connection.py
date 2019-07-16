@@ -188,6 +188,14 @@ class Frame_mongodb_maint_connection(FormatableFrame):
         return True
     
     
+    def get_nextframe(self):
+        '''
+        overwrite the super class FtdFrame, set the next frame as database maint popup
+        '''
+        func = self.open_popup_table_maint
+        return func
+    
+    
     def set_maintain_mode(self):
         '''
         verify the initial maintain mode (create or load)
@@ -344,3 +352,18 @@ class Frame_mongodb_maint_connection(FormatableFrame):
         return mongodb_connection_result
         
         
+    def open_popup_table_maint(self):
+        '''
+        open the table maint popup
+        '''
+        connectionParams = Database_parameters()
+        connectionParams.set_contact_points(self.__input02.get())
+        connectionParams.set_port(self.__input03.get())
+        connectionParams.set_username(self.__input04.get())
+        connectionParams.set_password(self.__input05.get())
+        mongodb_connection = Mongodb_driver(connectionParams)
+        
+        popup = Popup_table_maint(mongodb_connection)
+        popup.grab_set()
+        popup.focus_set()
+        popup.wait_window()   
