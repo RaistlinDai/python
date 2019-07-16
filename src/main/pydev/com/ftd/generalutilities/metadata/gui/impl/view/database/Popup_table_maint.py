@@ -47,7 +47,7 @@ class Popup_table_maint(Toplevel):
         self.__table_body.place(width=930, height=480, x=10, y=30)
         
         #---- left top panel ----------
-        self.__canv_left_top = Canvas(self.__table_body, bg="red")
+        self.__canv_left_top = Canvas(self.__table_body, bg="white")
         self.__canv_left_top.place(width=170, height=80, x=0, y=0)
         #label
         label1 = Label(self.__canv_left_top, text='Please choose a database')
@@ -60,7 +60,7 @@ class Popup_table_maint(Toplevel):
         self.__comboxlist["state"] = "readonly"
         
         #---- left bottom panel ----------
-        self.__canv_left_bottom = Canvas(self.__table_body, bg="blue")
+        self.__canv_left_bottom = Canvas(self.__table_body, bg="white")
         self.__canv_left_bottom.place(width=170, height=380, x=0, y=90)
         #label
         label2 = Label(self.__canv_left_bottom, text='Please choose a table')
@@ -88,7 +88,11 @@ class Popup_table_maint(Toplevel):
         self.__canv_right.configure(xscrollcommand=self.__vsb2.set)
         
         # render the table grid
-        self.render_table_grid()
+        columns = ['batch_job_id', 'batch_job_execution_id', 'batch_job_step_id', 'detail_no', 'batch_job_step_detail_id',
+                   'error_severity', 'record_display_text', 'record_link_url', 'record_text', 'result_label_term', 'result_returned', 
+                   'submit_result']
+        records = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
+        self.render_table_grid(columns, records)
         
         # Validation for database driver
         if not isinstance(database_driver, IDatabase_driver):
@@ -149,13 +153,16 @@ class Popup_table_maint(Toplevel):
         '''
         load records
         '''
+        selection = None
+        if len(self.__listbox.curselection()) > 0:
+            selection = self.__listbox.selection_get()
+        if selection:
+            columns, column_types, records = self.__database_driver.get_records(self.__comboxlist.get(), selection)
         
-        records = self.__database_driver.get_records(self.__comboxlist.get(), self.__listbox.curselection())
-        
-        pass
+        self.render_table_grid(columns, records)
     
     
-    def render_table_grid(self, data_table=None):
+    def render_table_grid(self, table_columns=None, table_records=None):
         '''
         render the grid
         '''
@@ -164,36 +171,52 @@ class Popup_table_maint(Toplevel):
         self.__canv_right.create_window((0, 0), window=frame_cells, anchor='nw')
         
         # add a table
-        rows = 3
-        columns = 5
-        if data_table and len(data_table) > 0:
-            cells = [[Entry() for j in xrange(columns)] for i in xrange(rows)]
-            for i in range(0, rows):  # Rows
-                for j in range(0, columns):  # Columns
+        rows_count = 0
+        column_count = 0
+        
+        # render the grid columns
+        if table_columns and len(table_columns) > 0:
+            column_count = len(table_columns)
+            columns = [Entry() for col_idx in xrange(column_count)]
+            for col_idx in range(0, column_count):
+                text_var = StringVar()
+                text_var.set(table_columns[col_idx])
+                columns[col_idx] = Entry(frame_cells, textvariable=text_var, borderwidth=3, bg='black', foreground='blue', relief=RAISED)
+                columns[col_idx].grid(row=0, column=col_idx, sticky='news')
+                columns[col_idx]["state"] = "readonly"
+        
+        # render the grid cells
+        if table_records and len(table_records) > 0:
+            rows_count = len(table_records)
+            cells = [[Entry() for j in xrange(column_count)] for i in xrange(rows_count)]
+            for i in range(0, rows_count):  # Rows
+                for j in range(0, column_count):  # Columns
                     text_var = StringVar()
                     # here we are setting cell text value
                     text_var.set('%s,%s' % (i+1, j+1)) 
                     cells[i][j] = Entry(frame_cells, textvariable=text_var)
-                    cells[i][j].grid(row=i, column=j, sticky='news')
+                    cells[i][j].grid(row=i+1, column=j, sticky='news')
     
+        # render the scroll bar
+        if rows_count > 0 or column_count > 0:
             # Update cell frames idle tasks to let tkinter calculate cell sizes
             frame_cells.update_idletasks()
             
             # Resize the canvas frame to show exactly 5-by-5 buttons and the scrollbar
             first5columns_width = 0
-            if rows > 5:
+            if rows_count > 5:
                 first5columns_width = sum([cells[0][j].winfo_width() for j in range(0, 5)])
             else:
-                first5columns_width = sum([cells[0][j].winfo_width() for j in range(0, rows-1)])
+                first5columns_width = sum([cells[0][j].winfo_width() for j in range(0, rows_count-1)])
             
             first20rows_height = 0
-            if columns > 20:
+            if column_count > 20:
                 first20rows_height = sum([cells[i][0].winfo_height() for i in range(0, 20)])
             else:
-                first20rows_height = sum([cells[i][0].winfo_height() for i in range(0, columns-1)])
+                first20rows_height = sum([cells[i][0].winfo_height() for i in range(0, column_count-1)])
             
             self.__table_body.config(width=first5columns_width + self.__vsb1.winfo_width(), height=first20rows_height + self.__vsb2.winfo_height())
-
+        
         # Set the canvas scrolling region
         self.__canv_right.config(scrollregion=self.__canv_right.bbox("all"))
         

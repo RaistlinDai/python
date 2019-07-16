@@ -46,6 +46,7 @@ elif testType == 3:
     
 elif testType == 4:
     dic = {111: 'FTD', 222: 'PDJ', 333: 'ZAL'}
+    dic[444] = {'DDO'}
     str1 = print('Value in dic: ' , dic.keys())
     for ii in dic.items():
         if ii[0] == 111:

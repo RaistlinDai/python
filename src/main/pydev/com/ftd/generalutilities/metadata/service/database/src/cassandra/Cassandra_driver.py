@@ -21,6 +21,7 @@ class Cassandra_driver(IDatabase_driver):
         IDatabase_driver.__init__(self, connection_param)
         self.__database_parameters = connection_param
         self.__cluster = None
+        self.__database_list = {}  # {A:{xxx}, B:{yyy}}
         
     
     def active_connection(self):
@@ -66,7 +67,7 @@ class Cassandra_driver(IDatabase_driver):
         test_result = False
         # Create Cassandra cluster
         temp_cluster = Cluster(contact_points=self.__contact_points, port=self.__port, auth_provider=self.__auth_provider)
-        session = temp_cluster.connect()
+        session = temp_cluster.connect(wait_for_all_pools=True)
         if not session.is_shutdown:
             test_result = True
         # Shutdown the connection
@@ -83,13 +84,22 @@ class Cassandra_driver(IDatabase_driver):
         keyspaces = []
         # Create Cassandra cluster
         self.active_connection()
-        self.__cluster.connect()
+        self.__cluster.connect(wait_for_all_pools=True)
         keyspace_items = self.__cluster.metadata.keyspaces
         
-        for item in keyspace_items.items():
-            keyspaces.append(item[0])
+        for db_item in keyspace_items.items():
+            tables = []
+            table_items = self.__cluster.metadata.keyspaces[db_item[0]].tables
+            for tb_item in table_items.items():
+                tables.append(tb_item[0])
+            
+            self.__database_list[db_item[0]] = tables
         
         self.__cluster.shutdown()
+        
+        for db_item in self.__database_list.keys():
+            keyspaces.append(db_item)
+        
         return keyspaces
     
     
@@ -98,32 +108,25 @@ class Cassandra_driver(IDatabase_driver):
         get the cassandra table by keyspace name
         @param database_name: keyspace name
         '''
-        tables = []
-        # Create Cassandra cluster
-        self.active_connection()
-        self.__cluster.connect()
-        table_items = self.__cluster.metadata.keyspaces[database_name].tables
-        
-        for item in table_items.items():
-            tables.append(item[0])
-        
-        self.__cluster.shutdown()
-        return tables
+        if not self.__database_list[database_name]:
+            self.get_database_list()
+            
+        return self.__database_list[database_name]
     
     
     def get_records(self, database_name, table_name):
         '''
         get the records by table name
         '''
-        rows = []
         # Create Cassandra cluster
         self.active_connection()
-        session = self.__cluster.connect(database_name)
-        
-        rows = session.execute('SELECT * FROM ' + table_name)
+        session = self.__cluster.connect(database_name, wait_for_all_pools=True)
+        query = 'SELECT * FROM %s' % table_name
+        print(query)
+        result = session.execute(query)
         
         self.__cluster.shutdown()
-        return rows
+        return result.column_names, result.column_types, result.current_rows
     
     
     
