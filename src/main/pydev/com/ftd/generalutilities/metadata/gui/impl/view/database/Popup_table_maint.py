@@ -5,10 +5,11 @@ Created on Jul 14, 2019
 '''
 from tkinter import *
 from numpy.core.tests.test_mem_overlap import xrange
-from tkinter.ttk import Combobox, Notebook
+from tkinter.ttk import Combobox
 from src.main.pydev.com.ftd.generalutilities.metadata.service.database.api.IDatabase_driver import IDatabase_driver
 from tkinter.messagebox import showerror
 from cassandra.cluster import NoHostAvailable
+from src.main.pydev.com.ftd.generalutilities.metadata.gui.impl.base.CustomNotebook import CustomNotebook
 
 class Popup_table_maint(Toplevel):
     '''
@@ -23,6 +24,8 @@ class Popup_table_maint(Toplevel):
         Toplevel.__init__(self, parent, **configs)
         # set database driver
         self.__database_driver = database_driver
+        # opened table
+        self.__opened_tables = []
         
         # set title
         self.title('Table content')
@@ -56,7 +59,7 @@ class Popup_table_maint(Toplevel):
         self.__comvalue = StringVar() 
         self.__comboxlist = Combobox(self.__canv_left_top,textvariable=self.__comvalue)
         self.__comboxlist.place(height=20, width=160, x=5, y=40)
-        self.__comboxlist.bind("<<ComboboxSelected>>",self.load_tables)
+        self.__comboxlist.bind("<<ComboboxSelected>>",self.event_load_tables)
         self.__comboxlist["state"] = "readonly"
         
         #---- left bottom panel ----------
@@ -72,10 +75,11 @@ class Popup_table_maint(Toplevel):
         self.__scroll.place(height=300, width=10, x=155, y=40)
         self.__scroll.config(command = self.__listbox.yview)
         self.__listbox.place(height=300, width=150, x=5, y=40)
-        self.__listbox.bind('<Double-Button>', self.load_records)
+        self.__listbox.bind('<Double-Button>', self.event_load_records)
         
         #---- right panel ----------
-        self.__note_right = Notebook(self.__table_body)
+        self.__note_right = CustomNotebook(self.__table_body)
+        self.__note_right.bind('<<NotebookTabClosed>>', self.event_close_tab)
         self.__note_right.place(width=730, height=470, x=180, y=0)
         
         # Validation for database driver
@@ -119,7 +123,7 @@ class Popup_table_maint(Toplevel):
         return result, message
         
         
-    def load_tables(self, event):
+    def event_load_tables(self, event):
         '''
         load the tables
         '''
@@ -133,16 +137,23 @@ class Popup_table_maint(Toplevel):
             self.__listbox.insert(END, name)
             
     
-    def load_records(self, event):
+    def event_load_records(self, event):
         '''
         load records
         '''
         selection = None
         if len(self.__listbox.curselection()) > 0:
             selection = self.__listbox.selection_get()
+            
+        if selection in self.__opened_tables:
+            return
+        
         if selection:
             columns, column_types, records = self.__database_driver.get_records(self.__comboxlist.get(), selection)
         
+        # record the selected table
+        self.__opened_tables.append(selection)
+        # render grid
         self.render_table_grid(selection, columns, records)
     
     
@@ -153,7 +164,7 @@ class Popup_table_maint(Toplevel):
         tab_frame = Frame(self.__note_right, width=730, height=470)
         self.__note_right.add(tab_frame, text=table_name)
         
-        table_canv_right = Canvas(tab_frame, bg="yellow")
+        table_canv_right = Canvas(tab_frame, bg="WhiteSmoke")
         table_canv_right.place(width=710, height=430, x=0, y=0)
         
         # link a scroll bar to the canvas yview
@@ -180,7 +191,7 @@ class Popup_table_maint(Toplevel):
             for col_idx in range(0, column_count):
                 text_var = StringVar()
                 text_var.set(table_columns[col_idx])
-                columns[col_idx] = Entry(frame_cells, textvariable=text_var, borderwidth=3, bg='black', foreground='blue', relief=RAISED)
+                columns[col_idx] = Entry(frame_cells, textvariable=text_var, borderwidth=3, foreground='black', relief=RAISED)
                 columns[col_idx].grid(row=0, column=col_idx, sticky='news')
                 columns[col_idx]["state"] = "readonly"
         
@@ -193,8 +204,10 @@ class Popup_table_maint(Toplevel):
                     text_var = StringVar()
                     # here we are setting cell text value
                     text_var.set(table_records[i][j]) 
-                    cells[i][j] = Entry(frame_cells, textvariable=text_var)
+                    cells[i][j] = Entry(frame_cells, textvariable=text_var, foreground='blue')
                     cells[i][j].grid(row=i+1, column=j, sticky='news')
+                    if i%2 == 0:
+                        cells[i][j].config(bg='LightCyan')
     
         # render the scroll bar
         if rows_count > 0 or column_count > 0:
@@ -219,4 +232,9 @@ class Popup_table_maint(Toplevel):
         # Set the canvas scrolling region
         table_canv_right.config(scrollregion=table_canv_right.bbox("all"))
         
-        
+    
+    def event_close_tab(self, event):
+        '''
+        close the TAB
+        '''
+        print('CLOSE TAB')
