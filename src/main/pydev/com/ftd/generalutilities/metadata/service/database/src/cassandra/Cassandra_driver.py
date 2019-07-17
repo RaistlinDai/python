@@ -126,7 +126,18 @@ class Cassandra_driver(IDatabase_driver):
         result = session.execute(query)
         
         self.__cluster.shutdown()
-        return result.column_names, result.column_types, result.current_rows
+        
+        # analysis records
+        analysis_rows = []
+        if len(result.column_names) > 0 and len(result.current_rows) > 0:
+            for i in range(0, len(result.current_rows)):
+                temp_row = result.current_rows[i]
+                analysis_row = []
+                for j in range(0, len(result.column_names)):
+                    analysis_row.append(temp_row[j])
+                analysis_rows.append(analysis_row)
+        
+        return result.column_names, result.column_types, analysis_rows
     
     
     

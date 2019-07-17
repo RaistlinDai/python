@@ -86,14 +86,14 @@ class Popup_table_maint(Toplevel):
         self.__vsb2 = Scrollbar(self.__table_body, orient="horizontal", command=self.__canv_right.xview)
         self.__vsb2.place(width=720, height=20, x=180, y=450)
         self.__canv_right.configure(xscrollcommand=self.__vsb2.set)
-        
+        '''
         # render the table grid
         columns = ['batch_job_id', 'batch_job_execution_id', 'batch_job_step_id', 'detail_no', 'batch_job_step_detail_id',
                    'error_severity', 'record_display_text', 'record_link_url', 'record_text', 'result_label_term', 'result_returned', 
                    'submit_result']
-        records = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
+        records = [[1,2,3,4,5,6,7,8,9,10,11,12],[11,12,13,14,15,16,17,18,19,20,21,22]]
         self.render_table_grid(columns, records)
-        
+        '''
         # Validation for database driver
         if not isinstance(database_driver, IDatabase_driver):
             showerror('Error', 'Incorrect database parameters, please close!')
@@ -193,7 +193,7 @@ class Popup_table_maint(Toplevel):
                 for j in range(0, column_count):  # Columns
                     text_var = StringVar()
                     # here we are setting cell text value
-                    text_var.set('%s,%s' % (i+1, j+1)) 
+                    text_var.set(table_records[i][j]) 
                     cells[i][j] = Entry(frame_cells, textvariable=text_var)
                     cells[i][j].grid(row=i+1, column=j, sticky='news')
     
@@ -204,16 +204,16 @@ class Popup_table_maint(Toplevel):
             
             # Resize the canvas frame to show exactly 5-by-5 buttons and the scrollbar
             first5columns_width = 0
-            if rows_count > 5:
-                first5columns_width = sum([cells[0][j].winfo_width() for j in range(0, 5)])
-            else:
-                first5columns_width = sum([cells[0][j].winfo_width() for j in range(0, rows_count-1)])
+            if column_count > 5:
+                first5columns_width = sum([columns[j].winfo_width() for j in range(0, 5)])
+            elif column_count > 0:
+                first5columns_width = sum([columns[j].winfo_width() for j in range(0, column_count-1)])
             
             first20rows_height = 0
-            if column_count > 20:
+            if rows_count > 20:
                 first20rows_height = sum([cells[i][0].winfo_height() for i in range(0, 20)])
-            else:
-                first20rows_height = sum([cells[i][0].winfo_height() for i in range(0, column_count-1)])
+            elif rows_count > 0:
+                first20rows_height = sum([cells[i][0].winfo_height() for i in range(0, rows_count-1)])
             
             self.__table_body.config(width=first5columns_width + self.__vsb1.winfo_width(), height=first20rows_height + self.__vsb2.winfo_height())
         
