@@ -5,7 +5,7 @@ Created on Jul 14, 2019
 '''
 from tkinter import *
 from numpy.core.tests.test_mem_overlap import xrange
-from tkinter.ttk import Combobox
+from tkinter.ttk import Combobox, Notebook
 from src.main.pydev.com.ftd.generalutilities.metadata.service.database.api.IDatabase_driver import IDatabase_driver
 from tkinter.messagebox import showerror
 from cassandra.cluster import NoHostAvailable
@@ -75,17 +75,8 @@ class Popup_table_maint(Toplevel):
         self.__listbox.bind('<Double-Button>', self.load_records)
         
         #---- right panel ----------
-        self.__canv_right = Canvas(self.__table_body, bg="yellow")
-        self.__canv_right.place(width=730, height=450, x=180, y=0)
-        
-        # link a scroll bar to the canvas yview
-        self.__vsb1 = Scrollbar(self.__table_body, orient="vertical", command=self.__canv_right.yview)
-        self.__vsb1.place(width=20, height=450, x=910, y=0)
-        self.__canv_right.configure(yscrollcommand=self.__vsb1.set)
-        # link a scroll bar to the canvas xview
-        self.__vsb2 = Scrollbar(self.__table_body, orient="horizontal", command=self.__canv_right.xview)
-        self.__vsb2.place(width=720, height=20, x=180, y=450)
-        self.__canv_right.configure(xscrollcommand=self.__vsb2.set)
+        self.__note_right = Notebook(self.__table_body)
+        self.__note_right.place(width=730, height=470, x=180, y=0)
         
         # Validation for database driver
         if not isinstance(database_driver, IDatabase_driver):
@@ -152,16 +143,31 @@ class Popup_table_maint(Toplevel):
         if selection:
             columns, column_types, records = self.__database_driver.get_records(self.__comboxlist.get(), selection)
         
-        self.render_table_grid(columns, records)
+        self.render_table_grid(selection, columns, records)
     
     
-    def render_table_grid(self, table_columns=None, table_records=None):
+    def render_table_grid(self, table_name, table_columns=None, table_records=None):
         '''
         render the grid
         '''
+        tab_frame = Frame(self.__note_right, width=730, height=470)
+        self.__note_right.add(tab_frame, text=table_name)
+        
+        table_canv_right = Canvas(tab_frame, bg="yellow")
+        table_canv_right.place(width=710, height=430, x=0, y=0)
+        
+        # link a scroll bar to the canvas yview
+        self.__vsb1 = Scrollbar(tab_frame, orient="vertical", command=table_canv_right.yview)
+        self.__vsb1.place(width=20, height=430, x=710, y=0)
+        table_canv_right.configure(yscrollcommand=self.__vsb1.set)
+        # link a scroll bar to the canvas xview
+        self.__vsb2 = Scrollbar(tab_frame, orient="horizontal", command=table_canv_right.xview)
+        self.__vsb2.place(width=710, height=20, x=0, y=430)
+        table_canv_right.configure(xscrollcommand=self.__vsb2.set)
+        
         # Create a frame to contain the grid cells
-        frame_cells = Frame(self.__canv_right, bg="black")
-        self.__canv_right.create_window((0, 0), window=frame_cells, anchor='nw')
+        frame_cells = Frame(table_canv_right, bg="black")
+        table_canv_right.create_window((0, 0), window=frame_cells, anchor='nw')
         
         # add a table
         rows_count = 0
@@ -208,9 +214,9 @@ class Popup_table_maint(Toplevel):
             elif rows_count > 0:
                 first20rows_height = sum([cells[i][0].winfo_height() for i in range(0, rows_count-1)])
             
-            self.__table_body.config(width=first5columns_width + self.__vsb1.winfo_width(), height=first20rows_height + self.__vsb2.winfo_height())
+            tab_frame.config(width=first5columns_width + self.__vsb1.winfo_width(), height=first20rows_height + self.__vsb2.winfo_height())
         
         # Set the canvas scrolling region
-        self.__canv_right.config(scrollregion=self.__canv_right.bbox("all"))
+        table_canv_right.config(scrollregion=table_canv_right.bbox("all"))
         
         
