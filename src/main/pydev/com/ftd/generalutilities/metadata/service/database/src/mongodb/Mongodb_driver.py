@@ -5,6 +5,7 @@ Created on Jul 13, 2019
 '''
 import pymongo
 from src.main.pydev.com.ftd.generalutilities.metadata.service.database.api.IDatabase_driver import IDatabase_driver
+from urllib.parse import quote_plus
 
 class Mongodb_driver(IDatabase_driver):
     '''
@@ -18,6 +19,7 @@ class Mongodb_driver(IDatabase_driver):
         IDatabase_driver.__init__(self, connection_param)
         self.__database_parameters = connection_param
         self.__client = None
+        self.__database_list = {}  # {A:{xxx}, B:{yyy}}
     
     
     # overwrite super class
@@ -29,11 +31,14 @@ class Mongodb_driver(IDatabase_driver):
         self.__contact_points = self.__database_parameters.get_contact_points()
         # Mongodb port
         self.__port = self.__database_parameters.get_port()
-        self.__username = None
-        self.__password = None
+        self.__username = self.__database_parameters.get_username()
+        self.__password = self.__database_parameters.get_password()
         
         maxSevSelDelay = 1
-        self.__client = pymongo.MongoClient('mongodb://%s:%s/' % (self.__contact_points,self.__port), \
+        self.__client = pymongo.MongoClient("mongodb://%s:%s@%s:%s" % (quote_plus(self.__username), \
+                                                                       quote_plus(self.__password), \
+                                                                       quote_plus(self.__contact_points), \
+                                                                       quote_plus(self.__port)), \
                                             serverSelectionTimeoutMS=maxSevSelDelay)
     
     
@@ -56,7 +61,7 @@ class Mongodb_driver(IDatabase_driver):
         self.__username = None
         self.__password = None
         
-        maxSevSelDelay = 1
+        maxSevSelDelay = 3
         self.__client = pymongo.MongoClient('mongodb://%s:%s/' % (self.__contact_points,self.__port), \
                                             serverSelectionTimeoutMS=maxSevSelDelay)
         
@@ -71,51 +76,28 @@ class Mongodb_driver(IDatabase_driver):
         '''
         get the mongodb database list
         '''
-        return self.__client.list_database_names()
-    
-    
-    def connect_database_by_name(self, db_name):
-        '''
-        get the mongodb database by name
-        @param db_name: mongodb database name
-        '''
-        dblist = self.__mongodb_client.list_database_names()
-        if db_name in dblist:
-            self.__mongodb_database_connector = self.__mongodb_client[db_name]
-            return True, None
-        else:
-            message = f"database %s is not existing{db_name}!"
-            print(message)
-            return False, message
-            
-    
-    @staticmethod
-    def create_collection(db_object, collection_name):
-        if not db_object:
-            return None
-        else:
-            collist = db_object.list_collection_names()
-            if collection_name in collist:
-                print("collection %s is existing" % collection_name)
-                return db_object[collection_name]
-            else:
-                print("collection %s is not existing" % collection_name)
-                new_collection = db_object.create_collection(collection_name)
-                return new_collection
-            
-
-    @staticmethod
-    def create_document(col_object, docs):
-        if not col_object:
-            return False
-        else:
-            if isinstance(docs, list):
-                col_object.insert_many(docs)
-                return None
-            elif isinstance(docs, dict):
-                col_object.insert_one(docs)
-            else:
-                return False
+        db_list = []
+        # Create Mongodb client
+        self.active_connection()
+        db_list = self.__client.list_database_names()
+        self.shutdown_connection()
         
-        return True
+        return db_list
+    
+    
+    # overwrite super class
+    def get_table_list(self, database_name):
+        '''
+        get the mongodb table by database name
+        @param database_name: database name
+        '''
+        return []
+    
+    
+    # overwrite super class
+    def get_records(self, database_name, table_name):
+        '''
+        get the records by table name
+        '''
+        return []
         

@@ -24,6 +24,7 @@ class Cassandra_driver(IDatabase_driver):
         self.__database_list = {}  # {A:{xxx}, B:{yyy}}
         
     
+    # overwrite super class
     def active_connection(self):
         '''
         Active the Cassandra connection
@@ -42,6 +43,7 @@ class Cassandra_driver(IDatabase_driver):
         self.__cluster = Cluster(contact_points=self.__contact_points, port=self.__port, auth_provider=self.__auth_provider)
     
     
+    # overwrite super class
     def shutdown_connection(self):
         '''
         Shutdown the Cassandra connection
@@ -50,6 +52,7 @@ class Cassandra_driver(IDatabase_driver):
         self.__cluster.shutdown()
         
     
+    # overwrite super class
     def test_connection(self):
         '''
         Test the Cassandra connection
@@ -103,6 +106,7 @@ class Cassandra_driver(IDatabase_driver):
         return keyspaces
     
     
+    # overwrite super class
     def get_table_list(self, database_name):
         '''
         get the cassandra table by keyspace name
@@ -114,6 +118,7 @@ class Cassandra_driver(IDatabase_driver):
         return self.__database_list[database_name]
     
     
+    # overwrite super class
     def get_records(self, database_name, table_name):
         '''
         get the records by table name

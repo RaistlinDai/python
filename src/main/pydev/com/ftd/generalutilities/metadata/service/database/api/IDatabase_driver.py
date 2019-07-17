@@ -35,4 +35,9 @@ class IDatabase_driver(object):
         pass
     
     
+    def get_table_list(self, database_name):
+        pass
     
+    
+    def get_records(self, database_name, table_name):
+        pass
