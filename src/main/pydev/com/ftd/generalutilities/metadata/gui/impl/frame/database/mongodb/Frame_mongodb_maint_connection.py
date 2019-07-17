@@ -147,7 +147,7 @@ class Frame_mongodb_maint_connection(FormatableFrame):
             return False
         
         # verify the input value
-        if not self.__input02.get() or not self.__input03.get() or not self.__input04.get() or not self.__input05.get():
+        if not self.__input02.get() or not self.__input03.get():
             showerror('Error', 'Please provide the complete info!')
             return False
         
@@ -330,7 +330,7 @@ class Frame_mongodb_maint_connection(FormatableFrame):
         mongodb_connection_result = False
         
         #--- verify the input value
-        if not self.__input02.get() or not self.__input03.get() or not self.__input04.get() or not self.__input05.get():
+        if not self.__input02.get() or not self.__input03.get():
             showerror('Error', 'Please provide the complete info!')
             return
         

@@ -35,11 +35,16 @@ class Mongodb_driver(IDatabase_driver):
         self.__password = self.__database_parameters.get_password()
         
         maxSevSelDelay = 1
-        self.__client = pymongo.MongoClient("mongodb://%s:%s@%s:%s" % (quote_plus(self.__username), \
-                                                                       quote_plus(self.__password), \
-                                                                       quote_plus(self.__contact_points), \
-                                                                       quote_plus(self.__port)), \
-                                            serverSelectionTimeoutMS=maxSevSelDelay)
+        if not self.__username and not self.__password:
+            self.__client = pymongo.MongoClient("mongodb://%s:%s" % (quote_plus(self.__contact_points), \
+                                                                     quote_plus(self.__port)), \
+                                                                     serverSelectionTimeoutMS=maxSevSelDelay)
+        else:
+            self.__client = pymongo.MongoClient("mongodb://%s:%s@%s:%s" % (quote_plus(self.__username), \
+                                                                           quote_plus(self.__password), \
+                                                                           quote_plus(self.__contact_points), \
+                                                                           quote_plus(self.__port)), \
+                                                                           serverSelectionTimeoutMS=maxSevSelDelay)
     
     
     def shutdown_connection(self):
@@ -80,6 +85,16 @@ class Mongodb_driver(IDatabase_driver):
         # Create Mongodb client
         self.active_connection()
         db_list = self.__client.list_database_names()
+        
+        for db_item in db_list:
+            tables = []
+            table_items = self.__client[db_item]
+            
+            for tb_item in table_items.list_collection_names():
+                tables.append(tb_item)
+            
+            self.__database_list[db_item] = tables
+            
         self.shutdown_connection()
         
         return db_list
@@ -91,7 +106,10 @@ class Mongodb_driver(IDatabase_driver):
         get the mongodb table by database name
         @param database_name: database name
         '''
-        return []
+        if not self.__database_list[database_name]:
+            self.get_database_list()
+            
+        return self.__database_list[database_name]
     
     
     # overwrite super class
@@ -99,5 +117,24 @@ class Mongodb_driver(IDatabase_driver):
         '''
         get the records by table name
         '''
-        return []
+        column_names = []
+        analysis_rows = []
         
+        # Create Mongodb client
+        self.active_connection()
+        db_table = self.__client[database_name][table_name]
+        cursor = db_table.find().limit(50);
+        self.shutdown_connection()
+        
+        for doc in cursor:
+            print(doc)
+            if len(column_names) == 0:
+                for field_key in doc.keys():
+                    column_names.append(field_key)
+                
+            analysis_row = []
+            for field_value in doc.items():
+                analysis_row.append(field_value[1])
+            analysis_rows.append(analysis_row)
+        
+        return column_names, None, analysis_rows    
