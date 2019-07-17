@@ -86,14 +86,7 @@ class Popup_table_maint(Toplevel):
         self.__vsb2 = Scrollbar(self.__table_body, orient="horizontal", command=self.__canv_right.xview)
         self.__vsb2.place(width=720, height=20, x=180, y=450)
         self.__canv_right.configure(xscrollcommand=self.__vsb2.set)
-        '''
-        # render the table grid
-        columns = ['batch_job_id', 'batch_job_execution_id', 'batch_job_step_id', 'detail_no', 'batch_job_step_detail_id',
-                   'error_severity', 'record_display_text', 'record_link_url', 'record_text', 'result_label_term', 'result_returned', 
-                   'submit_result']
-        records = [[1,2,3,4,5,6,7,8,9,10,11,12],[11,12,13,14,15,16,17,18,19,20,21,22]]
-        self.render_table_grid(columns, records)
-        '''
+        
         # Validation for database driver
         if not isinstance(database_driver, IDatabase_driver):
             showerror('Error', 'Incorrect database parameters, please close!')
