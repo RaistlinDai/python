@@ -10,7 +10,7 @@ from src.main.pydev.com.ftd.generalutilities.metadata.service.database.api.IData
 from tkinter.messagebox import showerror
 from cassandra.cluster import NoHostAvailable
 from src.main.pydev.com.ftd.generalutilities.metadata.gui.impl.base.CustomNotebook import CustomNotebook
-from test.test_funcattrs import cell
+from src.main.pydev.com.ftd.generalutilities.metadata.gui.impl.base.CustomGridCell import CustomGridCell
 
 class Popup_table_maint(Toplevel):
     '''
@@ -206,13 +206,13 @@ class Popup_table_maint(Toplevel):
         cells = None
         if table_records and len(table_records) > 0:
             rows_count = len(table_records)
-            cells = [[Entry() for j in xrange(column_count)] for i in xrange(rows_count)]
+            cells = [[CustomGridCell() for j in xrange(column_count)] for i in xrange(rows_count)]
             for i in range(0, rows_count):  # Rows
                 for j in range(0, column_count):  # Columns
                     text_var = StringVar()
                     # here we are setting cell text value
                     text_var.set(table_records[i][j]) 
-                    cells[i][j] = Entry(frame_cells, textvariable=text_var, foreground='blue')
+                    cells[i][j] = CustomGridCell(frame_cells, row=i, column=j, textvariable=text_var, foreground='blue')
                     cells[i][j].grid(row=i+1, column=j, sticky='news')
                     cells[i][j].bind('<ButtonPress-1>', self.event_grid_cell_click, j)
                     if i%2 == 0:
@@ -265,4 +265,5 @@ class Popup_table_maint(Toplevel):
         '''
         click on the grid cell
         '''
-        pass
+        print(event.widget.get_row())
+        print(event.widget.get_column())
