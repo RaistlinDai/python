@@ -10,6 +10,7 @@ from src.main.pydev.com.ftd.generalutilities.metadata.service.database.api.IData
 from tkinter.messagebox import showerror
 from cassandra.cluster import NoHostAvailable
 from src.main.pydev.com.ftd.generalutilities.metadata.gui.impl.base.CustomNotebook import CustomNotebook
+from test.test_funcattrs import cell
 
 class Popup_table_maint(Toplevel):
     '''
@@ -24,8 +25,11 @@ class Popup_table_maint(Toplevel):
         Toplevel.__init__(self, parent, **configs)
         # set database driver
         self.__database_driver = database_driver
-        # opened table
+        # opened tables
         self.__opened_tables = []
+        # current table
+        self.__current_table_columns = []
+        self.__current_table_records = []
         
         # set title
         self.title('Table content')
@@ -186,6 +190,7 @@ class Popup_table_maint(Toplevel):
         column_count = 0
         
         # render the grid columns
+        columns = None
         if table_columns and len(table_columns) > 0:
             column_count = len(table_columns)
             columns = [Entry() for col_idx in xrange(column_count)]
@@ -195,8 +200,10 @@ class Popup_table_maint(Toplevel):
                 columns[col_idx] = Entry(frame_cells, textvariable=text_var, borderwidth=3, foreground='black', relief=RAISED)
                 columns[col_idx].grid(row=0, column=col_idx, sticky='news')
                 columns[col_idx]["state"] = "readonly"
+        self.__current_table_columns = columns
         
         # render the grid cells
+        cells = None
         if table_records and len(table_records) > 0:
             rows_count = len(table_records)
             cells = [[Entry() for j in xrange(column_count)] for i in xrange(rows_count)]
@@ -207,8 +214,10 @@ class Popup_table_maint(Toplevel):
                     text_var.set(table_records[i][j]) 
                     cells[i][j] = Entry(frame_cells, textvariable=text_var, foreground='blue')
                     cells[i][j].grid(row=i+1, column=j, sticky='news')
+                    cells[i][j].bind('<ButtonPress-1>', self.event_grid_cell_click, j)
                     if i%2 == 0:
                         cells[i][j].config(bg='LightCyan')
+        self.__current_table_records = cells
     
         # render the scroll bar
         if rows_count > 0 or column_count > 0:
@@ -249,4 +258,11 @@ class Popup_table_maint(Toplevel):
         '''
         after close the Tab
         '''
-        print('event_after_close_tab')
+        pass
+    
+    
+    def event_grid_cell_click(self, event):
+        '''
+        click on the grid cell
+        '''
+        pass
