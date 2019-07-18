@@ -80,6 +80,7 @@ class Popup_table_maint(Toplevel):
         #---- right panel ----------
         self.__note_right = CustomNotebook(self.__table_body)
         self.__note_right.bind('<<NotebookTabClosed>>', self.event_close_tab)
+        self.__note_right.bind('<<After_NotebookTabClosed>>', self.event_after_close_tab)
         self.__note_right.place(width=730, height=470, x=180, y=0)
         
         # Validation for database driver
@@ -235,6 +236,17 @@ class Popup_table_maint(Toplevel):
     
     def event_close_tab(self, event):
         '''
-        close the TAB
+        remove the table name from cache when closing the TAB
         '''
-        print('CLOSE TAB')
+        tab = event.widget.get_active_tab_text()
+        if not tab:
+            return
+        if tab in self.__opened_tables:
+            self.__opened_tables.remove(tab)
+        
+    
+    def event_after_close_tab(self, event):
+        '''
+        after close the Tab
+        '''
+        print('event_after_close_tab')

@@ -19,36 +19,44 @@ class CustomNotebook(ttk.Notebook):
         ttk.Notebook.__init__(self, *args, **kwargs)
 
         self._active = None
+        self._active_text = None
 
         self.bind("<ButtonPress-1>", self.on_close_press, True)
         self.bind("<ButtonRelease-1>", self.on_close_release)
 
 
     def on_close_press(self, event):
-        """Called when the button is pressed over the close button"""
+        '''
+        Called when the button is pressed over the close button
+        '''
 
         element = self.identify(event.x, event.y)
-
+        print('on_close_press')
         if "close" in element:
             index = self.index("@%d,%d" % (event.x, event.y))
             self.state(['pressed'])
             self._active = index
+            self._active_text = self.tab(self.tabs()[index], "text")
+            self.event_generate("<<NotebookTabClosed>>")
             
 
     def on_close_release(self, event):
-        """Called when the button is released over the close button"""
+        '''
+        Called when the button is released over the close button
+        '''
         if not self.instate(['pressed']):
             return
-
+        print('on_close_release')
         element =  self.identify(event.x, event.y)
         index = self.index("@%d,%d" % (event.x, event.y))
 
         if "close" in element and self._active == index:
             self.forget(index)
-            self.event_generate("<<NotebookTabClosed>>")
+            self.event_generate("<<After_NotebookTabClosed>>")
 
         self.state(["!pressed"])
         self._active = None
+        self._active_text = None
 
 
     def __initialize_custom_style(self):
@@ -95,3 +103,10 @@ class CustomNotebook(ttk.Notebook):
             ]
         })
     ])
+        
+    
+    def get_active_tab_text(self):
+        '''
+        get the text of active Tab
+        '''
+        return self._active_text

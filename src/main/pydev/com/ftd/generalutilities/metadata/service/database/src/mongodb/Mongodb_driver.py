@@ -127,7 +127,6 @@ class Mongodb_driver(IDatabase_driver):
         self.shutdown_connection()
         
         for doc in cursor:
-            print(doc)
             if len(column_names) == 0:
                 for field_key in doc.keys():
                     column_names.append(field_key)
