@@ -282,15 +282,22 @@ class Popup_table_maint(Toplevel):
         '''
         click on the grid cell
         '''
-        for i in len(self.__current_table_columns):
-            self.__current_table_records[event.widget.get_row()][i].config(bg='darkblue', foreground='white')
+        idx = 0
+        for cell in self.__current_table_records[event.widget.get_row()]:
+            if idx == len(self.__current_table_columns):
+                break
+            cell.config(bg='darkblue', foreground='white')
+            idx += 1
             
     
     def event_grid_cell_leave(self, event):
         '''
         focus leave from the grid cell
         '''
-        for i in len(self.__current_table_columns):
-            self.__current_table_records[event.widget.get_row()][i].config(bg=event.widget.get_origin_color(), foreground='blue')
-    
+        idx = 0
+        for cell in self.__current_table_records[event.widget.get_row()]:
+            if idx == len(self.__current_table_columns):
+                break
+            cell.config(bg=event.widget.get_origin_color(), foreground='blue')
+            idx += 1
     
