@@ -36,6 +36,8 @@ class Popup_table_maint(Toplevel):
         
         # forbidden resize
         self.resizable(width=False, height=False)
+        # set close event
+        self.protocol("WM_DELETE_WINDOW", self.on_closing)
         
         # background layer frame
         self.__background = Frame(self)
@@ -95,6 +97,14 @@ class Popup_table_maint(Toplevel):
         result, message = self.load_databases()
         if not result:
             showerror('Error', message)
+    
+    
+    def on_closing(self):
+        '''
+        close event
+        '''
+        self.__database_driver.shutdown_connection()
+        self.destroy()
         
     
     def load_databases(self):
@@ -206,7 +216,7 @@ class Popup_table_maint(Toplevel):
         cells = None
         if table_records and len(table_records) > 0:
             rows_count = len(table_records)
-            cells = [[CustomGridCell() for j in xrange(column_count)] for i in xrange(rows_count)]
+            cells = [[CustomGridCell() for j in xrange(column_count+1)] for i in xrange(rows_count)]
             for i in range(0, rows_count):  # Rows
                 for j in range(0, column_count):  # Columns
                     text_var = StringVar()
@@ -214,9 +224,16 @@ class Popup_table_maint(Toplevel):
                     text_var.set(table_records[i][j]) 
                     cells[i][j] = CustomGridCell(frame_cells, row=i, column=j, textvariable=text_var, foreground='blue')
                     cells[i][j].grid(row=i+1, column=j, sticky='news')
-                    cells[i][j].bind('<ButtonPress-1>', self.event_grid_cell_click, j)
+                    cells[i][j].bind('<ButtonPress-1>', self.event_grid_cell_click)
+                    cells[i][j].bind('<FocusOut>', self.event_grid_cell_leave)
                     if i%2 == 0:
                         cells[i][j].config(bg='LightCyan')
+                        cells[i][j].set_origin_color('LightCyan')
+                    else:
+                        cells[i][j].config(bg='white')
+                        cells[i][j].set_origin_color('white')
+                cells[i][column_count] = 'V'  # the last column of grid cell - row status
+                        
         self.__current_table_records = cells
     
         # render the scroll bar
@@ -265,5 +282,15 @@ class Popup_table_maint(Toplevel):
         '''
         click on the grid cell
         '''
-        print(event.widget.get_row())
-        print(event.widget.get_column())
+        for i in len(self.__current_table_columns):
+            self.__current_table_records[event.widget.get_row()][i].config(bg='darkblue', foreground='white')
+            
+    
+    def event_grid_cell_leave(self, event):
+        '''
+        focus leave from the grid cell
+        '''
+        for i in len(self.__current_table_columns):
+            self.__current_table_records[event.widget.get_row()][i].config(bg=event.widget.get_origin_color(), foreground='blue')
+    
+    

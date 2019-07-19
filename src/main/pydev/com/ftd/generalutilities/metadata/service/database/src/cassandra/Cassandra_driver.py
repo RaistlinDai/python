@@ -22,6 +22,7 @@ class Cassandra_driver(IDatabase_driver):
         self.__database_parameters = connection_param
         self.__cluster = None
         self.__database_list = {}  # {A:{xxx}, B:{yyy}}
+        self.__is_connected = False
         
     
     # overwrite super class
@@ -39,8 +40,13 @@ class Cassandra_driver(IDatabase_driver):
         self.__auth_provider = PlainTextAuthProvider(username=self.__database_parameters.get_username(), \
                                                      password=self.__database_parameters.get_password())
         
-        # Create Cassandra cluster
-        self.__cluster = Cluster(contact_points=self.__contact_points, port=self.__port, auth_provider=self.__auth_provider)
+        try:
+            # Create Cassandra cluster
+            self.__cluster = Cluster(contact_points=self.__contact_points, port=self.__port, auth_provider=self.__auth_provider)
+        except Exception as e:
+            raise e
+        
+        self.__is_connected = True
     
     
     # overwrite super class
@@ -85,23 +91,28 @@ class Cassandra_driver(IDatabase_driver):
         get the cassandra keyspace list
         '''
         keyspaces = []
-        # Create Cassandra cluster
-        self.active_connection()
-        self.__cluster.connect(wait_for_all_pools=True)
-        keyspace_items = self.__cluster.metadata.keyspaces
         
-        for db_item in keyspace_items.items():
-            tables = []
-            table_items = self.__cluster.metadata.keyspaces[db_item[0]].tables
-            for tb_item in table_items.items():
-                tables.append(tb_item[0])
+        try:
+            # Create Cassandra cluster
+            if not self.__is_connected:
+                self.active_connection()
+                
+            self.__cluster.connect(wait_for_all_pools=True)
+            keyspace_items = self.__cluster.metadata.keyspaces
             
-            self.__database_list[db_item[0]] = tables
-        
-        self.__cluster.shutdown()
-        
-        for db_item in self.__database_list.keys():
-            keyspaces.append(db_item)
+            for db_item in keyspace_items.items():
+                tables = []
+                table_items = self.__cluster.metadata.keyspaces[db_item[0]].tables
+                for tb_item in table_items.items():
+                    tables.append(tb_item[0])
+                
+                self.__database_list[db_item[0]] = tables
+            
+            for db_item in self.__database_list.keys():
+                keyspaces.append(db_item)
+                
+        except Exception as e:
+            raise e
         
         return keyspaces
     
@@ -123,27 +134,33 @@ class Cassandra_driver(IDatabase_driver):
         '''
         get the records by table name
         '''
-        # Create Cassandra cluster
-        self.active_connection()
-        session = self.__cluster.connect(database_name, wait_for_all_pools=True)
-        query = 'SELECT * FROM %s' % table_name
-        print(query)
-        result = session.execute(query)
-        
-        self.__cluster.shutdown()
-        
-        # analysis records
+        column_names = []
+        column_types = []
         analysis_rows = []
-        if len(result.column_names) > 0 and len(result.current_rows) > 0:
-            for i in range(0, len(result.current_rows)):
-                temp_row = result.current_rows[i]
-                analysis_row = []
-                for j in range(0, len(result.column_names)):
-                    analysis_row.append(temp_row[j])
-                analysis_rows.append(analysis_row)
         
-        return result.column_names, result.column_types, analysis_rows
-    
-    
-    
+        # Create Cassandra cluster
+        try:
+            self.active_connection()
+            session = self.__cluster.connect(database_name, wait_for_all_pools=True)
+            query = 'SELECT * FROM %s LIMIT 50' % table_name
+            print(query)
+            
+            result = session.execute(query)
+            column_names = result.column_names
+            column_types = result.column_types
+            
+            # analysis records
+            analysis_rows = []
+            if len(result.column_names) > 0 and len(result.current_rows) > 0:
+                for i in range(0, len(result.current_rows)):
+                    temp_row = result.current_rows[i]
+                    analysis_row = []
+                    for j in range(0, len(result.column_names)):
+                        analysis_row.append(temp_row[j])
+                    analysis_rows.append(analysis_row)
+        except Exception as e:
+            raise e
         
+        return column_names, column_types, analysis_rows
+    
+    

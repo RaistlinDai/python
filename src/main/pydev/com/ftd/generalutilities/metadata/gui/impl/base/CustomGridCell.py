@@ -7,6 +7,7 @@ class CustomGridCell(Entry):
         self.__row = row
         self.__column = column
         self.__origin_value = None
+        self.__origin_color = None
     
     
     def get_row(self):
@@ -15,3 +16,11 @@ class CustomGridCell(Entry):
     
     def get_column(self):
         return self.__column
+    
+    
+    def get_origin_color(self):
+        return self.__origin_color
+    
+    
+    def set_origin_color(self, color):
+        self.__origin_color = color
