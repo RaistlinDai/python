@@ -8,6 +8,8 @@ from cassandra.cluster import Cluster
 from cassandra.auth import PlainTextAuthProvider
 from src.main.pydev.com.ftd.generalutilities.metadata.dto.database.Database_parameters import Database_parameters
 from src.main.pydev.com.ftd.generalutilities.metadata.service.database.api.IDatabase_driver import IDatabase_driver
+from cassandra.policies import DCAwareRoundRobinPolicy,\
+    DowngradingConsistencyRetryPolicy
 
 class Cassandra_driver(IDatabase_driver):
     '''
@@ -42,7 +44,9 @@ class Cassandra_driver(IDatabase_driver):
         
         try:
             # Create Cassandra cluster
-            self.__cluster = Cluster(contact_points=self.__contact_points, port=self.__port, auth_provider=self.__auth_provider)
+            self.__cluster = Cluster(contact_points=self.__contact_points, port=self.__port, auth_provider=self.__auth_provider, \
+                                #     load_balancing_policy=DCAwareRoundRobinPolicy(local_dc='DC2'), \
+                                     default_retry_policy=DowngradingConsistencyRetryPolicy())
         except Exception as e:
             raise e
         

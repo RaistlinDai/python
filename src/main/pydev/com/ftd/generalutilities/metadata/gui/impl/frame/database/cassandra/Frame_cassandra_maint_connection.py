@@ -16,6 +16,8 @@ from cassandra.cluster import NoHostAvailable
 from src.main.pydev.com.ftd.generalutilities.metadata.service.database.src.cassandra.Cassandra_driver import Cassandra_driver
 from src.main.pydev.com.ftd.generalutilities.metadata.dto.database.Database_parameters import Database_parameters
 from src.main.pydev.com.ftd.generalutilities.metadata.gui.impl.view.database.Popup_table_maint import Popup_table_maint
+from src.main.pydev.com.ftd.qt.gui.impl.frame.Database_maint_frame import Database_maint_frame
+from PyQt5.QtWidgets import QApplication
 
 class Frame_cassandra_maint_connection(FormatableFrame):
     '''
@@ -370,8 +372,16 @@ class Frame_cassandra_maint_connection(FormatableFrame):
         connectionParams.set_password(self.__input05.get())
         cassandra_connection = Cassandra_driver(connectionParams)
         
+        '''
         popup = Popup_table_maint(cassandra_connection)
         popup.grab_set()
         popup.focus_set()
         popup.wait_window()
+        '''
+        
+        #创建应用程序和对象
+        app = QApplication(sys.argv)
+        popup = Database_maint_frame()
+        #sys.exit(app.exec_()) 
+        
         
