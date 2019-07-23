@@ -6,10 +6,8 @@ Created on Jul 10, 2018
 
 from cassandra.cluster import Cluster
 from cassandra.auth import PlainTextAuthProvider
-from src.main.pydev.com.ftd.generalutilities.metadata.dto.database.Database_parameters import Database_parameters
-from src.main.pydev.com.ftd.generalutilities.metadata.service.database.api.IDatabase_driver import IDatabase_driver
-from cassandra.policies import DCAwareRoundRobinPolicy,\
-    DowngradingConsistencyRetryPolicy
+from cassandra.policies import DowngradingConsistencyRetryPolicy
+from src.main.pydev.com.ftd.generalutilities.database.api.IDatabase_driver import IDatabase_driver
 
 class Cassandra_driver(IDatabase_driver):
     '''

@@ -13,8 +13,8 @@ from src.main.pydev.com.ftd.generalutilities.metadata.service.base.File_processo
 from tkinter.ttk import Combobox
 from src.main.pydev.com.ftd.generalutilities.metadata.gui.impl.button.Button_selfdesign import Button_selfdesign
 from src.main.pydev.com.ftd.generalutilities.metadata.gui.impl.view.database.Popup_table_maint import Popup_table_maint
-from src.main.pydev.com.ftd.generalutilities.metadata.service.database.src.mongodb.Mongodb_driver import Mongodb_driver
-from src.main.pydev.com.ftd.generalutilities.metadata.dto.database.Database_parameters import Database_parameters
+from src.main.pydev.com.ftd.generalutilities.database.dto.Database_parameters import Database_parameters
+from src.main.pydev.com.ftd.generalutilities.database.src.mongodb.Mongodb_driver import Mongodb_driver
 
 class Frame_mongodb_maint_connection(FormatableFrame):
     '''

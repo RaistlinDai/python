@@ -13,11 +13,11 @@ from src.main.pydev.com.ftd.generalutilities.metadata.service.base.File_processo
 from tkinter.ttk import Combobox
 from src.main.pydev.com.ftd.generalutilities.metadata.gui.impl.button.Button_selfdesign import Button_selfdesign
 from cassandra.cluster import NoHostAvailable
-from src.main.pydev.com.ftd.generalutilities.metadata.service.database.src.cassandra.Cassandra_driver import Cassandra_driver
-from src.main.pydev.com.ftd.generalutilities.metadata.dto.database.Database_parameters import Database_parameters
 from src.main.pydev.com.ftd.generalutilities.metadata.gui.impl.view.database.Popup_table_maint import Popup_table_maint
 from src.main.pydev.com.ftd.qt.gui.impl.frame.Database_maint_frame import Database_maint_frame
 from PyQt5.QtWidgets import QApplication
+from src.main.pydev.com.ftd.generalutilities.database.dto.Database_parameters import Database_parameters
+from src.main.pydev.com.ftd.generalutilities.database.src.cassandra.Cassandra_driver import Cassandra_driver
 
 class Frame_cassandra_maint_connection(FormatableFrame):
     '''
@@ -378,10 +378,6 @@ class Frame_cassandra_maint_connection(FormatableFrame):
         popup.focus_set()
         popup.wait_window()
         '''
-        
-        #创建应用程序和对象
-        app = QApplication(sys.argv)
-        popup = Database_maint_frame()
-        #sys.exit(app.exec_()) 
+        Database_maint_frame()
         
         

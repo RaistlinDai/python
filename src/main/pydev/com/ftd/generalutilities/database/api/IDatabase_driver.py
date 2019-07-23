@@ -3,7 +3,7 @@ Created on Jul 14, 2019
 
 @author: ftd
 '''
-from src.main.pydev.com.ftd.generalutilities.metadata.dto.database.Database_parameters import Database_parameters
+from src.main.pydev.com.ftd.generalutilities.database.dto.Database_parameters import Database_parameters
 
 class IDatabase_driver(object):
     '''

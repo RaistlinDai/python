@@ -6,11 +6,11 @@ Created on Jul 14, 2019
 from tkinter import *
 from numpy.core.tests.test_mem_overlap import xrange
 from tkinter.ttk import Combobox
-from src.main.pydev.com.ftd.generalutilities.metadata.service.database.api.IDatabase_driver import IDatabase_driver
 from tkinter.messagebox import showerror
 from cassandra.cluster import NoHostAvailable
 from src.main.pydev.com.ftd.generalutilities.metadata.gui.impl.base.CustomNotebook import CustomNotebook
 from src.main.pydev.com.ftd.generalutilities.metadata.gui.impl.base.CustomGridCell import CustomGridCell
+from src.main.pydev.com.ftd.generalutilities.database.api.IDatabase_driver import IDatabase_driver
 
 class Popup_table_maint(Toplevel):
     '''
