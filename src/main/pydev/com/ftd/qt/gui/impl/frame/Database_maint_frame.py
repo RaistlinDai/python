@@ -10,10 +10,11 @@ pip install PyQt5-tools
 
 import sys
 from PyQt5.QtWidgets import QApplication, QWidget, QMainWindow, QPushButton,\
-    QFrame
+    QFrame, QComboBox
 from PyQt5.QtGui import QIcon
 from src.main.pydev.com.ftd.generalutilities.metadata.service.base.File_constant import File_constant
 import os
+from PyQt5.QtCore import QRect
 
 class Database_maint_frame(QMainWindow):
 
@@ -59,11 +60,20 @@ class Database_maint_frame(QMainWindow):
         
         # add frame
         self.__lefttop_square = QFrame(self)
-        self.__lefttop_square.setGeometry(10, 30, 230, 250)
+        self.__lefttop_square.setGeometry(10, 30, 230, 180)
         self.__leftbtm_square = QFrame(self)
-        self.__leftbtm_square.setGeometry(10, 290, 230, 410)
+        self.__leftbtm_square.setGeometry(10, 220, 230, 480)
         self.__right_square = QFrame(self)
         self.__right_square.setGeometry(250, 30, 820, 670)
+        
+        # Add combobox and add items.
+        self.comboBox = QComboBox(self.__lefttop_square)
+        self.comboBox.setGeometry(QRect(20, 40, 200, 30))
+        self.comboBox.setObjectName(("comboBox"))
+        self.comboBox.addItem("PyQt")
+        self.comboBox.addItem("Qt")
+        self.comboBox.addItem("Python")
+        self.comboBox.addItem("Example")
         
         # add buttons
         self.__new_btn = QPushButton('New',self)
