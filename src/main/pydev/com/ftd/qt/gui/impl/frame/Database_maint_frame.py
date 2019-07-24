@@ -10,14 +10,17 @@ pip install PyQt5-tools
 
 import sys
 from PyQt5.QtWidgets import QApplication, QWidget, QMainWindow, QPushButton,\
-    QFrame, QComboBox
-from PyQt5.QtGui import QIcon
+    QFrame, QComboBox, QTreeView, QAbstractItemView, QFileSystemModel,\
+    QTableWidget, QTableWidgetItem
+from PyQt5.QtGui import QIcon, QStandardItemModel
 from src.main.pydev.com.ftd.generalutilities.metadata.service.base.File_constant import File_constant
 import os
-from PyQt5.QtCore import QRect
+from PyQt5.QtCore import QRect, Qt, QDir, pyqtSlot
 
 class Database_maint_frame(QMainWindow):
 
+    FROM, SUBJECT, DATE = range(3)
+    
     def __init__(self):
         # create application object
         app = QApplication(sys.argv)
@@ -66,14 +69,25 @@ class Database_maint_frame(QMainWindow):
         self.__right_square = QFrame(self)
         self.__right_square.setGeometry(250, 30, 820, 670)
         
-        # Add combobox and add items.
-        self.comboBox = QComboBox(self.__lefttop_square)
-        self.comboBox.setGeometry(QRect(20, 40, 200, 30))
-        self.comboBox.setObjectName(("comboBox"))
-        self.comboBox.addItem("PyQt")
-        self.comboBox.addItem("Qt")
-        self.comboBox.addItem("Python")
-        self.comboBox.addItem("Example")
+        # Add database combobox and add items
+        self.__db_comboBox = QComboBox(self.__lefttop_square)
+        self.__db_comboBox.setGeometry(QRect(15, 60, 200, 30))
+        self.__db_comboBox.setObjectName(("comboBox"))
+        self.__db_comboBox.addItem("PyQt")
+        self.__db_comboBox.addItem("Qt")
+        self.__db_comboBox.addItem("Python")
+        self.__db_comboBox.addItem("Example")
+        
+        # Add database combobox and add items
+        self.__tb_treeview = QTreeView(self.__leftbtm_square)
+        model = self.create_treeview_model()
+        self.__tb_treeview.setModel(model)
+        self.__tb_treeview.setGeometry(15, 30, 200, 430)
+        
+        # Add datatable
+        self.__datatable = self.create_datatable(self.__right_square)
+        self.__datatable.setGeometry(15, 30, 790, 590)
+        self.__datatable.doubleClicked.connect(self.on_click) # double click event
         
         # add buttons
         self.__new_btn = QPushButton('New',self)
@@ -127,3 +141,33 @@ class Database_maint_frame(QMainWindow):
         delete button click
         '''
         print('DELETE BUTTON')
+        
+    
+    def create_treeview_model(self):
+        model = QFileSystemModel()
+        model.setRootPath(QDir.currentPath())
+        model.setReadOnly(True)
+        return model
+    
+    
+    def create_datatable(self, parent):
+        # Create table
+        tableWidget = QTableWidget(parent)
+        tableWidget.setRowCount(4)
+        tableWidget.setColumnCount(2)
+        tableWidget.setItem(0,0, QTableWidgetItem("Cell (1,1)"))
+        tableWidget.setItem(0,1, QTableWidgetItem("Cell (1,2)"))
+        tableWidget.setItem(1,0, QTableWidgetItem("Cell (2,1)"))
+        tableWidget.setItem(1,1, QTableWidgetItem("Cell (2,2)"))
+        tableWidget.setItem(2,0, QTableWidgetItem("Cell (3,1)"))
+        tableWidget.setItem(2,1, QTableWidgetItem("Cell (3,2)"))
+        tableWidget.setItem(3,0, QTableWidgetItem("Cell (4,1)"))
+        tableWidget.setItem(3,1, QTableWidgetItem("Cell (4,2)"))
+        
+        return tableWidget
+    
+    
+    def on_click(self):
+        print("\n")
+        for currentQTableWidgetItem in self.__datatable.selectedItems():
+            print(currentQTableWidgetItem.row(), currentQTableWidgetItem.column(), currentQTableWidgetItem.text())

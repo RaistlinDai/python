@@ -15,7 +15,6 @@ from src.main.pydev.com.ftd.generalutilities.metadata.gui.impl.button.Button_sel
 from cassandra.cluster import NoHostAvailable
 from src.main.pydev.com.ftd.generalutilities.metadata.gui.impl.view.database.Popup_table_maint import Popup_table_maint
 from src.main.pydev.com.ftd.qt.gui.impl.frame.Database_maint_frame import Database_maint_frame
-from PyQt5.QtWidgets import QApplication
 from src.main.pydev.com.ftd.generalutilities.database.dto.Database_parameters import Database_parameters
 from src.main.pydev.com.ftd.generalutilities.database.src.cassandra.Cassandra_driver import Cassandra_driver
 
