@@ -166,8 +166,11 @@ class Database_maint_frame(QMainWindow):
         
         tableWidget.setAlternatingRowColors(True)
         
-        stylesheet = "::section{Background-color:rgb(190,1,1);border-radius:14px;}"
+        stylesheet = "::section{Background-color:rgb(190,1,1);}"
         tableWidget.horizontalHeader().setStyleSheet(stylesheet)
+        
+        stylesheet2 = "::section{Background-color:blue;width:50px;}"
+        tableWidget.verticalHeader().setStyleSheet(stylesheet2)
         
         return tableWidget
     

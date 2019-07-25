@@ -13,7 +13,7 @@ QFrame, QLabel, QToolTip {
 /*                 QPushButton                   */
 /* --------------------------------------------- */
 QPushButton {
-    border: 2px solid slategray;
+    border: 2px outset slategray;
     border-radius: 6px;
     background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
                                       stop: 0 #f6f7fa, stop: 1 #dadbde);
@@ -127,7 +127,7 @@ QTreeView::item:selected:!active {
 /*                 QTableWidget                  */
 /* --------------------------------------------- */
 QTableWidget {
-    border: 2px solid slategray;
+    border: 3px inset slategray;
     border-radius: 6px;
     background-color: lightyellow;
     alternate-background-color: ghostwhite;
@@ -135,14 +135,19 @@ QTableWidget {
 
 QTableWidget QFrame {
     border: 0px solid #d9d9d9;
-    background-color: blue
+    background-color: slategray
+}
+
+QTableWidget QFrame::section{
+	background-color:qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
+                                      stop: 0 #f6f7fa, stop: 1 #dadbde);
 }
 
 /* --------------------------------------------- */
 /*             QTableCornerButton                */
 /* --------------------------------------------- */
 QTableCornerButton::section {
-    border: 2px solid slategray;
+    border: 2px outset slategray;
     background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
                                       stop: 0 #f6f7fa, stop: 1 #dadbde);
 }
