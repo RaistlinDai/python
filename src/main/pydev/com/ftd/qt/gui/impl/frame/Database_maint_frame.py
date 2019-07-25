@@ -63,9 +63,9 @@ class Database_maint_frame(QMainWindow):
         
         # add frame
         self.__lefttop_square = QFrame(self)
-        self.__lefttop_square.setGeometry(10, 30, 230, 180)
+        self.__lefttop_square.setGeometry(10, 30, 230, 150)
         self.__leftbtm_square = QFrame(self)
-        self.__leftbtm_square.setGeometry(10, 220, 230, 480)
+        self.__leftbtm_square.setGeometry(10, 190, 230, 510)
         self.__right_square = QFrame(self)
         self.__right_square.setGeometry(250, 30, 820, 670)
         
@@ -153,8 +153,8 @@ class Database_maint_frame(QMainWindow):
     def create_datatable(self, parent):
         # Create table
         tableWidget = QTableWidget(parent)
-        tableWidget.setRowCount(4)
-        tableWidget.setColumnCount(2)
+        tableWidget.setRowCount(40)
+        tableWidget.setColumnCount(50)
         tableWidget.setItem(0,0, QTableWidgetItem("Cell (1,1)"))
         tableWidget.setItem(0,1, QTableWidgetItem("Cell (1,2)"))
         tableWidget.setItem(1,0, QTableWidgetItem("Cell (2,1)"))
@@ -163,6 +163,11 @@ class Database_maint_frame(QMainWindow):
         tableWidget.setItem(2,1, QTableWidgetItem("Cell (3,2)"))
         tableWidget.setItem(3,0, QTableWidgetItem("Cell (4,1)"))
         tableWidget.setItem(3,1, QTableWidgetItem("Cell (4,2)"))
+        
+        tableWidget.setAlternatingRowColors(True)
+        
+        stylesheet = "::section{Background-color:rgb(190,1,1);border-radius:14px;}"
+        tableWidget.horizontalHeader().setStyleSheet(stylesheet)
         
         return tableWidget
     
