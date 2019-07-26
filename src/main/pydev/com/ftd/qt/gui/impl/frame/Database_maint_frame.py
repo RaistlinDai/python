@@ -11,7 +11,7 @@ pip install PyQt5-tools
 import sys
 from PyQt5.QtWidgets import QApplication, QWidget, QMainWindow, QPushButton,\
     QFrame, QComboBox, QTreeView, QAbstractItemView, QFileSystemModel,\
-    QTableWidget, QTableWidgetItem
+    QTableWidget, QTableWidgetItem, QTabWidget, QLabel
 from PyQt5.QtGui import QIcon, QStandardItemModel
 from src.main.pydev.com.ftd.generalutilities.metadata.service.base.File_constant import File_constant
 import os
@@ -71,7 +71,7 @@ class Database_maint_frame(QMainWindow):
         
         # Add database combobox and add items
         self.__db_comboBox = QComboBox(self.__lefttop_square)
-        self.__db_comboBox.setGeometry(QRect(15, 60, 200, 30))
+        self.__db_comboBox.setGeometry(QRect(15, 30, 200, 30))
         self.__db_comboBox.setObjectName(("comboBox"))
         self.__db_comboBox.addItem("PyQt")
         self.__db_comboBox.addItem("Qt")
@@ -82,24 +82,26 @@ class Database_maint_frame(QMainWindow):
         self.__tb_treeview = QTreeView(self.__leftbtm_square)
         model = self.create_treeview_model()
         self.__tb_treeview.setModel(model)
-        self.__tb_treeview.setGeometry(15, 30, 200, 430)
+        self.__tb_treeview.setGeometry(15, 30, 200, 440)
         
-        # Add datatable
-        self.__datatable = self.create_datatable(self.__right_square)
-        self.__datatable.setGeometry(15, 30, 790, 590)
+        # Add tabs
+        self.__tab = QTabWidget(self.__right_square)
+        self.__tab.setGeometry(10, 10, 800, 620)
+        self.__datatable = self.create_tab(self.__tab)
         self.__datatable.doubleClicked.connect(self.on_click) # double click event
+        
         
         # add buttons
         self.__new_btn = QPushButton('New',self)
         self.__new_btn.setToolTip('Add a new record')
         self.__new_btn.resize(60, 30)
-        self.__new_btn.move(400,660)
+        self.__new_btn.move(400,665)
         self.__new_btn.clicked.connect(self.click_new_btn) # button click event
         
         self.__del_btn = QPushButton('Delete',self)
         self.__del_btn.setToolTip('Delete a new record')
         self.__del_btn.resize(60, 30)
-        self.__del_btn.move(470,660)
+        self.__del_btn.move(470,665)
         self.__del_btn.clicked.connect(self.click_del_btn) # button click event
         
         # show the window
@@ -150,29 +152,34 @@ class Database_maint_frame(QMainWindow):
         return model
     
     
-    def create_datatable(self, parent):
+    def create_tab(self, parent):
+        datagrid = self.create_datatable()
+        label2 = QLabel("Widget in Tab 2.")
+        parent.addTab(datagrid, "Tab 1")
+        parent.addTab(label2, "Tab 2")
+        
+        return datagrid
+    
+    
+    def create_datatable(self):
         # Create table
-        tableWidget = QTableWidget(parent)
-        tableWidget.setRowCount(40)
-        tableWidget.setColumnCount(50)
-        tableWidget.setItem(0,0, QTableWidgetItem("Cell (1,1)"))
-        tableWidget.setItem(0,1, QTableWidgetItem("Cell (1,2)"))
-        tableWidget.setItem(1,0, QTableWidgetItem("Cell (2,1)"))
-        tableWidget.setItem(1,1, QTableWidgetItem("Cell (2,2)"))
-        tableWidget.setItem(2,0, QTableWidgetItem("Cell (3,1)"))
-        tableWidget.setItem(2,1, QTableWidgetItem("Cell (3,2)"))
-        tableWidget.setItem(3,0, QTableWidgetItem("Cell (4,1)"))
-        tableWidget.setItem(3,1, QTableWidgetItem("Cell (4,2)"))
+        temp_grid = QTableWidget()
+        temp_grid.setRowCount(40)
+        temp_grid.setColumnCount(50)
+        temp_grid.setItem(0,0, QTableWidgetItem("Cell (1,1)"))
+        temp_grid.setItem(0,1, QTableWidgetItem("Cell (1,2)"))
+        temp_grid.setItem(1,0, QTableWidgetItem("Cell (2,1)"))
+        temp_grid.setItem(1,1, QTableWidgetItem("Cell (2,2)"))
+        temp_grid.setItem(2,0, QTableWidgetItem("Cell (3,1)"))
+        temp_grid.setItem(2,1, QTableWidgetItem("Cell (3,2)"))
+        temp_grid.setItem(3,0, QTableWidgetItem("Cell (4,1)"))
+        temp_grid.setItem(3,1, QTableWidgetItem("Cell (4,2)"))
         
-        tableWidget.setAlternatingRowColors(True)
+        temp_grid.setAlternatingRowColors(True)
+        temp_grid.horizontalHeader().setObjectName("dt_hheader")
+        temp_grid.verticalHeader().setObjectName("dt_vheader")
         
-        stylesheet = "::section{Background-color:rgb(190,1,1);}"
-        tableWidget.horizontalHeader().setStyleSheet(stylesheet)
-        
-        stylesheet2 = "::section{Background-color:blue;width:50px;}"
-        tableWidget.verticalHeader().setStyleSheet(stylesheet2)
-        
-        return tableWidget
+        return temp_grid
     
     
     def on_click(self):
