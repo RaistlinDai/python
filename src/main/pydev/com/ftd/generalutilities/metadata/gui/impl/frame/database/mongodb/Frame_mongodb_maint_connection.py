@@ -15,6 +15,8 @@ from src.main.pydev.com.ftd.generalutilities.metadata.gui.impl.button.Button_sel
 from src.main.pydev.com.ftd.generalutilities.metadata.gui.impl.view.database.Popup_table_maint import Popup_table_maint
 from src.main.pydev.com.ftd.generalutilities.database.dto.Database_parameters import Database_parameters
 from src.main.pydev.com.ftd.generalutilities.database.src.mongodb.Mongodb_driver import Mongodb_driver
+from src.main.pydev.com.ftd.qt.gui.impl.frame.Database_maint_frame import Database_maint_frame
+from src.main.pydev.com.ftd.generalutilities.database.api.IDatabase_driver import IDatabase_driver
 
 class Frame_mongodb_maint_connection(FormatableFrame):
     '''
@@ -363,7 +365,15 @@ class Frame_mongodb_maint_connection(FormatableFrame):
         connectionParams.set_password(self.__input05.get())
         mongodb_connection = Mongodb_driver(connectionParams)
         
+        # Validation for database driver
+        if not mongodb_connection or not isinstance(mongodb_connection, IDatabase_driver):
+            showerror('Error', 'Incorrect database parameters, please check!')
+            return
+        
+        '''
         popup = Popup_table_maint(mongodb_connection)
         popup.grab_set()
         popup.focus_set()
         popup.wait_window()   
+        '''
+        Database_maint_frame(mongodb_connection)

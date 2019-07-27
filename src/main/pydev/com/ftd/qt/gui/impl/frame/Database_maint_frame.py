@@ -9,19 +9,22 @@ pip install PyQt5-tools
 '''
 
 import sys
-from PyQt5.QtWidgets import QApplication, QWidget, QMainWindow, QPushButton,\
-    QFrame, QComboBox, QTreeView, QAbstractItemView, QFileSystemModel,\
+from PyQt5.QtWidgets import QApplication, QMainWindow, QPushButton,\
+    QFrame, QComboBox,\
     QTableWidget, QTableWidgetItem, QTabWidget, QLabel
-from PyQt5.QtGui import QIcon, QStandardItemModel
+from PyQt5.QtGui import QIcon
 from src.main.pydev.com.ftd.generalutilities.metadata.service.base.File_constant import File_constant
 import os
-from PyQt5.QtCore import QRect, Qt, QDir, pyqtSlot
+from PyQt5.QtCore import QRect
+from PyQt5.Qt import QTreeWidgetItem, QTreeWidget, QHeaderView, QMessageBox
+from src.main.pydev.com.ftd.generalutilities.database.api.IDatabase_driver import IDatabase_driver
 
 class Database_maint_frame(QMainWindow):
 
     FROM, SUBJECT, DATE = range(3)
     
-    def __init__(self):
+    def __init__(self, cassandra_connection=None):
+        
         # create application object
         app = QApplication(sys.argv)
         super().__init__()
@@ -32,10 +35,19 @@ class Database_maint_frame(QMainWindow):
         self.__width=1080
         self.__height=720
         
-        # initialize method
-        self.initUI()
+        # Validation for database driver
+        self.__database_driver = None
+        if cassandra_connection and isinstance(cassandra_connection, IDatabase_driver):
+            # set database driver
+            self.__database_driver = cassandra_connection
+            
+        # opened tables
+        self.__opened_tables = []
+        
         # set style sheet
         self.set_stylesheet()
+        # initialize method
+        self.initUI()
         
         sys.exit(app.exec_()) 
         
@@ -69,40 +81,41 @@ class Database_maint_frame(QMainWindow):
         self.__right_square = QFrame(self)
         self.__right_square.setGeometry(250, 30, 820, 670)
         
-        # Add database combobox and add items
+        # add database combobox and add items
         self.__db_comboBox = QComboBox(self.__lefttop_square)
         self.__db_comboBox.setGeometry(QRect(15, 30, 200, 30))
         self.__db_comboBox.setObjectName(("comboBox"))
-        self.__db_comboBox.addItem("PyQt")
-        self.__db_comboBox.addItem("Qt")
-        self.__db_comboBox.addItem("Python")
-        self.__db_comboBox.addItem("Example")
+        # load data
+        self.load_databases(self.__db_comboBox)
         
-        # Add database combobox and add items
-        self.__tb_treeview = QTreeView(self.__leftbtm_square)
-        model = self.create_treeview_model()
-        self.__tb_treeview.setModel(model)
-        self.__tb_treeview.setGeometry(15, 30, 200, 440)
+        # add datatable treeview and add items
+        self.__tb_treeview = QTreeWidget(self.__leftbtm_square)
+        self.__tb_treeview.setGeometry(15, 30, 200, 440) 
+        self.__tb_treeview_root = QTreeWidgetItem(self.__tb_treeview)
+        self.__tb_treeview_root.setText(0, "Tables")
+        self.create_treeview_nodes(self.__tb_treeview_root, [])
+        self.__tb_treeview.addTopLevelItem(self.__tb_treeview_root) 
+        self.__tb_treeview.expandAll()
+        self.__tb_treeview.setHeaderHidden(True)
         
-        # Add tabs
+        # add tab and datagrid
         self.__tab = QTabWidget(self.__right_square)
         self.__tab.setGeometry(10, 10, 800, 620)
-        self.__datatable = self.create_tab(self.__tab)
+        self.__datatable = self.create_tab_and_datagrid(self.__tab)
         self.__datatable.doubleClicked.connect(self.on_click) # double click event
         
+        # add datagrid buttons
+        self.__new_rec_btn = QPushButton('New',self)
+        self.__new_rec_btn.setToolTip('Add a new record')
+        self.__new_rec_btn.resize(60, 30)
+        self.__new_rec_btn.move(400,665)
+        self.__new_rec_btn.clicked.connect(self.click_new_rec_btn) # button click event
         
-        # add buttons
-        self.__new_btn = QPushButton('New',self)
-        self.__new_btn.setToolTip('Add a new record')
-        self.__new_btn.resize(60, 30)
-        self.__new_btn.move(400,665)
-        self.__new_btn.clicked.connect(self.click_new_btn) # button click event
-        
-        self.__del_btn = QPushButton('Delete',self)
-        self.__del_btn.setToolTip('Delete a new record')
-        self.__del_btn.resize(60, 30)
-        self.__del_btn.move(470,665)
-        self.__del_btn.clicked.connect(self.click_del_btn) # button click event
+        self.__del_rec_btn = QPushButton('Delete',self)
+        self.__del_rec_btn.setToolTip('Delete a new record')
+        self.__del_rec_btn.resize(60, 30)
+        self.__del_rec_btn.move(470,665)
+        self.__del_rec_btn.clicked.connect(self.click_del_rec_btn) # button click event
         
         # show the window
         self.show()
@@ -131,37 +144,72 @@ class Database_maint_frame(QMainWindow):
         self.statusBar().showMessage(status)
         
     
-    def click_new_btn(self):
+    def closeEvent(self, event):
+        '''
+        window close event
+        '''
+        reply = QMessageBox.question(self, 'Message', 'Do you want to quit?', QMessageBox.Yes | QMessageBox.No,QMessageBox.Yes)
+        if reply == QMessageBox.Yes:
+            event.accept()
+        else:
+            event.ignore()
+        
+    
+    def click_new_rec_btn(self):
         '''
         new button click
         '''
         print('NEW BUTTON')
         
     
-    def click_del_btn(self):
+    def click_del_rec_btn(self):
         '''
         delete button click
         '''
         print('DELETE BUTTON')
+    
+    
+    def load_databases(self, parent, itemlist=None):
+        '''
+        load the database name list and append into combolist
+        '''
+        if not self.__database_driver:
+            QMessageBox.warning(self, 'Warning', "Invalid database driver, please check.", QMessageBox.Ok)
+            return
+            
+        result, database_list, message = self.__database_driver.get_database_list()
+        if not result:
+            QMessageBox.critical(self, 'Error', message, QMessageBox.Ok)
+        else:
+            if len(database_list) > 0:
+                for name in database_list:
+                    parent.addItem(name)
+            else:
+                QMessageBox.warning(self, 'Warning', "Database is empty.", QMessageBox.Ok)
+    
+    
+    def create_treeview_nodes(self, root, nodelist=None):
+        '''
+        append nodes into datatable treeview
+        '''
+        if nodelist:
+            pass
+        else:
+            child1 = QTreeWidgetItem(root) 
+            child1.setText(0,'child1')  
+            child1.setText(1,'name1')  
+            child2 = QTreeWidgetItem(root)  
+            child2.setText(0,'child2')  
+            child2.setText(1,'name2')  
+            child3 = QTreeWidgetItem(root)  
+            child3.setText(0,'child3')  
+            child4 = QTreeWidgetItem(child3)  
+            child4.setText(0,'child4')  
+            child4.setText(1,'name4')
+
+    
+    def create_tab_and_datagrid(self, parent, datalist=None):
         
-    
-    def create_treeview_model(self):
-        model = QFileSystemModel()
-        model.setRootPath(QDir.currentPath())
-        model.setReadOnly(True)
-        return model
-    
-    
-    def create_tab(self, parent):
-        datagrid = self.create_datatable()
-        label2 = QLabel("Widget in Tab 2.")
-        parent.addTab(datagrid, "Tab 1")
-        parent.addTab(label2, "Tab 2")
-        
-        return datagrid
-    
-    
-    def create_datatable(self):
         # Create table
         temp_grid = QTableWidget()
         temp_grid.setRowCount(40)
@@ -178,6 +226,13 @@ class Database_maint_frame(QMainWindow):
         temp_grid.setAlternatingRowColors(True)
         temp_grid.horizontalHeader().setObjectName("dt_hheader")
         temp_grid.verticalHeader().setObjectName("dt_vheader")
+        temp_grid.verticalHeader().setSectionResizeMode(QHeaderView.Fixed)
+        
+        # Create tab
+        parent.addTab(temp_grid, "Tab 1")
+        
+        label2 = QLabel("Widget in Tab 2.")
+        parent.addTab(label2, "Tab 2")
         
         return temp_grid
     

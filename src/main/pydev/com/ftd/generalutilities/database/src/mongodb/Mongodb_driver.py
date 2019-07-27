@@ -81,24 +81,41 @@ class Mongodb_driver(IDatabase_driver):
         '''
         get the mongodb database list
         '''
+        result = True
+        message = None
         db_list = []
-        # Create Mongodb client
-        self.active_connection()
-        db_list = self.__client.list_database_names()
         
-        for db_item in db_list:
-            tables = []
-            table_items = self.__client[db_item]
+        try:
+            # Create Mongodb client
+            self.active_connection()
+            db_list = self.__client.list_database_names()
             
-            for tb_item in table_items.list_collection_names():
-                tables.append(tb_item)
+            for db_item in db_list:
+                tables = []
+                table_items = self.__client[db_item]
+                
+                for tb_item in table_items.list_collection_names():
+                    tables.append(tb_item)
+                
+                self.__database_list[db_item] = tables
+                
+            self.shutdown_connection()
             
-            self.__database_list[db_item] = tables
-            
-        self.shutdown_connection()
+            if not db_list or len(db_list) == 0:
+                result = False
+                message = 'No valid database!'
+        except TypeError as te:
+            message = te
+            result = False
+        except ValueError:
+            message = 'Incorrect port number!'
+            result = False
+        except Exception as e:
+            message = f'Connect failed:{e}'
+            result = False
         
-        return db_list
-    
+        return result, db_list, message
+        
     
     # overwrite super class
     def get_table_list(self, database_name):

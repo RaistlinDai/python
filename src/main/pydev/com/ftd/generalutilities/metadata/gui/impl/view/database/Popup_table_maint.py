@@ -6,8 +6,7 @@ Created on Jul 14, 2019
 from tkinter import *
 from numpy.core.tests.test_mem_overlap import xrange
 from tkinter.ttk import Combobox
-from tkinter.messagebox import showerror
-from cassandra.cluster import NoHostAvailable
+from tkinter.messagebox import showerror, showwarning
 from src.main.pydev.com.ftd.generalutilities.metadata.gui.impl.base.CustomNotebook import CustomNotebook
 from src.main.pydev.com.ftd.generalutilities.metadata.gui.impl.base.CustomGridCell import CustomGridCell
 from src.main.pydev.com.ftd.generalutilities.database.api.IDatabase_driver import IDatabase_driver
@@ -94,9 +93,8 @@ class Popup_table_maint(Toplevel):
             showerror('Error', 'Incorrect database parameters, please close!')
             return
         
-        result, message = self.load_databases()
-        if not result:
-            showerror('Error', message)
+        # load data
+        self.load_databases()
     
     
     def on_closing(self):
@@ -111,31 +109,14 @@ class Popup_table_maint(Toplevel):
         '''
         load the database name list from database_driver
         '''
-        result = True
-        message = None
-        database_list = []
-        
-        try:
-            database_list = self.__database_driver.get_database_list()
-            if not database_list or len(database_list) == 0:
-                result = False
-                message = 'No valid database!'
-        except TypeError as te:
-            message = te
-            result = False
-        except ValueError:
-            message = 'Incorrect port number!'
-            result = False
-        except NoHostAvailable as ne:
-            message = ne.args[0]
-            result = False
-        except Exception as e:
-            message = f'Connect failed:{e}'
-            result = False
-        
-        self.__comboxlist["values"] = database_list
-        
-        return result, message
+        result, database_list, message = self.__database_driver.get_database_list()
+        if not result:
+            showerror('Error', message)
+        else:
+            if len(database_list) > 0:
+                self.__comboxlist["values"] = database_list
+            else:
+                showwarning('Warning', "Database is empty.")
         
         
     def event_load_tables(self, event):

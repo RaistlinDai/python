@@ -4,7 +4,7 @@ Created on Jul 10, 2018
 @author: ftd
 '''
 
-from cassandra.cluster import Cluster
+from cassandra.cluster import Cluster, NoHostAvailable
 from cassandra.auth import PlainTextAuthProvider
 from cassandra.policies import DowngradingConsistencyRetryPolicy
 from src.main.pydev.com.ftd.generalutilities.database.api.IDatabase_driver import IDatabase_driver
@@ -57,7 +57,8 @@ class Cassandra_driver(IDatabase_driver):
         Shutdown the Cassandra connection
         '''
         # Shutdown the connection
-        self.__cluster.shutdown()
+        if self.__cluster:
+            self.__cluster.shutdown()
         
     
     # overwrite super class
@@ -93,6 +94,8 @@ class Cassandra_driver(IDatabase_driver):
         get the cassandra keyspace list
         '''
         keyspaces = []
+        result = True
+        message = None
         
         try:
             # Create Cassandra cluster
@@ -112,11 +115,25 @@ class Cassandra_driver(IDatabase_driver):
             
             for db_item in self.__database_list.keys():
                 keyspaces.append(db_item)
-                
-        except Exception as e:
-            raise e
         
-        return keyspaces
+            if not keyspaces or len(keyspaces) == 0:
+                result = False
+                message = 'No valid database!'
+                
+        except TypeError as te:
+            message = te
+            result = False
+        except ValueError:
+            message = 'Incorrect port number!'
+            result = False
+        except NoHostAvailable as ne:
+            message = ne.args[0]
+            result = False
+        except Exception as e:
+            message = f'Connect failed:{e}'
+            result = False
+        
+        return result, keyspaces, message
     
     
     # overwrite super class

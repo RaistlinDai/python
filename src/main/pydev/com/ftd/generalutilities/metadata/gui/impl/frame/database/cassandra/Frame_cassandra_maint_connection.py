@@ -17,6 +17,7 @@ from src.main.pydev.com.ftd.generalutilities.metadata.gui.impl.view.database.Pop
 from src.main.pydev.com.ftd.qt.gui.impl.frame.Database_maint_frame import Database_maint_frame
 from src.main.pydev.com.ftd.generalutilities.database.dto.Database_parameters import Database_parameters
 from src.main.pydev.com.ftd.generalutilities.database.src.cassandra.Cassandra_driver import Cassandra_driver
+from src.main.pydev.com.ftd.generalutilities.database.api.IDatabase_driver import IDatabase_driver
 
 class Frame_cassandra_maint_connection(FormatableFrame):
     '''
@@ -371,12 +372,18 @@ class Frame_cassandra_maint_connection(FormatableFrame):
         connectionParams.set_password(self.__input05.get())
         cassandra_connection = Cassandra_driver(connectionParams)
         
+        # Validation for database driver
+        if not cassandra_connection or not isinstance(cassandra_connection, IDatabase_driver):
+            showerror('Error', 'Incorrect database parameters, please check!')
+            return
+        
         '''
         popup = Popup_table_maint(cassandra_connection)
         popup.grab_set()
         popup.focus_set()
         popup.wait_window()
         '''
-        Database_maint_frame()
+        
+        Database_maint_frame(cassandra_connection)
         
         

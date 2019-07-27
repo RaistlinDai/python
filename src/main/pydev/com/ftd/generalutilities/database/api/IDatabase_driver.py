@@ -41,3 +41,4 @@ class IDatabase_driver(object):
     
     def get_records(self, database_name, table_name):
         pass
+    
