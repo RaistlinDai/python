@@ -22,8 +22,13 @@ class Popup_table_maint(Toplevel):
         '''
         
         Toplevel.__init__(self, parent, **configs)
-        # set database driver
-        self.__database_driver = database_driver
+        
+        # Validation for database driver
+        self.__database_driver = None
+        if database_driver and isinstance(database_driver, IDatabase_driver):
+            # set database driver
+            self.__database_driver = database_driver
+            
         # opened tables
         self.__opened_tables = []
         # current table
@@ -109,6 +114,10 @@ class Popup_table_maint(Toplevel):
         '''
         load the database name list from database_driver
         '''
+        if not self.__database_driver:
+            showwarning('Warning', "Invalid database driver, please check.")
+            return
+        
         result, database_list, message = self.__database_driver.get_database_list()
         if not result:
             showerror('Error', message)

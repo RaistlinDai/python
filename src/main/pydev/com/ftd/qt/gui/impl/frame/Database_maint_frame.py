@@ -23,7 +23,7 @@ class Database_maint_frame(QMainWindow):
 
     FROM, SUBJECT, DATE = range(3)
     
-    def __init__(self, cassandra_connection=None):
+    def __init__(self, database_driver=None):
         
         # create application object
         app = QApplication(sys.argv)
@@ -37,9 +37,9 @@ class Database_maint_frame(QMainWindow):
         
         # Validation for database driver
         self.__database_driver = None
-        if cassandra_connection and isinstance(cassandra_connection, IDatabase_driver):
+        if database_driver and isinstance(database_driver, IDatabase_driver):
             # set database driver
-            self.__database_driver = cassandra_connection
+            self.__database_driver = database_driver
             
         # opened tables
         self.__opened_tables = []
@@ -85,15 +85,15 @@ class Database_maint_frame(QMainWindow):
         self.__db_comboBox = QComboBox(self.__lefttop_square)
         self.__db_comboBox.setGeometry(QRect(15, 30, 200, 30))
         self.__db_comboBox.setObjectName(("comboBox"))
+        #self.__db_comboBox.currentIndexChanged.connect(self.on_selection_change) # selection change event
         # load data
-        self.load_databases(self.__db_comboBox)
+        self.on_load_combolist(self.__db_comboBox)  # load event
         
         # add datatable treeview and add items
         self.__tb_treeview = QTreeWidget(self.__leftbtm_square)
         self.__tb_treeview.setGeometry(15, 30, 200, 440) 
         self.__tb_treeview_root = QTreeWidgetItem(self.__tb_treeview)
         self.__tb_treeview_root.setText(0, "Tables")
-        self.create_treeview_nodes(self.__tb_treeview_root, [])
         self.__tb_treeview.addTopLevelItem(self.__tb_treeview_root) 
         self.__tb_treeview.expandAll()
         self.__tb_treeview.setHeaderHidden(True)
@@ -169,7 +169,14 @@ class Database_maint_frame(QMainWindow):
         print('DELETE BUTTON')
     
     
-    def load_databases(self, parent, itemlist=None):
+    def on_load_combolist(self, parent):
+        '''
+        combobox load event
+        '''
+        self.load_databases(parent)
+        
+    
+    def load_databases(self, parent):
         '''
         load the database name list and append into combolist
         '''
@@ -188,24 +195,35 @@ class Database_maint_frame(QMainWindow):
                 QMessageBox.warning(self, 'Warning', "Database is empty.", QMessageBox.Ok)
     
     
-    def create_treeview_nodes(self, root, nodelist=None):
+    def on_selection_change(self):
+        '''
+        combobox selection change event
+        '''
+        if not self.__database_driver:
+            return
+        
+        table_list = self.__database_driver.get_table_list(self.__comboxlist.get())
+        
+        self.clear_treeview_nodes()
+        self.create_treeview_nodes(table_list)
+        
+    
+    def clear_treeview_nodes(self, root):
+        '''
+        clear nodes from datatable treeview
+        '''
+        self.__tb_treeview_root.clear()
+        
+    
+    def create_treeview_nodes(self, nodelist=None):
         '''
         append nodes into datatable treeview
         '''
         if nodelist:
-            pass
-        else:
-            child1 = QTreeWidgetItem(root) 
-            child1.setText(0,'child1')  
-            child1.setText(1,'name1')  
-            child2 = QTreeWidgetItem(root)  
-            child2.setText(0,'child2')  
-            child2.setText(1,'name2')  
-            child3 = QTreeWidgetItem(root)  
-            child3.setText(0,'child3')  
-            child4 = QTreeWidgetItem(child3)  
-            child4.setText(0,'child4')  
-            child4.setText(1,'name4')
+            for table in nodelist:
+                child = QTreeWidgetItem(self.__tb_treeview_root) 
+                child.setText(0,table)  
+                child.setText(1,'name1')  
 
     
     def create_tab_and_datagrid(self, parent, datalist=None):
