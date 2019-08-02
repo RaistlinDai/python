@@ -85,7 +85,6 @@ class Database_maint_frame(QMainWindow):
         self.__db_comboBox = QComboBox(self.__lefttop_square)
         self.__db_comboBox.setGeometry(QRect(15, 30, 200, 30))
         self.__db_comboBox.setObjectName(("comboBox"))
-        #self.__db_comboBox.currentIndexChanged.connect(self.on_selection_change) # selection change event
         # load data
         self.on_load_combolist(self.__db_comboBox)  # load event
         
@@ -102,7 +101,6 @@ class Database_maint_frame(QMainWindow):
         self.__tab = QTabWidget(self.__right_square)
         self.__tab.setGeometry(10, 10, 800, 620)
         self.__datatable = self.create_tab_and_datagrid(self.__tab)
-        self.__datatable.doubleClicked.connect(self.on_click) # double click event
         
         # add datagrid buttons
         self.__new_rec_btn = QPushButton('New',self)
@@ -115,7 +113,11 @@ class Database_maint_frame(QMainWindow):
         self.__del_rec_btn.setToolTip('Delete a new record')
         self.__del_rec_btn.resize(60, 30)
         self.__del_rec_btn.move(470,665)
+        
+        # event
         self.__del_rec_btn.clicked.connect(self.click_del_rec_btn) # button click event
+        self.__db_comboBox.currentIndexChanged.connect(self.on_selection_change) # selection change event
+        self.__datatable.doubleClicked.connect(self.on_click) # double click event
         
         # show the window
         self.show()
@@ -189,6 +191,7 @@ class Database_maint_frame(QMainWindow):
             QMessageBox.critical(self, 'Error', message, QMessageBox.Ok)
         else:
             if len(database_list) > 0:
+                parent.addItem("")
                 for name in database_list:
                     parent.addItem(name)
             else:
@@ -202,17 +205,23 @@ class Database_maint_frame(QMainWindow):
         if not self.__database_driver:
             return
         
-        table_list = self.__database_driver.get_table_list(self.__comboxlist.get())
-        
         self.clear_treeview_nodes()
+        
+        if not self.__db_comboBox.currentText():
+            return
+        
+        table_list = self.__database_driver.get_table_list(self.__db_comboBox.currentText())
+        
         self.create_treeview_nodes(table_list)
         
     
-    def clear_treeview_nodes(self, root):
+    def clear_treeview_nodes(self):
         '''
         clear nodes from datatable treeview
         '''
-        self.__tb_treeview_root.clear()
+        if self.__tb_treeview_root :
+            while self.__tb_treeview_root.childCount() > 0:
+                self.__tb_treeview_root.removeChild(self.__tb_treeview_root.takeChild(0))
         
     
     def create_treeview_nodes(self, nodelist=None):
