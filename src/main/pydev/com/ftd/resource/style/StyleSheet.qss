@@ -32,6 +32,8 @@ QFrame, QLabel, QToolTip {
 QPushButton {
     border: 2px outset slategray;
     border-radius: 6px;
+    min-width:50px;
+    min-height:20px;
     background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
                                       stop: 0 #f6f7fa, stop: 1 #dadbde);
 }
@@ -51,7 +53,20 @@ QPushButton:flat {
 }
 
 QPushButton:default {
-    border-color: navy; /* make the default button prominent */
+    border: 2px outset slategray;
+    border-radius: 6px;
+    background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
+                                      stop: 0 #f6f7fa, stop: 1 palegreen);
+}
+
+QPushButton:default:hover {
+    background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, 
+    							stop: 0 #e7effd, stop: 1 lawngreen);
+}
+
+QPushButton:default:pressed {
+    background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
+                                      stop: 0 palegreen, stop: 1 #f6f7fa);
 }
 
 /* --------------------------------------------- */
@@ -244,4 +259,11 @@ QTableWidget QTableCornerButton::section {
 QTableWidget QTableCornerButton::section:pressed {
 	background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
                                       stop: 0 #dadbde, stop: 1 #f6f7fa);
+}
+
+/* --------------------------------------------- */
+/*                  QMessageBox                  */
+/* --------------------------------------------- */
+QMessageBox > QLabel {
+    border: 0px;
 }
