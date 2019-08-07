@@ -93,6 +93,7 @@ class Database_maint_frame(QMainWindow):
         self.__tb_treeview.setGeometry(15, 30, 200, 440) 
         self.__tb_treeview_root = QTreeWidgetItem(self.__tb_treeview)
         self.__tb_treeview_root.setText(0, "Tables")
+        self.__tb_treeview_root.setText(1, "root")
         self.__tb_treeview.addTopLevelItem(self.__tb_treeview_root) 
         self.__tb_treeview.expandAll()
         self.__tb_treeview.setHeaderHidden(True)
@@ -116,8 +117,9 @@ class Database_maint_frame(QMainWindow):
         
         # event
         self.__del_rec_btn.clicked.connect(self.click_del_rec_btn) # button click event
-        self.__db_comboBox.currentIndexChanged.connect(self.on_selection_change) # selection change event
-        self.__datatable.doubleClicked.connect(self.on_click) # double click event
+        self.__db_comboBox.currentIndexChanged.connect(self.on_combox_selection_change) # selection change event
+        self.__tb_treeview.doubleClicked.connect(self.on_treeview_doubleClick) # selection change event
+        self.__datatable.doubleClicked.connect(self.on_gridcell_click) # double click event
         
         # show the window
         self.show()
@@ -198,7 +200,7 @@ class Database_maint_frame(QMainWindow):
                 QMessageBox.warning(self, 'Warning', "Database is empty.", QMessageBox.Ok)
     
     
-    def on_selection_change(self):
+    def on_combox_selection_change(self):
         '''
         combobox selection change event
         '''
@@ -213,13 +215,13 @@ class Database_maint_frame(QMainWindow):
         table_list = self.__database_driver.get_table_list(self.__db_comboBox.currentText())
         
         self.create_treeview_nodes(table_list)
-        
+    
     
     def clear_treeview_nodes(self):
         '''
         clear nodes from datatable treeview
         '''
-        if self.__tb_treeview_root :
+        if self.__tb_treeview_root:
             while self.__tb_treeview_root.childCount() > 0:
                 self.__tb_treeview_root.removeChild(self.__tb_treeview_root.takeChild(0))
         
@@ -231,10 +233,23 @@ class Database_maint_frame(QMainWindow):
         if nodelist:
             for table in nodelist:
                 child = QTreeWidgetItem(self.__tb_treeview_root) 
-                child.setText(0,table)  
-                child.setText(1,'name1')  
+                child.setText(0,table)
+                child.setText(1,'child')
 
     
+    def on_treeview_doubleClick(self):
+        '''
+        treeview selection double click event
+        '''
+        if self.__tb_treeview.currentItem():
+            hititem = self.__tb_treeview.currentItem()
+            
+            if hititem.text(1) == 'root':
+                return
+            
+            print(hititem.text(0))
+            
+            
     def create_tab_and_datagrid(self, parent, datalist=None):
         
         # Create table
@@ -264,7 +279,6 @@ class Database_maint_frame(QMainWindow):
         return temp_grid
     
     
-    def on_click(self):
-        print("\n")
+    def on_gridcell_click(self):
         for currentQTableWidgetItem in self.__datatable.selectedItems():
             print(currentQTableWidgetItem.row(), currentQTableWidgetItem.column(), currentQTableWidgetItem.text())
