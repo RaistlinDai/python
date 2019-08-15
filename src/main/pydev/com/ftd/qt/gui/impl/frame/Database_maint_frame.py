@@ -98,10 +98,9 @@ class Database_maint_frame(QMainWindow):
         self.__tb_treeview.expandAll()
         self.__tb_treeview.setHeaderHidden(True)
         
-        # add tab and datagrid
+        # add tab
         self.__tab = QTabWidget(self.__right_square)
         self.__tab.setGeometry(10, 10, 800, 620)
-        self.__datatable = self.create_tab_and_datagrid(self.__tab)
         
         # add datagrid buttons
         self.__new_rec_btn = QPushButton('New',self)
@@ -119,7 +118,6 @@ class Database_maint_frame(QMainWindow):
         self.__del_rec_btn.clicked.connect(self.click_del_rec_btn) # button click event
         self.__db_comboBox.currentIndexChanged.connect(self.on_combox_selection_change) # selection change event
         self.__tb_treeview.doubleClicked.connect(self.on_treeview_doubleClick) # selection change event
-        self.__datatable.doubleClicked.connect(self.on_gridcell_click) # double click event
         
         # show the window
         self.show()
@@ -247,37 +245,54 @@ class Database_maint_frame(QMainWindow):
             if hititem.text(1) == 'root':
                 return
             
-            print(hititem.text(0))
+            if hititem.text(0) in self.__opened_tables:
+                return
+            
+            columns = []
+            column_types = []
+            records = []
+            try:
+                # load the datatable record
+                columns, column_types, records = self.__database_driver.get_records(self.__db_comboBox.currentText(), hititem.text(0))
+            except Exception as e:
+                QMessageBox.warning(self, 'Warning', "Table load failed, please retry.", QMessageBox.Ok)
+                print('expect:', e)
+                return
+            
+            # record the selected table
+            self.__opened_tables.append(hititem.text(0))
+            # render grid
+            self.render_table_grid(hititem.text(0), columns, column_types, records)
             
             
-    def create_tab_and_datagrid(self, parent, datalist=None):
-        
+    def render_table_grid(self, datatablename, columns, column_types, records):
+        '''
+        render the grid
+        '''
         # Create table
-        temp_grid = QTableWidget()
-        temp_grid.setRowCount(40)
-        temp_grid.setColumnCount(50)
-        temp_grid.setItem(0,0, QTableWidgetItem("Cell (1,1)"))
-        temp_grid.setItem(0,1, QTableWidgetItem("Cell (1,2)"))
-        temp_grid.setItem(1,0, QTableWidgetItem("Cell (2,1)"))
-        temp_grid.setItem(1,1, QTableWidgetItem("Cell (2,2)"))
-        temp_grid.setItem(2,0, QTableWidgetItem("Cell (3,1)"))
-        temp_grid.setItem(2,1, QTableWidgetItem("Cell (3,2)"))
-        temp_grid.setItem(3,0, QTableWidgetItem("Cell (4,1)"))
-        temp_grid.setItem(3,1, QTableWidgetItem("Cell (4,2)"))
+        self.__datatable = QTableWidget()
+        self.__datatable.setRowCount(len(records))
+        self.__datatable.setColumnCount(len(columns))
+        '''
+        self.__datatable.setItem(0,0, QTableWidgetItem("Cell (1,1)"))
+        self.__datatable.setItem(0,1, QTableWidgetItem("Cell (1,2)"))
+        self.__datatable.setItem(1,0, QTableWidgetItem("Cell (2,1)"))
+        self.__datatable.setItem(1,1, QTableWidgetItem("Cell (2,2)"))
+        self.__datatable.setItem(2,0, QTableWidgetItem("Cell (3,1)"))
+        self.__datatable.setItem(2,1, QTableWidgetItem("Cell (3,2)"))
+        self.__datatable.setItem(3,0, QTableWidgetItem("Cell (4,1)"))
+        self.__datatable.setItem(3,1, QTableWidgetItem("Cell (4,2)"))
+        '''
+        self.__datatable.setAlternatingRowColors(True)
+        self.__datatable.horizontalHeader().setObjectName("dt_hheader")
+        self.__datatable.verticalHeader().setObjectName("dt_vheader")
+        self.__datatable.verticalHeader().setSectionResizeMode(QHeaderView.Fixed)
         
-        temp_grid.setAlternatingRowColors(True)
-        temp_grid.horizontalHeader().setObjectName("dt_hheader")
-        temp_grid.verticalHeader().setObjectName("dt_vheader")
-        temp_grid.verticalHeader().setSectionResizeMode(QHeaderView.Fixed)
-        
+        self.__datatable.doubleClicked.connect(self.on_gridcell_click) # double click event
+  
         # Create tab
-        parent.addTab(temp_grid, "Tab 1")
-        
-        label2 = QLabel("Widget in Tab 2.")
-        parent.addTab(label2, "Tab 2")
-        
-        return temp_grid
-    
+        self.__tab.addTab(self.__datatable, datatablename)
+           
     
     def on_gridcell_click(self):
         for currentQTableWidgetItem in self.__datatable.selectedItems():

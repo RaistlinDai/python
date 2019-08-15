@@ -98,7 +98,7 @@ class Frame_mongodb_maint_connection(FormatableFrame):
         self.__input03 = Entry(canv2, textvariable=self.__feet, borderwidth=3, bg='black', foreground='yellow', highlightcolor='red', insertbackground='red')
         self.__input03.place(height=20, width=100, relx=0.65, rely=0.4)
         #label
-        label2 = Label(canv2, text='(yab config | grep mongodb.default.node.main.native_transport_port)', fg='blue')
+        label2 = Label(canv2, text='(yab config | grep qad-collaboration.mongodb.port)', fg='blue')
         label2.place(height=20, width=410, relx=0.1, rely=0.47)
         
         #label
