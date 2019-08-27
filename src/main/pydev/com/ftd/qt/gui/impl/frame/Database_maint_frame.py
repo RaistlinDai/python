@@ -265,24 +265,27 @@ class Database_maint_frame(QMainWindow):
             self.render_table_grid(hititem.text(0), columns, column_types, records)
             
             
-    def render_table_grid(self, datatablename, columns, column_types, records):
+    def render_table_grid(self, datatablename, columns, column_types, table_records):
         '''
         render the grid
         '''
         # Create table
         self.__datatable = QTableWidget()
-        self.__datatable.setRowCount(len(records))
+        
+        # render the columns
+        self.__datatable.setRowCount(len(table_records))
         self.__datatable.setColumnCount(len(columns))
-        '''
-        self.__datatable.setItem(0,0, QTableWidgetItem("Cell (1,1)"))
-        self.__datatable.setItem(0,1, QTableWidgetItem("Cell (1,2)"))
-        self.__datatable.setItem(1,0, QTableWidgetItem("Cell (2,1)"))
-        self.__datatable.setItem(1,1, QTableWidgetItem("Cell (2,2)"))
-        self.__datatable.setItem(2,0, QTableWidgetItem("Cell (3,1)"))
-        self.__datatable.setItem(2,1, QTableWidgetItem("Cell (3,2)"))
-        self.__datatable.setItem(3,0, QTableWidgetItem("Cell (4,1)"))
-        self.__datatable.setItem(3,1, QTableWidgetItem("Cell (4,2)"))
-        '''
+        self.__datatable.setHorizontalHeaderLabels(columns)
+        
+        # render the grid cells
+        if table_records and len(table_records) > 0:
+            rows_count = len(table_records)
+            column_count = len(columns)
+            for i in range(0, rows_count):  # Rows
+                for j in range(0, column_count):  # Columns
+                    self.__datatable.setItem(i , j, QTableWidgetItem(str(table_records[i][j])))
+        
+        # render grid style
         self.__datatable.setAlternatingRowColors(True)
         self.__datatable.horizontalHeader().setObjectName("dt_hheader")
         self.__datatable.verticalHeader().setObjectName("dt_vheader")

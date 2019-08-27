@@ -57,8 +57,9 @@ class Cassandra_driver(IDatabase_driver):
         Shutdown the Cassandra connection
         '''
         # Shutdown the connection
-        if self.__cluster:
+        if self.__cluster and self.__is_connected:
             self.__cluster.shutdown()
+            self.__is_connected = False
         
     
     # overwrite super class
@@ -156,10 +157,11 @@ class Cassandra_driver(IDatabase_driver):
         column_names = []
         column_types = []
         analysis_rows = []
-        
-        # Create Cassandra cluster
         try:
-            self.active_connection()
+            # Create Cassandra cluster
+            if not self.__is_connected:
+                self.active_connection()
+                
             session = self.__cluster.connect(database_name, wait_for_all_pools=True)
             query = 'SELECT * FROM %s LIMIT 50' % table_name
             print(query)
@@ -167,6 +169,7 @@ class Cassandra_driver(IDatabase_driver):
             result = session.execute(query)
             column_names = result.column_names
             column_types = result.column_types
+            print('00000000000000000')
             
             # analysis records
             analysis_rows = []
@@ -178,8 +181,10 @@ class Cassandra_driver(IDatabase_driver):
                         analysis_row.append(temp_row[j])
                     analysis_rows.append(analysis_row)
         except Exception as e:
+            print(e)
             raise e
         
+        print('11111111111111')
         return column_names, column_types, analysis_rows
     
     
